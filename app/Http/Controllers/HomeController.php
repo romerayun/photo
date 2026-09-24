@@ -11,8 +11,9 @@ use Illuminate\View\View;
 
 class HomeController extends Controller
 {
-    public function index(Request $request, string $locale): View
+    public function index(Request $request): View
     {
+        $locale = 'ru';
         $isDemo = Setting::isDemoMode();
 
         $featuredSeries = Series::query()

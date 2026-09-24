@@ -114,7 +114,7 @@ class AdminAccessAndPublishingTest extends TestCase
         // Turn demo mode off
         Setting::set('demo_mode', '0');
 
-        $response = $this->get('/ru/portfolio');
+        $response = $this->get('/portfolio');
         $response->assertStatus(200);
         // The demo series shouldn't be listed when demo mode is disabled
         $response->assertDontSee($demoSeries->title_ru);

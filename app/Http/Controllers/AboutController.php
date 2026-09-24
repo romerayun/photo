@@ -8,8 +8,9 @@ use Illuminate\View\View;
 
 class AboutController extends Controller
 {
-    public function index(Request $request, string $locale): View
+    public function index(Request $request): View
     {
+        $locale = 'ru';
         $isDemo = Setting::isDemoMode();
 
         return view('pages.about', [

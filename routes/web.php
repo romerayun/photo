@@ -16,27 +16,27 @@ use App\Http\Controllers\RobotsController;
 use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 
-// Root redirect to default locale
-Route::get('/', function () {
-    return redirect('/ru');
-});
-
 // SEO routes
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 Route::get('/robots.txt', [RobotsController::class, 'index'])->name('robots');
 
-// Localized public routes (/ru, /en)
-Route::prefix('{locale}')
-    ->where(['locale' => 'ru|en'])
-    ->middleware('set_locale')
-    ->group(function () {
-        Route::get('/', [HomeController::class, 'index'])->name('home');
-        Route::get('/portfolio', [PortfolioController::class, 'index'])->name('portfolio.index');
-        Route::get('/series/{slug}', [PortfolioController::class, 'showSeries'])->name('series.show');
-        Route::get('/pricing', [PricingController::class, 'index'])->name('pricing.index');
-        Route::get('/about', [AboutController::class, 'index'])->name('about.index');
-        Route::get('/contacts', [ContactController::class, 'index'])->name('contacts.index');
-    });
+// Public routes (Russian only)
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/portfolio', [PortfolioController::class, 'index'])->name('portfolio.index');
+Route::get('/series/{slug}', [PortfolioController::class, 'showSeries'])->name('series.show');
+Route::get('/pricing', [PricingController::class, 'index'])->name('pricing.index');
+Route::get('/about', [AboutController::class, 'index'])->name('about.index');
+Route::get('/contacts', [ContactController::class, 'index'])->name('contacts.index');
+
+// Redirect legacy /ru and /en paths
+Route::redirect('/ru', '/', 301);
+Route::redirect('/en', '/', 301);
+Route::get('/ru/{any}', function ($any) {
+    return redirect('/' . $any, 301);
+})->where('any', '.*');
+Route::get('/en/{any}', function ($any) {
+    return redirect('/' . $any, 301);
+})->where('any', '.*');
 
 // Admin authentication
 Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('login');

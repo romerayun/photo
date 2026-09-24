@@ -10,8 +10,9 @@ use Illuminate\View\View;
 
 class PortfolioController extends Controller
 {
-    public function index(Request $request, string $locale): View
+    public function index(Request $request): View
     {
+        $locale = 'ru';
         $isDemo = Setting::isDemoMode();
         $selectedCategorySlug = $request->query('category');
 
@@ -48,8 +49,9 @@ class PortfolioController extends Controller
         ]);
     }
 
-    public function showSeries(Request $request, string $locale, string $slug): View
+    public function showSeries(Request $request, string $slug): View
     {
+        $locale = 'ru';
         $isDemo = Setting::isDemoMode();
 
         $series = Series::query()

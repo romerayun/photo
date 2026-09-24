@@ -28,22 +28,12 @@
 
         {{-- Breadcrumb --}}
         <div class="mb-8">
-            <a href="{{ route('portfolio.index', ['locale' => $locale]) }}" 
+            <a href="{{ route('portfolio.index') }}" 
                class="text-xs uppercase tracking-widest text-neutral-500 hover:text-crimson inline-flex items-center gap-1.5 transition-colors font-mono font-bold">
                 <span>&larr;</span>
                 <span>{{ __('site.back_to_portfolio') }}</span>
             </a>
         </div>
-
-        {{-- Untranslated Notice if English is missing --}}
-        @if($locale === 'en' && empty($series->title_en))
-        <div class="mb-8 p-4 bg-white border border-arch-border text-xs text-neutral-600 flex items-center justify-between font-mono">
-            <span>{{ __('site.untranslated_notice') }}</span>
-            <a href="{{ route('series.show', ['locale' => 'ru', 'slug' => $series->slug]) }}" class="text-crimson underline font-bold">
-                Читать на русском
-            </a>
-        </div>
-        @endif
 
         {{-- Series Master Header --}}
         <div class="border-b border-arch-border pb-12 mb-16">
@@ -144,14 +134,14 @@
                 </div>
 
                 <div class="flex flex-col sm:flex-row items-center gap-4 shrink-0">
-                    <a href="{{ route('contacts.index', ['locale' => $locale]) }}" 
+                    <a href="{{ route('contacts.index') }}" 
                        class="btn-crimson px-8 py-4 text-xs font-bold">
                         <span>{{ __('site.similar_cta') }}</span>
                         <span>&nearr;</span>
                     </a>
 
                     @if($nextSeries)
-                    <a href="{{ route('series.show', ['locale' => $locale, 'slug' => $nextSeries->slug]) }}" 
+                    <a href="{{ route('series.show', ['slug' => $nextSeries->slug]) }}" 
                        class="px-7 py-4 bg-white border border-arch-border text-arch-text text-xs uppercase tracking-widest font-bold hover:border-black transition-colors inline-flex items-center gap-2 font-mono">
                         <span>{{ __('site.next_series') }}</span>
                         <span>&rarr;</span>

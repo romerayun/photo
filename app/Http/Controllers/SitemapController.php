@@ -26,24 +26,22 @@ class SitemapController extends Controller
 
         $urls = [];
 
-        foreach (['ru', 'en'] as $locale) {
-            foreach ($staticPages as $routeName) {
-                $urls[] = [
-                    'loc' => route($routeName, ['locale' => $locale]),
-                    'lastmod' => now()->toDateString(),
-                    'changefreq' => 'weekly',
-                    'priority' => $routeName === 'home' ? '1.0' : '0.8',
-                ];
-            }
+        foreach ($staticPages as $routeName) {
+            $urls[] = [
+                'loc' => route($routeName),
+                'lastmod' => now()->toDateString(),
+                'changefreq' => 'weekly',
+                'priority' => $routeName === 'home' ? '1.0' : '0.8',
+            ];
+        }
 
-            foreach ($series as $s) {
-                $urls[] = [
-                    'loc' => route('series.show', ['locale' => $locale, 'slug' => $s->slug]),
-                    'lastmod' => $s->updated_at->toDateString(),
-                    'changefreq' => 'monthly',
-                    'priority' => '0.7',
-                ];
-            }
+        foreach ($series as $s) {
+            $urls[] = [
+                'loc' => route('series.show', ['slug' => $s->slug]),
+                'lastmod' => $s->updated_at->toDateString(),
+                'changefreq' => 'monthly',
+                'priority' => '0.7',
+            ];
         }
 
         $xml = view('seo.sitemap', ['urls' => $urls])->render();

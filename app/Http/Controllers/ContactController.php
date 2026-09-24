@@ -8,15 +8,16 @@ use Illuminate\View\View;
 
 class ContactController extends Controller
 {
-    public function index(Request $request, string $locale): View
+    public function index(Request $request): View
     {
+        $locale = 'ru';
         $isDemo = Setting::isDemoMode();
 
         $telegramUrl = Setting::telegramUrl();
         $telegramHandle = Setting::telegramHandle();
         $phoneLink = Setting::phoneLink();
         $phoneDisplay = Setting::phoneDisplay();
-        $city = $locale === 'en' ? Setting::get('city_en', 'Irkutsk') : Setting::get('city_ru', 'Иркутск');
+        $city = Setting::get('city_ru', 'Иркутск');
 
         return view('pages.contacts', [
             'telegramUrl' => $telegramUrl,

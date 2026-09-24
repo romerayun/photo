@@ -1,16 +1,13 @@
 <!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}" class="scroll-smooth bg-cine-black text-white antialiased">
+<html lang="ru" class="scroll-smooth bg-cine-black text-white antialiased">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>@yield('title', __('site.meta_title'))</title>
     <meta name="description" content="@yield('description', __('site.meta_description'))">
     
-    {{-- Canonical & Hreflang --}}
+    {{-- Canonical --}}
     <link rel="canonical" href="{{ url()->current() }}">
-    <link rel="alternate" hreflang="ru" href="{{ \App\Support\LocaleHelper::alternateUrl('ru') }}">
-    <link rel="alternate" hreflang="en" href="{{ \App\Support\LocaleHelper::alternateUrl('en') }}">
-    <link rel="alternate" hreflang="x-default" href="{{ \App\Support\LocaleHelper::alternateUrl('ru') }}">
 
     {{-- Open Graph --}}
     <meta property="og:site_name" content="{{ __('site.author_name') }}">

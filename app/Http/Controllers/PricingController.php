@@ -10,8 +10,9 @@ use Illuminate\View\View;
 
 class PricingController extends Controller
 {
-    public function index(Request $request, string $locale): View
+    public function index(Request $request): View
     {
+        $locale = 'ru';
         $isDemo = Setting::isDemoMode();
 
         $packages = Package::query()

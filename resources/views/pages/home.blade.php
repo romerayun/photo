@@ -62,12 +62,12 @@
 
         {{-- Bold Crimson CTA Button with Arrow (As in Reference) --}}
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a href="{{ route('contacts.index', ['locale' => $locale]) }}" 
+            <a href="{{ route('contacts.index') }}" 
                class="btn-crimson px-10 py-4 text-xs font-extrabold tracking-mega shadow-crimson-btn">
                 <span>{{ __('site.hero_cta') }}</span>
                 <span class="text-sm font-bold">&nearr;</span>
             </a>
-            <a href="{{ route('portfolio.index', ['locale' => $locale]) }}" 
+            <a href="{{ route('portfolio.index') }}" 
                class="px-8 py-4 bg-white/10 hover:bg-white/15 text-white border border-white/20 text-xs font-bold uppercase tracking-widest backdrop-blur-md transition-colors inline-flex items-center gap-2">
                 <span>{{ __('site.hero_portfolio') }}</span>
                 <span>&rarr;</span>
@@ -97,7 +97,7 @@
                     </blockquote>
                 </div>
                 <div>
-                    <a href="{{ route('about.index', ['locale' => $locale]) }}" 
+                    <a href="{{ route('about.index') }}" 
                        class="btn-crimson px-6 py-3 text-[0.7rem] font-bold">
                         <span>О подходе автора</span>
                         <span>&rarr;</span>
@@ -142,7 +142,7 @@
                 </div>
 
                 {{-- Crimson Duotone Editorial Highlight Card --}}
-                <a href="{{ route('portfolio.index', ['locale' => $locale]) }}" 
+                <a href="{{ route('portfolio.index') }}" 
                    class="block relative rounded-sm overflow-hidden group bg-crimson text-white p-8 aspect-[4/5] flex flex-col justify-between shadow-card-depth">
                     <img src="{{ asset('storage/demo/hero-secondary.jpg') }}" alt="" class="absolute inset-0 w-full h-full object-cover mix-blend-multiply opacity-70 group-hover:scale-105 transition-transform duration-700">
                     <div class="relative z-10 flex items-center justify-between text-xs font-mono font-bold uppercase">
@@ -190,7 +190,7 @@
                     Живые моменты, чистая геометрия кадра и естественный свет. Выберите подходящее направление для вашей съёмки.
                 </p>
                 <div class="pt-4">
-                    <a href="{{ route('portfolio.index', ['locale' => $locale]) }}" class="btn-crimson px-8 py-3.5 text-xs font-bold">
+                    <a href="{{ route('portfolio.index') }}" class="btn-crimson px-8 py-3.5 text-xs font-bold">
                         <span>Смотреть все серии</span>
                         <span>&nearr;</span>
                     </a>
@@ -200,7 +200,7 @@
             {{-- Right Column: Horizontal Accordion Rows with Thumbnails --}}
             <div class="lg:col-span-7 divide-y divide-white/10 border-y border-white/10">
                 @foreach($categories as $cat)
-                    <a href="{{ route('portfolio.index', ['locale' => $locale, 'category' => $cat->slug]) }}" 
+                    <a href="{{ route('portfolio.index', ['category' => $cat->slug]) }}" 
                        class="py-6 px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-6 group hover:bg-white/[0.03] transition-colors">
                         
                         <div class="space-y-1">
@@ -259,7 +259,7 @@
                     SEE THE MAGIC FOR YOURSELF
                 </h2>
             </div>
-            <a href="{{ route('portfolio.index', ['locale' => $locale]) }}" 
+            <a href="{{ route('portfolio.index') }}" 
                class="text-xs uppercase tracking-widest font-bold text-arch-text hover:text-crimson inline-flex items-center gap-2 transition-colors font-mono">
                 <span>{{ __('site.view_all_series') }}</span>
                 <span>&rarr;</span>
@@ -305,7 +305,7 @@
                                     {{ $series->localizedTitle($locale) }}
                                 </h3>
                                 <div>
-                                    <a href="{{ route('series.show', ['locale' => $locale, 'slug' => $series->slug]) }}" 
+                                    <a href="{{ route('series.show', ['slug' => $series->slug]) }}" 
                                        class="btn-crimson px-6 py-3 text-xs tracking-wider font-bold">
                                         <span>Смотреть серию</span>
                                         <span>&nearr;</span>
@@ -392,7 +392,7 @@
                         </ul>
                     </div>
 
-                    <a href="{{ route('contacts.index', ['locale' => $locale]) }}" 
+                    <a href="{{ route('contacts.index') }}" 
                        class="btn-crimson w-full py-3.5 text-xs text-center font-bold">
                         <span>{{ __('site.book_package') }}</span>
                         <span>&nearr;</span>
@@ -436,11 +436,11 @@
                     «Мне важно, чтобы во время съёмки вы чувствовали себя свободно и естественно. Без навязанных поз и шаблонов — только ваши настоящие эмоции.»
                 </blockquote>
                 <div class="pt-4 flex items-center gap-6">
-                    <a href="{{ route('contacts.index', ['locale' => $locale]) }}" class="btn-crimson px-8 py-3.5 text-xs font-bold">
+                    <a href="{{ route('contacts.index') }}" class="btn-crimson px-8 py-3.5 text-xs font-bold">
                         <span>Обсудить съёмку</span>
                         <span>&nearr;</span>
                     </a>
-                    <a href="{{ route('about.index', ['locale' => $locale]) }}" class="text-xs font-mono uppercase tracking-widest font-bold text-arch-text hover:text-crimson transition-colors">
+                    <a href="{{ route('about.index') }}" class="text-xs font-mono uppercase tracking-widest font-bold text-arch-text hover:text-crimson transition-colors">
                         Подробнее о фотографе &rarr;
                     </a>
                 </div>

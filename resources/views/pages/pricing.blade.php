@@ -118,7 +118,7 @@
 
                     {{-- CTA --}}
                     <div class="pt-6">
-                        <a href="{{ route('contacts.index', ['locale' => $locale]) }}" 
+                        <a href="{{ route('contacts.index') }}" 
                            class="btn-crimson w-full py-4 text-xs font-bold">
                             <span>{{ __('site.book_package') }}</span>
                             <span>&nearr;</span>
@@ -166,7 +166,7 @@
                         Если у вас есть вопросы по подготовке, локациям или таймингу — напишите мне напрямую в Telegram.
                     </p>
                     <div>
-                        <a href="{{ route('contacts.index', ['locale' => $locale]) }}" 
+                        <a href="{{ route('contacts.index') }}" 
                            class="btn-crimson px-7 py-3 text-xs font-bold">
                             <span>Задать вопрос</span>
                             <span>&nearr;</span>

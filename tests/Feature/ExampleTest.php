@@ -2,16 +2,18 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
-    /**
-     * Test root redirection.
-     */
-    public function test_root_redirects_to_localized_home(): void
+    use RefreshDatabase;
+
+    public function test_the_application_returns_a_successful_response(): void
     {
+        $this->seed();
         $response = $this->get('/');
-        $response->assertRedirect('/ru');
+
+        $response->assertStatus(200);
     }
 }

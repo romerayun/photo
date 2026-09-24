@@ -18,11 +18,8 @@
         </div>
 
         <div class="flex items-center gap-3">
-            <a href="{{ route('series.show', ['locale' => 'ru', 'slug' => $series->slug]) }}" target="_blank" class="px-3 py-1.5 border border-gray-300 text-xs uppercase tracking-wider text-gray-700 hover:border-gray-900 rounded">
-                Смотреть RU &rarr;
-            </a>
-            <a href="{{ route('series.show', ['locale' => 'en', 'slug' => $series->slug]) }}" target="_blank" class="px-3 py-1.5 border border-gray-300 text-xs uppercase tracking-wider text-gray-700 hover:border-gray-900 rounded">
-                Смотреть EN &rarr;
+            <a href="{{ route('series.show', ['slug' => $series->slug]) }}" target="_blank" class="px-3 py-1.5 border border-gray-300 text-xs uppercase tracking-wider text-gray-700 hover:border-gray-900 rounded">
+                Смотреть на сайте &rarr;
             </a>
             <a href="{{ route('admin.series.index') }}" class="px-3 py-1.5 text-xs uppercase tracking-wider text-gray-500 hover:text-gray-900">
                 К списку

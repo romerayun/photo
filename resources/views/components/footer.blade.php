@@ -14,7 +14,7 @@
                     <span class="text-neutral-400">Напишите мне сегодня.</span>
                 </h2>
                 <div class="pt-2">
-                    <a href="{{ route('contacts.index', ['locale' => app()->getLocale()]) }}" 
+                    <a href="{{ route('contacts.index') }}" 
                        class="btn-crimson px-8 py-4 text-xs font-bold">
                         <span>{{ __('site.hero_cta') }}</span>
                         <span>&nearr;</span>
@@ -59,11 +59,11 @@
                     Навигация
                 </span>
                 <ul class="space-y-2 uppercase tracking-wider font-bold">
-                    <li><a href="{{ route('home', ['locale' => app()->getLocale()]) }}" class="text-neutral-400 hover:text-white transition-colors">{{ __('site.nav_home') }}</a></li>
-                    <li><a href="{{ route('portfolio.index', ['locale' => app()->getLocale()]) }}" class="text-neutral-400 hover:text-white transition-colors">{{ __('site.nav_portfolio') }}</a></li>
-                    <li><a href="{{ route('pricing.index', ['locale' => app()->getLocale()]) }}" class="text-neutral-400 hover:text-white transition-colors">{{ __('site.nav_pricing') }}</a></li>
-                    <li><a href="{{ route('about.index', ['locale' => app()->getLocale()]) }}" class="text-neutral-400 hover:text-white transition-colors">{{ __('site.nav_about') }}</a></li>
-                    <li><a href="{{ route('contacts.index', ['locale' => app()->getLocale()]) }}" class="text-neutral-400 hover:text-white transition-colors">{{ __('site.nav_contacts') }}</a></li>
+                    <li><a href="{{ route('home') }}" class="text-neutral-400 hover:text-white transition-colors">{{ __('site.nav_home') }}</a></li>
+                    <li><a href="{{ route('portfolio.index') }}" class="text-neutral-400 hover:text-white transition-colors">{{ __('site.nav_portfolio') }}</a></li>
+                    <li><a href="{{ route('pricing.index') }}" class="text-neutral-400 hover:text-white transition-colors">{{ __('site.nav_pricing') }}</a></li>
+                    <li><a href="{{ route('about.index') }}" class="text-neutral-400 hover:text-white transition-colors">{{ __('site.nav_about') }}</a></li>
+                    <li><a href="{{ route('contacts.index') }}" class="text-neutral-400 hover:text-white transition-colors">{{ __('site.nav_contacts') }}</a></li>
                 </ul>
             </div>
 

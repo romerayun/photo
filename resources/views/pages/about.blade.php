@@ -57,12 +57,12 @@
 
                 {{-- Action links --}}
                 <div class="pt-6 border-t border-arch-border flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-                    <a href="{{ route('contacts.index', ['locale' => $locale]) }}" 
+                    <a href="{{ route('contacts.index') }}" 
                        class="btn-crimson px-8 py-4 text-xs font-bold">
                         <span>{{ __('site.about_cta') }}</span>
                         <span>&nearr;</span>
                     </a>
-                    <a href="{{ route('portfolio.index', ['locale' => $locale]) }}" 
+                    <a href="{{ route('portfolio.index') }}" 
                        class="px-7 py-4 bg-white border border-arch-border text-arch-text text-xs uppercase tracking-widest font-bold hover:border-black transition-colors font-mono">
                         {{ __('site.hero_portfolio') }} &rarr;
                     </a>

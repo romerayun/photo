@@ -19,43 +19,33 @@ class LocalizationAndPublicRoutesTest extends TestCase
         $this->seed();
     }
 
-    public function test_root_redirects_to_russian_locale(): void
+    public function test_root_renders_russian_home_page(): void
     {
         $response = $this->get('/');
-        $response->assertRedirect('/ru');
-    }
-
-    public function test_russian_home_page_renders_with_editorial_elements(): void
-    {
-        $response = $this->get('/ru');
         $response->assertStatus(200);
         $response->assertSee('Роман Юн');
         $response->assertSee('Фотограф в Иркутске');
-        $response->assertSee('Ваши истории. Мой взгляд.');
         $response->assertSee('Обсудить съёмку');
         $response->assertSee('Смотреть работы');
     }
 
-    public function test_english_home_page_renders_with_natural_english(): void
+    public function test_legacy_localized_urls_redirect_to_clean_routes(): void
     {
-        $response = $this->get('/en');
-        $response->assertStatus(200);
-        $response->assertSee('Roman Yun');
-        $response->assertSee('Photographer in Irkutsk');
-        $response->assertSee('Your stories. My perspective.');
-        $response->assertSee('Book a Session');
-        $response->assertSee('View Work');
+        $this->get('/ru')->assertRedirect('/');
+        $this->get('/en')->assertRedirect('/');
+        $this->get('/ru/portfolio')->assertRedirect('/portfolio');
+        $this->get('/en/pricing')->assertRedirect('/pricing');
     }
 
     public function test_portfolio_page_with_category_filtering(): void
     {
-        $response = $this->get('/ru/portfolio');
+        $response = $this->get('/portfolio');
         $response->assertStatus(200);
         $response->assertSee('Портфолио и серии');
         $response->assertSee('Все направления');
 
         // Filter by portraits
-        $responsePortraits = $this->get('/ru/portfolio?category=portraits');
+        $responsePortraits = $this->get('/portfolio?category=portraits');
         $responsePortraits->assertStatus(200);
         $responsePortraits->assertSee('Северный свет');
     }
@@ -65,7 +55,7 @@ class LocalizationAndPublicRoutesTest extends TestCase
         $series = Series::where('slug', 'northern-light-portraits')->first();
         $this->assertNotNull($series);
 
-        $response = $this->get('/ru/series/' . $series->slug);
+        $response = $this->get('/series/' . $series->slug);
         $response->assertStatus(200);
         $response->assertSee('Северный свет');
         $response->assertSee('Иркутск, исторический центр');
@@ -74,29 +64,21 @@ class LocalizationAndPublicRoutesTest extends TestCase
 
     public function test_pricing_page_shows_packages_without_invented_prices(): void
     {
-        $response = $this->get('/ru/pricing');
+        $response = $this->get('/pricing');
         $response->assertStatus(200);
         $response->assertSee('Короткая съёмка');
         $response->assertSee('Индивидуальная история');
         $response->assertSee('Событие / проект');
         $response->assertSee('Стоимость уточняется');
-
-        // English pricing keeps RUB
-        $package = Package::first();
-        $package->update(['price' => 15000]);
-
-        $responseEn = $this->get('/en/pricing');
-        $responseEn->assertStatus(200);
-        $responseEn->assertSee('15,000 RUB');
     }
 
     public function test_about_and_contacts_pages_render_cleanly(): void
     {
-        $responseAbout = $this->get('/ru/about');
+        $responseAbout = $this->get('/about');
         $responseAbout->assertStatus(200);
         $responseAbout->assertSee('Роман Юн');
 
-        $responseContacts = $this->get('/ru/contacts');
+        $responseContacts = $this->get('/contacts');
         $responseContacts->assertStatus(200);
         $responseContacts->assertSee('Связаться и обсудить съёмку');
     }
@@ -106,10 +88,10 @@ class LocalizationAndPublicRoutesTest extends TestCase
         $responseSitemap = $this->get('/sitemap.xml');
         $responseSitemap->assertStatus(200);
         $responseSitemap->assertHeader('Content-Type', 'application/xml');
+        $responseSitemap->assertDontSee('/en');
 
         $responseRobots = $this->get('/robots.txt');
         $responseRobots->assertStatus(200);
-        // In demo mode robots disallows crawling
         $responseRobots->assertSee('Disallow: /');
     }
 }

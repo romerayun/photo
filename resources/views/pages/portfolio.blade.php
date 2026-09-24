@@ -19,13 +19,13 @@
 
         {{-- Category Filters --}}
         <nav class="flex flex-wrap items-center gap-2 pb-6 mb-12 border-b border-arch-border font-mono text-xs uppercase" aria-label="Category Filters">
-            <a href="{{ route('portfolio.index', ['locale' => $locale]) }}" 
+            <a href="{{ route('portfolio.index') }}" 
                class="px-5 py-2.5 transition-colors font-bold {{ empty($selectedCategorySlug) ? 'bg-crimson text-white shadow-crimson-btn' : 'bg-white text-arch-text border border-arch-border hover:border-black' }}">
                 {{ __('site.all_categories') }}
             </a>
 
             @foreach($categories as $category)
-                <a href="{{ route('portfolio.index', ['locale' => $locale, 'category' => $category->slug]) }}" 
+                <a href="{{ route('portfolio.index', ['category' => $category->slug]) }}" 
                    class="px-5 py-2.5 transition-colors font-bold {{ $selectedCategorySlug === $category->slug ? 'bg-crimson text-white shadow-crimson-btn' : 'bg-white text-arch-text border border-arch-border hover:border-black' }}">
                     {{ $category->localizedName($locale) }}
                     <span class="ml-1 opacity-70">({{ $category->series_count }})</span>
@@ -38,7 +38,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                 @foreach($seriesList as $index => $series)
                     <article class="bg-white border border-arch-border shadow-card-depth overflow-hidden group">
-                        <a href="{{ route('series.show', ['locale' => $locale, 'slug' => $series->slug]) }}" class="block">
+                        <a href="{{ route('series.show', ['slug' => $series->slug]) }}" class="block">
                             
                             <div class="overflow-hidden aspect-[16/10] relative bg-neutral-900">
                                 <img src="{{ $series->cover_url }}" 
@@ -90,7 +90,7 @@
                     {{ __('site.empty_category') }}
                 </span>
                 <div class="pt-2">
-                    <a href="{{ route('portfolio.index', ['locale' => $locale]) }}" 
+                    <a href="{{ route('portfolio.index') }}" 
                        class="btn-crimson px-6 py-3 text-xs font-bold">
                         {{ __('site.all_categories') }}
                     </a>

@@ -62,7 +62,7 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 text-right text-xs space-x-3">
-                            <a href="{{ route('series.show', ['locale' => 'ru', 'slug' => $s->slug]) }}" target="_blank" class="text-gray-500 hover:text-gray-900">Просмотр</a>
+                            <a href="{{ route('series.show', ['slug' => $s->slug]) }}" target="_blank" class="text-gray-500 hover:text-gray-900">Просмотр</a>
                             <a href="{{ route('admin.series.edit', $s) }}" class="text-terracotta hover:underline font-semibold">Редактировать</a>
                             <form method="POST" action="{{ route('admin.series.destroy', $s) }}" class="inline-block" onsubmit="return confirm('Удалить серию? Все загруженные фотографии также будут удалены.');">
                                 @csrf
