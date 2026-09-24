@@ -10,7 +10,7 @@
         {{-- Header --}}
         <div class="mb-14 text-center md:text-left">
             <span class="text-xs uppercase tracking-widest text-crimson font-mono font-bold block mb-2">
-                06 / CONTACTS
+                06 / КОНТАКТЫ
             </span>
             <h1 class="text-4xl sm:text-6xl font-extrabold uppercase tracking-tightest font-display text-arch-text mb-4">
                 {{ __('site.contacts_title') }}
@@ -87,7 +87,7 @@
                     </p>
                 </div>
                 <div class="text-xs font-mono text-crimson uppercase tracking-widest px-4 py-2 border border-crimson/30 shrink-0 font-bold">
-                    IRKUTSK &bull; TIMEZONE UTC+8
+                    ИРКУТСК &bull; ЧАСОВОЙ ПОЯС МСК+5 (UTC+8)
                 </div>
             </div>
 

@@ -13,7 +13,7 @@
                         {{ __('site.author_name') }}
                     </span>
                     <span class="text-[0.62rem] uppercase tracking-widest text-neutral-400 font-mono">
-                        {{ __('site.location') }} &bull; PORTFOLIO
+                        {{ __('site.location') }} &bull; ФОТОГРАФ
                     </span>
                 </div>
             </a>

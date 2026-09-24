@@ -45,22 +45,6 @@
 </head>
 <body class="bg-cine-black text-white font-sans antialiased selection:bg-crimson selection:text-white flex flex-col min-h-screen relative overflow-x-hidden">
 
-    {{-- Demo Mode Notification Banner --}}
-    @if(\App\Models\Setting::isDemoMode())
-    <aside class="w-full bg-cine-surface border-b border-cine-border py-2 px-4 text-xs text-cine-muted z-50">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
-            <div class="flex items-center gap-2.5">
-                <span class="inline-block w-2 h-2 rounded-full bg-crimson shadow-crimson-glow animate-pulse" aria-hidden="true"></span>
-                <span class="font-bold text-white tracking-wide uppercase text-[0.68rem]">{{ __('site.demo_badge') }}:</span>
-                <span class="text-neutral-400 text-xs">{{ __('site.demo_banner_text') }}</span>
-            </div>
-            <a href="{{ route('admin.login') }}" class="text-crimson hover:text-white text-xs font-bold transition-colors shrink-0 underline underline-offset-4">
-                Панель управления &rarr;
-            </a>
-        </div>
-    </aside>
-    @endif
-
     {{-- Avant-Garde Header --}}
     @include('components.navbar')
 

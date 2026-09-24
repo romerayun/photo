@@ -21,25 +21,14 @@
         <div class="absolute inset-0 bg-radial from-transparent via-cine-black/50 to-cine-black"></div>
     </div>
 
-    {{-- Floating Author Tag (Top Left as in Reference) --}}
-    <div class="absolute top-8 left-6 sm:left-12 z-20 hidden sm:flex items-center gap-3 bg-cine-surface/80 backdrop-blur-md p-2.5 pr-4 border border-white/10 rounded-sm shadow-xl">
-        <div class="w-10 h-10 overflow-hidden bg-neutral-800 rounded-sm relative border border-white/20">
-            <img src="{{ asset('storage/demo/portrait-2.jpg') }}" alt="Roman Yun" class="w-full h-full object-cover">
-        </div>
-        <div class="text-left font-mono">
-            <span class="text-xs font-bold text-white uppercase block leading-none tracking-wider">Роман Юн</span>
-            <span class="text-[0.62rem] text-crimson uppercase tracking-widest font-semibold">Иркутск &bull; Автор</span>
-        </div>
-    </div>
-
     {{-- Camera Auto-Focus Frame (Center Visual Anchor from Reference) --}}
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-44 z-10 pointer-events-none">
         <div class="camera-focus-bracket w-36 h-36 sm:w-44 sm:h-44 rounded-sm">
             <span class="absolute -top-3 left-0 bg-crimson text-white font-mono text-[0.6rem] px-1 font-bold uppercase tracking-widest">
-                AF-C 50MM
+                ФОКУС 50MM
             </span>
             <span class="absolute -bottom-3 right-0 bg-white/20 backdrop-blur-sm text-white font-mono text-[0.6rem] px-1 uppercase tracking-widest">
-                RAW &bull; 1/250s
+                RAW &bull; 1/250с
             </span>
         </div>
     </div>
@@ -49,7 +38,7 @@
         
         <div class="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md border border-white/15 mb-6 text-[0.68rem] uppercase font-mono tracking-widest text-neutral-300">
             <span class="w-2 h-2 rounded-full bg-crimson shadow-crimson-glow"></span>
-            <span>PORTFOLIO &bull; IRKUTSK 2026</span>
+            <span>ПОРТФОЛИО &bull; ИРКУТСК 2026</span>
         </div>
 
         <h1 class="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold uppercase tracking-tight text-white font-display leading-[0.95] mb-6">
@@ -90,7 +79,7 @@
             <div class="lg:col-span-4 p-8 sm:p-12 flex flex-col justify-between space-y-8">
                 <div>
                     <span class="text-[0.68rem] uppercase tracking-widest text-neutral-400 font-mono font-bold block mb-4">
-                        01 / YEARBOOK 2026
+                        01 / СЕЗОН 2026
                     </span>
                     <blockquote class="text-xl sm:text-2xl font-bold uppercase tracking-tight text-arch-text leading-snug">
                         «Каждый кадр — это пойманный свет, честные эмоции и внимание к индивидуальности человека.»
@@ -109,7 +98,7 @@
             <div class="lg:col-span-4 p-8 sm:p-12 flex flex-col justify-between space-y-6">
                 <div class="flex items-center justify-between font-mono text-xs text-neutral-400">
                     <span class="text-3xl font-extrabold text-arch-text font-display">05</span>
-                    <span class="uppercase tracking-widest">DIRECTIONS</span>
+                    <span class="uppercase tracking-widest">НАПРАВЛЕНИЙ</span>
                 </div>
 
                 {{-- Folder Tab Styled Card --}}
@@ -117,7 +106,7 @@
                     <div class="aspect-[4/5] overflow-hidden bg-neutral-100 mb-3 relative">
                         <img src="{{ asset('storage/demo/portrait-3.jpg') }}" alt="" class="w-full h-full object-cover filter grayscale contrast-110 group-hover:scale-105 transition-transform duration-700">
                         <div class="absolute top-2 left-2 bg-black text-white text-[0.6rem] font-mono uppercase px-2 py-0.5">
-                            PORTRAIT
+                            ПОРТРЕТ
                         </div>
                     </div>
                     <p class="text-xs text-neutral-600 font-mono leading-relaxed">
@@ -126,7 +115,7 @@
                 </div>
 
                 <div class="text-[0.68rem] font-mono text-neutral-400 uppercase tracking-widest">
-                    IRKUTSK &bull; EDITORIAL ARCHIVE
+                    ИРКУТСК &bull; АРХИВ СЪЁМОК
                 </div>
             </div>
 
@@ -134,10 +123,10 @@
             <div class="lg:col-span-4 p-8 sm:p-12 flex flex-col justify-between space-y-6">
                 <div>
                     <span class="text-[0.68rem] uppercase tracking-widest text-crimson font-mono font-bold block mb-2">
-                        02 / CONCEPT
+                        02 / КОНЦЕПЦИЯ
                     </span>
                     <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight uppercase font-display text-arch-text">
-                        CAPTURING LIFE BEYOND THE FRAME
+                        ЖИЗНЬ ЗА ПРЕДЕЛАМИ КАДРА
                     </h2>
                 </div>
 
@@ -146,7 +135,7 @@
                    class="block relative rounded-sm overflow-hidden group bg-crimson text-white p-8 aspect-[4/5] flex flex-col justify-between shadow-card-depth">
                     <img src="{{ asset('storage/demo/hero-secondary.jpg') }}" alt="" class="absolute inset-0 w-full h-full object-cover mix-blend-multiply opacity-70 group-hover:scale-105 transition-transform duration-700">
                     <div class="relative z-10 flex items-center justify-between text-xs font-mono font-bold uppercase">
-                        <span>PORTFOLIO</span>
+                        <span>ПОРТФОЛИО</span>
                         <span class="w-8 h-8 rounded-full border border-white/40 flex items-center justify-center group-hover:bg-white group-hover:text-crimson transition-colors">
                             &nearr;
                         </span>
@@ -160,7 +149,7 @@
                 </a>
 
                 <div class="text-[0.68rem] font-mono text-neutral-400 uppercase tracking-widest">
-                    BAIKAL REGION &bull; AVAILABLE 2026
+                    БАЙКАЛ И ОБЛАСТЬ &bull; СЕЗОН 2026
                 </div>
             </div>
 
@@ -184,7 +173,7 @@
                     <span>{{ __('site.directions_title') }}</span>
                 </div>
                 <h2 class="text-4xl sm:text-6xl font-extrabold uppercase tracking-tight text-white font-display leading-[0.95]">
-                    WHAT I CAN OFFER
+                    НАПРАВЛЕНИЯ СЪЁМОК
                 </h2>
                 <p class="text-sm text-neutral-400 font-light max-w-md leading-relaxed font-mono">
                     Живые моменты, чистая геометрия кадра и естественный свет. Выберите подходящее направление для вашей съёмки.
@@ -205,7 +194,7 @@
                         
                         <div class="space-y-1">
                             <div class="text-xs font-mono text-crimson font-bold">
-                                0{{ $loop->iteration }} &bull; DIRECTION
+                                0{{ $loop->iteration }} &bull; НАПРАВЛЕНИЕ
                             </div>
                             <h3 class="text-2xl font-bold uppercase tracking-tight text-white group-hover:text-crimson font-display transition-colors">
                                 {{ $cat->localizedName($locale) }}
@@ -244,19 +233,18 @@
 </section>
 
 {{-- ========================================================
-     4. PANORAMIC STORIES: "SEE THE MAGIC FOR YOURSELF"
+     4. PANORAMIC STORIES: FULL WIDTH ARCHIVE
      ======================================================== --}}
 <section class="bg-arch-bg text-arch-text py-24 border-b border-arch-border">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {{-- Section Header --}}
-        <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+    {{-- Section Header --}}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
                 <span class="text-xs uppercase tracking-widest text-crimson font-mono font-bold block mb-2">
-                    03 / CURATED ARCHIVE
+                    03 / ИЗБРАННЫЕ СЕРИИ
                 </span>
                 <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight uppercase font-display text-arch-text">
-                    SEE THE MAGIC FOR YOURSELF
+                    МАГИЯ В КАДРЕ
                 </h2>
             </div>
             <a href="{{ route('portfolio.index') }}" 
@@ -265,66 +253,63 @@
                 <span>&rarr;</span>
             </a>
         </div>
+    </div>
 
-        {{-- Panoramic Series Cards with Inset Overlapping Photo (Exact match to reference) --}}
-        <div class="space-y-16">
-            @foreach($featuredSeries as $index => $series)
-                <div class="bg-white border border-arch-border shadow-card-depth overflow-hidden group">
-                    <div class="relative aspect-[16/9] sm:aspect-[21/9] overflow-hidden bg-neutral-900">
-                        
-                        {{-- Panoramic Background Image --}}
-                        <img src="{{ $series->cover_url }}" 
-                             alt="{{ $series->localizedTitle($locale) }}" 
-                             loading="lazy"
-                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out opacity-85">
-                        
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+    {{-- Panoramic Full-Width Series Blocks --}}
+    <div class="w-full space-y-12">
+        @foreach($featuredSeries as $index => $series)
+            <div class="w-full relative overflow-hidden group bg-neutral-950 border-y border-arch-border aspect-[16/10] sm:aspect-[21/9] lg:aspect-[24/9] min-h-[460px]">
+                
+                {{-- Panoramic Background Image --}}
+                <img src="{{ $series->cover_url }}" 
+                     alt="{{ $series->localizedTitle($locale) }}" 
+                     loading="lazy"
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out opacity-85">
+                
+                <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
 
-                        {{-- Floating Inset Inverted Secondary Card (Signature from reference!) --}}
-                        <div class="absolute bottom-6 left-6 sm:bottom-8 sm:left-8 z-20 flex flex-col sm:flex-row sm:items-end gap-6">
-                            
-                            {{-- Mini Inset Thumbnail --}}
-                            @php
-                                $secondPhoto = $series->photos->skip(1)->first();
-                            @endphp
-                            @if($secondPhoto)
-                            <div class="w-32 h-44 sm:w-40 sm:h-52 bg-black border-2 border-white shadow-2xl overflow-hidden hidden sm:block relative">
-                                <img src="{{ $secondPhoto->url }}" alt="" class="w-full h-full object-cover">
-                                <span class="absolute top-2 left-2 bg-crimson text-white font-mono text-[0.55rem] px-1 font-bold">
-                                    INSET 0{{ $index + 1 }}
-                                </span>
-                            </div>
-                            @endif
-
-                            {{-- Title and Red Action Button --}}
-                            <div class="space-y-3 text-white text-left">
-                                <span class="text-xs font-mono uppercase tracking-widest text-crimson font-bold bg-black/60 px-2 py-0.5">
-                                    {{ $series->category ? $series->category->localizedName($locale) : 'SERIES' }} &bull; {{ $series->localizedLocation($locale) }}
-                                </span>
-                                <h3 class="text-2xl sm:text-4xl font-extrabold uppercase tracking-tight font-display drop-shadow-md">
-                                    {{ $series->localizedTitle($locale) }}
-                                </h3>
-                                <div>
-                                    <a href="{{ route('series.show', ['slug' => $series->slug]) }}" 
-                                       class="btn-crimson px-6 py-3 text-xs tracking-wider font-bold">
-                                        <span>Смотреть серию</span>
-                                        <span>&nearr;</span>
-                                    </a>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        {{-- Top Right Badge --}}
-                        <div class="absolute top-6 right-6 font-mono text-xs text-white bg-black/70 backdrop-blur-sm px-3 py-1 uppercase tracking-widest border border-white/20">
-                            {{ $series->photos->count() }} КАДРОВ
-                        </div>
-
+                {{-- Floating Content (Clean, without author mentions) --}}
+                <div class="absolute bottom-6 left-6 sm:bottom-10 sm:left-12 lg:left-20 z-20 flex flex-col sm:flex-row sm:items-end gap-6 sm:gap-8 max-w-5xl">
+                    
+                    {{-- Mini Inset Thumbnail (2nd photo of the series) --}}
+                    @php
+                        $secondPhoto = $series->photos->skip(1)->first();
+                    @endphp
+                    @if($secondPhoto)
+                    <div class="w-32 h-44 sm:w-40 sm:h-52 bg-black border-2 border-white shadow-2xl overflow-hidden hidden sm:block relative shrink-0">
+                        <img src="{{ $secondPhoto->url }}" alt="" class="w-full h-full object-cover">
+                        <span class="absolute top-2 left-2 bg-crimson text-white font-mono text-[0.55rem] px-1 font-bold">
+                            0{{ $index + 1 }}
+                        </span>
                     </div>
-                </div>
-            @endforeach
-        </div>
+                    @endif
 
+                    {{-- Title and Red Action Button --}}
+                    <div class="space-y-3 text-white text-left">
+                        <span class="text-xs font-mono uppercase tracking-widest text-crimson font-bold bg-black/70 px-2.5 py-1">
+                            {{ $series->category ? $series->category->localizedName($locale) : 'СЕРИЯ' }} &bull; {{ $series->localizedLocation($locale) }}
+                        </span>
+                        <h3 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold uppercase tracking-tight font-display drop-shadow-md">
+                            {{ $series->localizedTitle($locale) }}
+                        </h3>
+                        <div>
+                            <a href="{{ route('series.show', ['slug' => $series->slug]) }}" 
+                               class="btn-crimson px-7 py-3.5 text-xs tracking-wider font-bold">
+                                <span>Смотреть серию</span>
+                                <span>&nearr;</span>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+
+                {{-- Top Right Badge --}}
+                <div class="absolute top-6 right-6 sm:right-12 lg:right-20 font-mono text-xs text-white bg-black/70 backdrop-blur-sm px-4 py-1.5 uppercase tracking-widest border border-white/20">
+                    {{ $series->photos->count() }} КАДРОВ
+                </div>
+
+            </div>
+        @endforeach
     </div>
 </section>
 
@@ -336,27 +321,22 @@
         
         <div class="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-arch-border border-y border-arch-border">
             
-            {{-- Column 1: Intro & Portrait Tag --}}
+            {{-- Column 1: Intro --}}
             <div class="lg:col-span-4 p-8 sm:p-12 flex flex-col justify-between space-y-8">
                 <div>
                     <span class="text-[0.68rem] uppercase tracking-widest text-crimson font-mono font-bold block mb-3">
-                        04 / PRICING & PACKAGES
+                        04 / СТОИМОСТЬ И ПАКЕТЫ
                     </span>
                     <h2 class="text-3xl sm:text-5xl font-extrabold uppercase tracking-tight font-display text-arch-text mb-4">
-                        CHOOSE YOUR STORY
+                        ВЫБЕРИТЕ СВОЙ ФОРМАТ
                     </h2>
                     <p class="text-xs text-neutral-600 font-mono leading-relaxed">
                         Прозрачные форматы сотрудничества. Каждый пакет адаптируется под ваши задачи в Иркутске и окрестностях.
                     </p>
                 </div>
 
-                {{-- Author Mini Profile Tag --}}
-                <div class="bg-white p-4 border border-arch-border flex items-center gap-3">
-                    <img src="{{ asset('storage/demo/portrait-2.jpg') }}" alt="" class="w-10 h-10 object-cover rounded-sm">
-                    <div class="text-xs font-mono">
-                        <span class="font-bold text-arch-text block">Роман Юн</span>
-                        <span class="text-neutral-500 text-[0.65rem]">Консультация и бронь</span>
-                    </div>
+                <div class="text-[0.68rem] font-mono text-neutral-400 uppercase tracking-widest">
+                    ИРКУТСК &bull; СЕЗОН 2026
                 </div>
             </div>
 
@@ -367,7 +347,7 @@
                         {{-- Dark Header Card --}}
                         <div class="bg-neutral-950 text-white p-6 rounded-sm mb-6 relative overflow-hidden">
                             <span class="text-[0.65rem] font-mono text-crimson uppercase tracking-widest font-bold block mb-1">
-                                PACKAGE 0{{ $loop->iteration }}
+                                ПАКЕТ 0{{ $loop->iteration }}
                             </span>
                             <h3 class="text-2xl font-bold uppercase font-display mb-2">
                                 {{ $pkg->localizedTitle($locale) }}
@@ -417,7 +397,7 @@
             <div class="lg:col-span-4">
                 <div class="relative bg-crimson p-4 pb-12 shadow-card-depth">
                     <div class="aspect-[3/4] overflow-hidden bg-neutral-900">
-                        <img src="{{ asset('storage/demo/portrait-2.jpg') }}" alt="Roman Yun" class="w-full h-full object-cover filter contrast-110">
+                        <img src="{{ asset('storage/demo/portrait-2.jpg') }}" alt="Роман Юн" class="w-full h-full object-cover filter contrast-110">
                     </div>
                     <div class="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white font-mono text-xs uppercase font-bold">
                         <span>Роман Юн</span>
@@ -429,7 +409,7 @@
             {{-- Right: Massive Editorial Quote Statement --}}
             <div class="lg:col-span-8 space-y-6 lg:pl-6">
                 <span class="text-xs uppercase tracking-widest text-crimson font-mono font-bold block">
-                    05 / PHILOSOPHY
+                    05 / ФИЛОСОФИЯ
                 </span>
                 <span class="text-6xl text-crimson font-serif font-black block leading-none select-none">“</span>
                 <blockquote class="text-2xl sm:text-3xl lg:text-4xl font-extrabold uppercase tracking-tight text-arch-text font-display leading-snug -mt-8">

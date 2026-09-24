@@ -10,7 +10,7 @@
         {{-- Header --}}
         <div class="max-w-3xl mb-12">
             <span class="text-xs uppercase tracking-widest text-crimson font-mono font-bold block mb-2">
-                PORTFOLIO &bull; ARCHIVE
+                ПОРТФОЛИО &bull; АРХИВ
             </span>
             <h1 class="text-4xl sm:text-6xl font-extrabold uppercase tracking-tightest font-display text-arch-text mb-4">
                 {{ __('site.portfolio_subtitle') }}
@@ -47,12 +47,12 @@
                                      class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105">
                                 
                                 <div class="absolute top-4 left-4 bg-black/80 text-white text-[0.68rem] uppercase tracking-wider font-mono font-bold px-3 py-1">
-                                    {{ sprintf('%02d', $index + 1) }} &bull; {{ $series->category ? $series->category->localizedName($locale) : 'SERIES' }}
+                                    {{ sprintf('%02d', $index + 1) }} &bull; {{ $series->category ? $series->category->localizedName($locale) : 'СЕРИЯ' }}
                                 </div>
 
                                 @if($series->is_demo)
                                 <div class="absolute top-4 right-4 bg-crimson text-white text-[0.62rem] uppercase tracking-widest px-2.5 py-0.5 font-bold">
-                                    DEMO
+                                    ДЕМО
                                 </div>
                                 @endif
                             </div>

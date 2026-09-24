@@ -7,7 +7,7 @@
             {{-- Big Headline --}}
             <div class="md:col-span-6 space-y-4">
                 <span class="text-[0.68rem] uppercase tracking-widest text-crimson font-mono font-bold block">
-                    {{ __('site.location') }} &bull; INITIATE THE PROJECT
+                    {{ __('site.location') }} &bull; НАЧАТЬ ПРОЕКТ
                 </span>
                 <h2 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white font-display uppercase leading-tight">
                     Готовы начать?<br>
@@ -69,22 +69,13 @@
 
         </div>
 
-        {{-- Huge Edge-to-Edge Typography Signature (as in reference image!) --}}
-        <div class="pt-12 pb-8 overflow-hidden select-none">
-            <span class="font-display font-extrabold uppercase text-[14vw] leading-none text-white tracking-tightest block opacity-95">
-                ROMAN YUN
-            </span>
-        </div>
-
-        {{-- Bottom Copyright and Admin Access --}}
-        <div class="pt-6 border-t border-cine-border flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-500 gap-4 font-mono">
+        {{-- Bottom Copyright and Sitemap --}}
+        <div class="pt-8 mt-12 border-t border-cine-border flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-500 gap-4 font-mono">
             <div>
                 &copy; {{ date('Y') }} {{ __('site.author_name') }}. {{ __('site.copyright') }}
             </div>
-            <div class="flex items-center space-x-6">
-                <a href="{{ route('sitemap') }}" class="hover:text-white transition-colors">Sitemap</a>
-                <span>&bull;</span>
-                <a href="{{ route('admin.login') }}" class="hover:text-crimson transition-colors">Вход для автора &rarr;</a>
+            <div>
+                <a href="{{ route('sitemap') }}" class="hover:text-white transition-colors">Карта сайта</a>
             </div>
         </div>
 

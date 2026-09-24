@@ -23,7 +23,7 @@
                     
                     <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white font-mono text-xs uppercase font-bold">
                         <span>{{ __('site.author_name') }}</span>
-                        <span>{{ __('site.location') }} &bull; SIBERIA</span>
+                        <span>{{ __('site.location') }} &bull; СИБИРЬ</span>
                     </div>
                 </div>
             </div>
@@ -33,7 +33,7 @@
                 
                 <div>
                     <span class="text-xs uppercase tracking-widest text-crimson font-mono font-bold block mb-2">
-                        01 / ABOUT AUTHOR
+                        01 / О ФОТОГРАФЕ
                     </span>
                     <h1 class="text-4xl sm:text-6xl font-extrabold uppercase tracking-tightest font-display text-arch-text mb-3">
                         {{ __('site.about_title') }}

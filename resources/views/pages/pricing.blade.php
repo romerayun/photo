@@ -10,7 +10,7 @@
         {{-- Header --}}
         <div class="max-w-3xl mb-14">
             <span class="text-xs uppercase tracking-widest text-crimson font-mono font-bold block mb-2">
-                04 / PRICING & PACKAGES
+                04 / СТОИМОСТЬ И ПАКЕТЫ
             </span>
             <h1 class="text-4xl sm:text-6xl font-extrabold uppercase tracking-tightest font-display text-arch-text mb-4">
                 {{ __('site.pricing_subtitle') }}
@@ -35,7 +35,7 @@
                         {{-- Top Header --}}
                         <div class="flex items-center justify-between pb-4 mb-6 border-b border-arch-border">
                             <span class="font-mono text-xs text-neutral-400 uppercase tracking-widest font-bold">
-                                FORMAT 0{{ $loop->iteration }}
+                                ФОРМАТ 0{{ $loop->iteration }}
                             </span>
                         </div>
 
@@ -133,7 +133,7 @@
         <div class="max-w-3xl mx-auto pt-14 border-t border-arch-border">
             <div class="mb-10 text-center">
                 <span class="text-xs uppercase tracking-widest text-crimson font-mono font-bold block mb-2">
-                    05 / FAQ
+                    05 / ЧАСТЫЕ ВОПРОСЫ
                 </span>
                 <h2 class="text-3xl sm:text-4xl font-extrabold uppercase tracking-tight font-display text-arch-text">
                     {{ __('site.faq_title') }}

@@ -60,7 +60,7 @@
 
                     @if($series->is_demo)
                     <span class="bg-crimson/10 text-crimson px-2.5 py-0.5 text-[0.65rem] font-bold">
-                        DEMO
+                        ДЕМО
                     </span>
                     @endif
                 </div>
