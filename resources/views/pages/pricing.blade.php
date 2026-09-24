@@ -23,7 +23,7 @@
         {{-- 3 Packages in Editorial Grid --}}
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-24">
             @foreach($packages as $pkg)
-                <div class="bg-white p-8 sm:p-10 flex flex-col justify-between border border-arch-border shadow-card-depth relative {{ $loop->iteration === 2 ? 'ring-2 ring-crimson' : '' }}">
+                <div class="bg-white p-6 sm:p-8 flex flex-col justify-between border border-arch-border shadow-card-depth relative {{ $loop->iteration === 2 ? 'ring-2 ring-crimson' : '' }}">
                     
                     @if($loop->iteration === 2)
                     <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 bg-crimson text-white text-[0.65rem] uppercase tracking-widest font-bold shadow-crimson-btn font-mono">
@@ -39,7 +39,7 @@
                             </span>
                         </div>
 
-                        <h2 class="text-3xl font-extrabold uppercase font-display text-arch-text mb-2">
+                        <h2 class="text-xl sm:text-2xl font-extrabold uppercase font-display text-arch-text mb-2 leading-tight break-words">
                             {{ $pkg->localizedTitle($locale) }}
                         </h2>
 
@@ -50,11 +50,11 @@
                         @endif
 
                         {{-- Price Highlight Block --}}
-                        <div class="p-6 bg-neutral-950 text-white mb-8 rounded-sm">
+                        <div class="p-5 sm:p-6 bg-neutral-950 text-white mb-8 rounded-sm">
                             <span class="text-[0.65rem] uppercase tracking-widest text-neutral-400 font-mono block mb-1">
                                 Стоимость
                             </span>
-                            <span class="text-3xl font-extrabold font-display block">
+                            <span class="text-xl sm:text-2xl font-extrabold font-display block leading-snug break-words">
                                 {{ $pkg->formattedPrice($locale) }}
                             </span>
                             @if(is_null($pkg->price))

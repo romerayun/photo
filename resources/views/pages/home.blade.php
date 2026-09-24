@@ -286,21 +286,21 @@
 {{-- ========================================================
      5. PRICING & PACKAGES: "CHOOSE YOUR STORY"
      ======================================================== --}}
-<section class="bg-arch-bg text-arch-text py-24 border-b border-arch-border">
+<section class="bg-arch-bg text-arch-text py-20 sm:py-24 border-b border-arch-border">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div class="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-arch-border border-y border-arch-border">
             
             {{-- Column 1: Intro --}}
-            <div class="lg:col-span-4 p-8 sm:p-12 flex flex-col justify-between space-y-8">
+            <div class="lg:col-span-4 p-6 sm:p-8 lg:p-10 flex flex-col justify-between space-y-6">
                 <div>
                     <span class="text-[0.68rem] uppercase tracking-widest text-crimson font-mono font-bold block mb-3">
                         04 / СТОИМОСТЬ И ПАКЕТЫ
                     </span>
-                    <h2 class="text-3xl sm:text-5xl font-extrabold uppercase tracking-tight font-display text-arch-text mb-4">
+                    <h2 class="text-2xl sm:text-3xl lg:text-3xl xl:text-4xl font-extrabold uppercase tracking-tight font-display text-arch-text mb-4 leading-tight break-words">
                         ВЫБЕРИТЕ СВОЙ ФОРМАТ
                     </h2>
-                    <p class="text-xs text-neutral-600 font-mono leading-relaxed">
+                    <p class="text-xs sm:text-sm text-neutral-600 font-mono leading-relaxed">
                         Прозрачные форматы сотрудничества. Каждый пакет адаптируется под ваши задачи в Иркутске и окрестностях.
                     </p>
                 </div>
@@ -312,17 +312,17 @@
 
             {{-- Column 2 & 3: Packages with Dark Image Headers --}}
             @foreach($packages->take(2) as $pkg)
-                <div class="lg:col-span-4 p-8 sm:p-10 flex flex-col justify-between bg-white space-y-6">
+                <div class="lg:col-span-4 p-6 sm:p-8 flex flex-col justify-between bg-white space-y-6">
                     <div>
                         {{-- Dark Header Card --}}
-                        <div class="bg-neutral-950 text-white p-6 rounded-sm mb-6 relative overflow-hidden">
+                        <div class="bg-neutral-950 text-white p-5 sm:p-6 rounded-sm mb-6 relative overflow-hidden">
                             <span class="text-[0.65rem] font-mono text-crimson uppercase tracking-widest font-bold block mb-1">
                                 ПАКЕТ 0{{ $loop->iteration }}
                             </span>
-                            <h3 class="text-2xl font-bold uppercase font-display mb-2">
+                            <h3 class="text-xl sm:text-2xl font-bold uppercase font-display mb-3 leading-snug break-words">
                                 {{ $pkg->localizedTitle($locale) }}
                             </h3>
-                            <div class="text-2xl font-extrabold text-white">
+                            <div class="text-lg sm:text-xl font-bold text-neutral-200 font-display">
                                 {{ $pkg->formattedPrice($locale) }}
                             </div>
                         </div>
@@ -332,11 +332,11 @@
                         </p>
 
                         {{-- Inclusions --}}
-                        <ul class="space-y-2 text-xs font-mono text-neutral-700 mb-8 border-t border-arch-border pt-4">
+                        <ul class="space-y-2.5 text-xs font-mono text-neutral-700 mb-8 border-t border-arch-border pt-4">
                             @foreach($pkg->getIncludesList($locale) as $item)
                                 <li class="flex items-start gap-2">
-                                    <span class="text-crimson font-bold">&bull;</span>
-                                    <span>{{ $item }}</span>
+                                    <span class="text-crimson font-bold shrink-0">&bull;</span>
+                                    <span class="leading-relaxed">{{ $item }}</span>
                                 </li>
                             @endforeach
                         </ul>
