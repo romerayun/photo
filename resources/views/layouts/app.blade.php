@@ -46,28 +46,25 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-apple-bg text-apple-text font-sans antialiased selection:bg-apple-blue selection:text-white flex flex-col min-h-screen relative overflow-x-hidden">
-
-    {{-- Subtle Top Spotlight Radial Glow (Apple Pro Signature) --}}
-    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-apple-hero-radial pointer-events-none -z-10 opacity-70"></div>
+<body class="bg-apple-bg text-apple-text font-sans antialiased selection:bg-apple-accent selection:text-white flex flex-col min-h-screen relative overflow-x-hidden">
 
     {{-- Demo Mode Notification Pill --}}
     @if(\App\Models\Setting::isDemoMode())
-    <aside class="w-full bg-apple-surface/90 border-b border-apple-border py-2 px-4 text-xs text-apple-textMuted z-50">
+    <aside class="w-full bg-apple-surface/90 border-b border-black/5 py-2 px-4 text-xs text-apple-textMuted z-50">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
             <div class="flex items-center gap-2.5">
-                <span class="inline-block w-2 h-2 rounded-full bg-apple-blue shadow-[0_0_8px_#2997FF] animate-pulse" aria-hidden="true"></span>
-                <span class="font-semibold text-white tracking-wide uppercase text-[0.68rem]">{{ __('site.demo_badge') }}:</span>
+                <span class="inline-block w-2 h-2 rounded-full bg-apple-accent shadow-[0_0_8px_#B07D53] animate-pulse" aria-hidden="true"></span>
+                <span class="font-semibold text-apple-text tracking-wide uppercase text-[0.68rem]">{{ __('site.demo_badge') }}:</span>
                 <span class="text-apple-textMuted text-xs">{{ __('site.demo_banner_text') }}</span>
             </div>
-            <a href="{{ route('admin.login') }}" class="text-apple-blue hover:text-white text-xs font-medium transition-colors shrink-0 underline underline-offset-4">
+            <a href="{{ route('admin.login') }}" class="text-apple-accent hover:text-apple-accentHover text-xs font-semibold transition-colors shrink-0 underline underline-offset-4">
                 Панель управления &rarr;
             </a>
         </div>
     </aside>
     @endif
 
-    {{-- Apple Floating Header --}}
+    {{-- Apple Floating Island Header --}}
     @include('components.navbar')
 
     {{-- Main Content --}}

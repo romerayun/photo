@@ -6,68 +6,66 @@
 
 @layer base {
     html {
-        background-color: #070708;
-        color: #F5F5F7;
+        background-color: #F5F5F7;
+        color: #1D1D1F;
         font-feature-settings: "cv02", "cv03", "cv04", "cv11";
         -webkit-tap-highlight-color: transparent;
-        color-scheme: dark;
+        color-scheme: light;
     }
 
     ::selection {
-        background-color: #2997FF;
+        background-color: #B07D53;
         color: #FFFFFF;
     }
 
     :focus-visible {
-        outline: 2px solid #2997FF;
+        outline: 2px solid #B07D53;
         outline-offset: 3px;
     }
 
     body {
         min-height: 100vh;
         overflow-x: hidden;
-        background-color: #070708;
+        background-color: #F5F5F7;
+        color: #1D1D1F;
     }
 }
 
 @layer utilities {
     .apple-glass {
-        background: rgba(14, 14, 17, 0.72);
-        backdrop-filter: blur(24px);
-        -webkit-backdrop-filter: blur(24px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .apple-glass-pill {
-        background: rgba(21, 21, 24, 0.85);
+        background: rgba(255, 255, 255, 0.82);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(0, 0, 0, 0.06);
     }
 
-    .apple-text-gradient {
-        background: linear-gradient(180deg, #FFFFFF 0%, #A1A1A6 100%);
+    .apple-glass-subtle {
+        background: rgba(245, 245, 247, 0.75);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .apple-headline-gradient {
+        background: linear-gradient(180deg, #1D1D1F 10%, #434347 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
 
-    .apple-text-blue-gradient {
-        background: linear-gradient(135deg, #2997FF 0%, #90CAFF 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+    .apple-titanium-badge {
+        background: #FBF5EE;
+        border: 1px solid rgba(176, 125, 83, 0.25);
+        color: #96653E;
     }
 
-    .apple-card-glow {
-        position: relative;
-        background: #141416;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    .apple-card-hover {
+        transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .apple-card-glow:hover {
-        border-color: rgba(255, 255, 255, 0.22);
-        transform: translateY(-2px);
-        box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7), 0 0 25px -5px rgba(255, 255, 255, 0.05);
+    .apple-card-hover:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
+        border-color: rgba(0, 0, 0, 0.12);
     }
 }
 

@@ -16,37 +16,31 @@ export default {
             },
             colors: {
                 apple: {
-                    black: '#000000',
-                    bg: '#070708',
-                    surface: '#0E0E11',
-                    card: '#151518',
-                    cardHover: '#1D1D22',
-                    border: 'rgba(255, 255, 255, 0.08)',
-                    borderHover: 'rgba(255, 255, 255, 0.20)',
-                    line: 'rgba(255, 255, 255, 0.12)',
-                    text: '#F5F5F7',
-                    textMuted: '#86868B',
-                    textDark: '#515154',
-                    blue: '#2997FF',
-                    blueHover: '#147CE5',
-                    gold: '#D4AF37',
-                    titanium: '#8E8E93',
+                    bg: '#F5F5F7',            // Apple signature pearl background
+                    surface: '#FFFFFF',       // Pure white cards
+                    subtle: '#EBEBED',        // Subtle card / badge tint
+                    card: '#FFFFFF',
+                    border: 'rgba(0, 0, 0, 0.06)',
+                    borderHover: 'rgba(0, 0, 0, 0.15)',
+                    line: 'rgba(0, 0, 0, 0.08)',
+                    text: '#1D1D1F',          // Deepest Apple text
+                    textMuted: '#6E6E73',     // Secondary Apple text
+                    textLight: '#86868B',     // Tertiary Apple text
+                    accent: '#B07D53',        // Noble warm titanium / bronze
+                    accentHover: '#96653E',
+                    accentLight: '#FBF5EE',
                 },
             },
             letterSpacing: {
-                tightest: '-0.04em',
-                tighter: '-0.025em',
+                tightest: '-0.035em',
+                tighter: '-0.02em',
                 wide: '0.04em',
-                widest: '0.18em',
+                widest: '0.16em',
             },
             boxShadow: {
-                'apple-glow': '0 0 50px -10px rgba(255, 255, 255, 0.12)',
-                'apple-blue-glow': '0 0 50px -10px rgba(41, 151, 255, 0.3)',
-                'apple-card': '0 8px 32px 0 rgba(0, 0, 0, 0.45)',
-            },
-            backgroundImage: {
-                'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-                'apple-hero-radial': 'radial-gradient(circle at 50% 0%, rgba(41, 151, 255, 0.12), transparent 60%)',
+                'apple-card': '0 4px 24px -2px rgba(0, 0, 0, 0.04), 0 2px 6px -1px rgba(0, 0, 0, 0.02)',
+                'apple-card-hover': '0 20px 40px -10px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.04)',
+                'apple-pill': '0 2px 10px rgba(0, 0, 0, 0.06)',
             },
             aspectRatio: {
                 '4/5': '4 / 5',

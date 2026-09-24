@@ -1,15 +1,15 @@
-<footer class="bg-apple-black border-t border-white/10 mt-28 pt-16 pb-12 text-apple-textMuted">
+<footer class="bg-white border-t border-black/5 mt-28 pt-16 pb-12 text-apple-textMuted">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-10 pb-14 border-b border-white/10">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-10 pb-14 border-b border-black/5">
             
             {{-- Col 1: Brand & Statement --}}
             <div class="md:col-span-5 space-y-4">
                 <div class="flex items-center gap-3">
-                    <div class="w-7 h-7 rounded-full bg-white text-black text-xs font-bold flex items-center justify-center">
+                    <div class="w-8 h-8 rounded-full bg-apple-text text-white text-xs font-bold flex items-center justify-center shadow-sm">
                         RY
                     </div>
-                    <span class="text-xl font-bold tracking-tight text-white block">
+                    <span class="text-xl font-bold tracking-tight text-apple-text block">
                         {{ __('site.author_name') }}
                     </span>
                 </div>
@@ -28,15 +28,15 @@
                     Навигация
                 </span>
                 <ul class="space-y-2 text-xs">
-                    <li><a href="{{ route('home', ['locale' => app()->getLocale()]) }}" class="hover:text-white transition-colors">{{ __('site.nav_home') }}</a></li>
-                    <li><a href="{{ route('portfolio.index', ['locale' => app()->getLocale()]) }}" class="hover:text-white transition-colors">{{ __('site.nav_portfolio') }}</a></li>
-                    <li><a href="{{ route('pricing.index', ['locale' => app()->getLocale()]) }}" class="hover:text-white transition-colors">{{ __('site.nav_pricing') }}</a></li>
-                    <li><a href="{{ route('about.index', ['locale' => app()->getLocale()]) }}" class="hover:text-white transition-colors">{{ __('site.nav_about') }}</a></li>
-                    <li><a href="{{ route('contacts.index', ['locale' => app()->getLocale()]) }}" class="hover:text-white transition-colors">{{ __('site.nav_contacts') }}</a></li>
+                    <li><a href="{{ route('home', ['locale' => app()->getLocale()]) }}" class="text-apple-text hover:text-apple-accent transition-colors">{{ __('site.nav_home') }}</a></li>
+                    <li><a href="{{ route('portfolio.index', ['locale' => app()->getLocale()]) }}" class="text-apple-text hover:text-apple-accent transition-colors">{{ __('site.nav_portfolio') }}</a></li>
+                    <li><a href="{{ route('pricing.index', ['locale' => app()->getLocale()]) }}" class="text-apple-text hover:text-apple-accent transition-colors">{{ __('site.nav_pricing') }}</a></li>
+                    <li><a href="{{ route('about.index', ['locale' => app()->getLocale()]) }}" class="text-apple-text hover:text-apple-accent transition-colors">{{ __('site.nav_about') }}</a></li>
+                    <li><a href="{{ route('contacts.index', ['locale' => app()->getLocale()]) }}" class="text-apple-text hover:text-apple-accent transition-colors">{{ __('site.nav_contacts') }}</a></li>
                 </ul>
             </div>
 
-            {{-- Col 3: Direct Concierge Connect --}}
+            {{-- Col 3: Direct Connect --}}
             <div class="md:col-span-4 space-y-3">
                 <span class="text-[0.68rem] uppercase tracking-widest text-neutral-400 font-semibold block">
                     Прямая связь
@@ -44,8 +44,8 @@
                 <div class="space-y-2.5 text-xs">
                     @if(\App\Models\Setting::hasTelegram())
                         <div>
-                            <a href="{{ \App\Models\Setting::telegramUrl() }}" target="_blank" rel="noopener" class="text-white hover:text-apple-blue inline-flex items-center gap-2 transition-colors">
-                                <span class="w-2 h-2 rounded-full bg-apple-blue"></span>
+                            <a href="{{ \App\Models\Setting::telegramUrl() }}" target="_blank" rel="noopener" class="text-apple-text hover:text-apple-accent inline-flex items-center gap-2 transition-colors">
+                                <span class="w-2 h-2 rounded-full bg-apple-accent"></span>
                                 <span>Telegram:</span>
                                 <span class="font-semibold underline underline-offset-4">{{ \App\Models\Setting::telegramHandle() }}</span>
                             </a>
@@ -54,7 +54,7 @@
 
                     @if(\App\Models\Setting::hasPhone())
                         <div>
-                            <a href="{{ \App\Models\Setting::phoneLink() }}" class="text-white hover:text-apple-blue inline-flex items-center gap-2 transition-colors">
+                            <a href="{{ \App\Models\Setting::phoneLink() }}" class="text-apple-text hover:text-apple-accent inline-flex items-center gap-2 transition-colors">
                                 <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                                 <span>Телефон:</span>
                                 <span class="font-semibold underline underline-offset-4">{{ \App\Models\Setting::phoneDisplay() }}</span>
@@ -63,13 +63,13 @@
                     @endif
 
                     @if(!\App\Models\Setting::hasTelegram() && !\App\Models\Setting::hasPhone())
-                        <p class="text-[0.75rem] text-neutral-500 italic">
+                        <p class="text-[0.75rem] text-neutral-400 italic">
                             {{ __('site.contacts_not_configured') }}
                         </p>
                     @endif
 
                     <div class="pt-2">
-                        <a href="{{ route('contacts.index', ['locale' => app()->getLocale()]) }}" class="text-[0.7rem] uppercase tracking-widest text-apple-blue hover:text-white font-semibold inline-flex items-center gap-1 transition-colors">
+                        <a href="{{ route('contacts.index', ['locale' => app()->getLocale()]) }}" class="text-[0.7rem] uppercase tracking-widest text-apple-accent hover:text-apple-accentHover font-semibold inline-flex items-center gap-1 transition-colors">
                             <span>{{ __('site.hero_cta') }}</span>
                             <span>&rarr;</span>
                         </a>
@@ -80,14 +80,14 @@
         </div>
 
         {{-- Bottom Copyright & Admin link --}}
-        <div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-[0.72rem] text-neutral-500 gap-4">
+        <div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-[0.72rem] text-neutral-400 gap-4">
             <div>
                 &copy; {{ date('Y') }} {{ __('site.author_name') }}. {{ __('site.copyright') }}
             </div>
             <div class="flex items-center space-x-4">
-                <a href="{{ route('sitemap') }}" class="hover:text-white transition-colors">Sitemap</a>
+                <a href="{{ route('sitemap') }}" class="hover:text-apple-text transition-colors">Sitemap</a>
                 <span>&bull;</span>
-                <a href="{{ route('admin.login') }}" class="hover:text-white transition-colors">Вход для автора</a>
+                <a href="{{ route('admin.login') }}" class="hover:text-apple-text transition-colors">Вход для автора</a>
             </div>
         </div>
 
