@@ -1,66 +1,178 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Авторский сайт-портфолио фотографа: Роман Юн (Иркутск)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Современный многостраничный веб-сайт фотографа, объединяющий эстетику авторского фотожурнала и функциональное коммерческое портфолио с удобной панелью управления.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 1. Визуальная и концептуальная основа
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Арт-дирекшн**: Современное редакционное издание о фотографии (editorial photo journal). 
+- **Цветовая палитра**:
+  - Тёплый светлый фон: холст/лён `#FAF8F5`, поверхность карточек `#F4EFEB`.
+  - Графитовый текст: `#1E1D1B` и оттенки глубокого графита (высокий контраст, мягкость для глаз).
+  - Сдержанный акцент: тёплая терракота / охра `#9E5B3D` (интерактивные акценты, hover-состояния).
+  - Тонкие редакционные линии-разделители: `#E3DDD3`.
+- **Типографика**:
+  - Заголовки и цитаты: выразительный классический сериф *Cormorant Garamond* с качественной кириллицей и латиницей.
+  - Навигация, теги, цены и интерфейс: чистый геометрический гротеск *Plus Jakarta Sans*.
+- **Сетка и пропорции**:
+  - Асимметричная двухкадровая композиция первого экрана.
+  - Сохранение естественных пропорций фотографий в сериях без искусственного обрезания.
+  - Доступный Lightbox с клавиатурной навигацией (Escape, стрелки влево/вправо, управление фокусом).
+  - Полная поддержка `prefers-reduced-motion` и мобильная адаптация (390px, 768px, 1440px+).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 2. Архитектура и стек технологий
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- **Бэкенд**: Laravel 11.x (PHP 8.2+).
+- **База данных**: SQLite (`database/database.sqlite`).
+- **Фронтенд**: Blade, Tailwind CSS, Alpine.js, Vite.
+- **Локализация**:
+  - Префиксы маршрутов `/ru` и `/en`.
+  - Корень сайта `/` выполняет автоматический 302-редирект на `/ru`.
+  - Переключатель языка сохраняет текущую страницу (`LocaleHelper`).
+  - Раздельные поля перевода в базе данных для названий, описаний, локаций и параметров пакетов.
+  - Цены в английской версии выводятся в рублях с обозначением `RUB`.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 3. Инструкция по локальному запуску
 
-## Laravel Sponsors
+### Требования
+- PHP 8.2+ с расширениями `pdo_sqlite`, `gd`, `fileinfo`, `mbstring`, `curl`.
+- Composer 2.x
+- Node.js 18+ и npm
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Пошаговый запуск
 
-### Premium Partners
+1. **Клонирование / переход в директорию проекта**:
+   ```bash
+   cd /Users/romerayun/Documents/Web/photo
+   ```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+2. **Установка зависимостей бэкенда**:
+   ```bash
+   composer install
+   ```
 
-## Contributing
+3. **Установка зависимостей фронтенда и сборка ассетов**:
+   ```bash
+   npm install
+   npm run build
+   # или npm run dev для "горячей" перезагрузки во время разработки
+   ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+4. **Настройка окружения и символической ссылки на хранилище**:
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   php artisan storage:link
+   ```
 
-## Code of Conduct
+5. **Миграции и первичное наполнение (сидеры с демонстрационным материалом)**:
+   ```bash
+   touch database/database.sqlite
+   php artisan migrate --seed
+   ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+6. **Запуск локального веб-сервера**:
+   ```bash
+   php artisan serve --port=8080
+   ```
+   Сайт будет доступен по адресу: [http://127.0.0.1:8080](http://127.0.0.1:8080) (или [http://127.0.0.1:8080/ru](http://127.0.0.1:8080/ru)).
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 4. Создание учетной записи администратора
 
-## License
+В соответствии с требованиями безопасности, публичная регистрация на сайте отключена, а в коде и сидерах **нет предустановленных паролей**.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Чтобы безопасно создать или обновить учетную запись владельца, выполните консольную команду:
+
+```bash
+php artisan app:create-admin
+```
+
+Команда запросит:
+1. **Email администратора** (например: `roman@romanyun.ru`).
+2. **Имя администратора** (по умолчанию `Роман Юн`).
+3. **Пароль** (вводится скрыто, минимум 8 символов).
+4. **Подтверждение пароля**.
+
+После создания перейдите по адресу `/admin/login` и войдите в систему.
+
+---
+
+## 5. Где и как управлять контентом
+
+Все разделы сайта редактируются через панель управления `/admin`:
+
+1. **Серии съёмок (`/admin/series`)**:
+   - Создание новой серии с указанием названия на русском и английском, категории, описания, локации и даты съёмки.
+   - Загрузка множества фотографий одновременно (форматы JPG, PNG, WEBP до 10 МБ). Размеры и пропорции кадров считываются автоматически.
+   - Назначение любого кадра обложкой серии («Сделать обложкой»).
+   - Управление порядком вывода и удаление кадров.
+   - Переключатели: «Опубликовать серию», «Показывать в избранном на главной», «Пометить как Demo».
+
+2. **Категории (`/admin/categories`)**:
+   - Редактирование начальных категорий: *Портреты*, *Пары*, *Семьи*, *События*, *Бизнес и контент*.
+   - Добавление новых категорий с названиями на RU и EN и URL-слагами.
+
+3. **Пакеты и цены (`/admin/packages`)**:
+   - Три стартовых пакета: «Короткая съёмка», «Индивидуальная история», «Событие / проект».
+   - Редактирование продолжительности, количества готовых кадров, пунктов «Что входит», сроков сдачи и дополнительных условий.
+   - Поле цены: если цена не заполнена (пустое поле), на сайте корректно и аккуратно выводится **«Стоимость уточняется»**. Если цена указана — выводится сумма в рублях (на русском `15 000 ₽`, на английском `15,000 RUB`), с возможностью включения приставки «от».
+
+4. **Контакты и главные тексты (`/admin/settings`)**:
+   - **Telegram**: укажите юзернейм `@username` или ссылку.
+   - **Телефон**: укажите номер, сайт сформирует кликабельную ссылку `tel:`.
+   - **Город**: Иркутск (на русском и английском).
+   - **Главные фразы первого экрана**: «Ваши истории. Мой взгляд.» и подзаголовок.
+   - **Переключатель «Демонстрационный режим»**:
+     - *Включен*: отображаются демонстрационные серии с аккуратной плашкой Demo, поисковая индексация закрыта (`Disallow: /` в `robots.txt`), незаполненные контакты сопровождаются вежливой подсказкой.
+     - *Выключен (публичный режим)*: сайт открыт для поисковиков (`Allow: /`), показываются только реальные опубликованные серии, незаполненные контакты скрываются без битых ссылок и кнопок-#.
+
+---
+
+## 6. Демонстрационные материалы и сведения об авторах
+
+Все временные фотографии сохранены локально в директории `storage/app/public/demo/` (доступны через веб по `/storage/demo/...`).
+
+Сведения об авторах и лицензиях зафиксированы в [`storage/app/public/demo/credits.json`](storage/app/public/demo/credits.json):
+- `portrait-1`: Aiony Haust (Unsplash Free License)
+- `portrait-2`: Joseph Gonzalez (Unsplash Free License)
+- `portrait-3`: Valerie Elash (Unsplash Free License)
+- `couple-1`: Everton Vila (Unsplash Free License)
+- `couple-2`: Candice Picard (Unsplash Free License)
+- `couple-3`: Carly Rae Hobbins (Unsplash Free License)
+- `family-1`: Jessica Rockowitz (Unsplash Free License)
+- `family-2`: Daiga Ellaby (Unsplash Free License)
+- `event-1`: Evangeline Shaw (Unsplash Free License)
+- `event-2`: Priscilla Du Preez (Unsplash Free License)
+- `business-1`: Austin Distel (Unsplash Free License)
+- `business-2`: Nastuh Abootalebi (Unsplash Free License)
+- `hero-main`: Bailey Zindel (Unsplash Free License)
+- `hero-secondary`: David Marcu (Unsplash Free License)
+
+---
+
+## 7. Отчёт о проверках и тестах
+
+- **Автоматические тесты (PHPUnit)**:
+  - Выполнены 16 функциональных тестов (`tests/Feature/LocalizationAndPublicRoutesTest.php`, `tests/Feature/AdminAccessAndPublishingTest.php`, `tests/Feature/ExampleTest.php`).
+  - Все **16 тестов (67 утверждений) успешно пройдены**.
+- **Проверка HTTP-статусов**:
+  - `/` -> 302 Found (редирект на `/ru`)
+  - `/ru`, `/en` -> 200 OK
+  - `/ru/portfolio`, `/en/portfolio` -> 200 OK
+  - `/ru/portfolio?category=portraits` -> 200 OK
+  - `/ru/series/northern-light-portraits` -> 200 OK
+  - `/ru/pricing`, `/en/pricing` -> 200 OK
+  - `/ru/about`, `/en/about` -> 200 OK
+  - `/ru/contacts`, `/en/contacts` -> 200 OK
+  - `/admin/login` -> 200 OK
+  - `/sitemap.xml` -> 200 OK (валидный XML)
+  - `/robots.txt` -> 200 OK (в демо-режиме закрывает индексацию)
+- **Сборка фронтенда**:
+  - Vite v6 + Tailwind CSS v3.4 + Alpine.js компилируются без ошибок и предупреждений.
