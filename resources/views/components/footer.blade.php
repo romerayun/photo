@@ -1,93 +1,90 @@
-<footer class="bg-white border-t border-black/5 mt-28 pt-16 pb-12 text-apple-textMuted">
+<footer class="bg-cine-black border-t border-cine-border pt-20 pb-10 text-neutral-400 overflow-hidden relative">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-10 pb-14 border-b border-black/5">
+        {{-- Top Call to Action Grid --}}
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-12 pb-16 border-b border-cine-border items-start">
             
-            {{-- Col 1: Brand & Statement --}}
-            <div class="md:col-span-5 space-y-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-apple-text text-white text-xs font-bold flex items-center justify-center shadow-sm">
-                        RY
-                    </div>
-                    <span class="text-xl font-bold tracking-tight text-apple-text block">
-                        {{ __('site.author_name') }}
-                    </span>
-                </div>
-                <p class="text-xs text-apple-textMuted max-w-sm leading-relaxed">
-                    {{ __('site.footer_tagline') }}
-                </p>
-                <div class="inline-flex items-center gap-2 text-[0.68rem] uppercase tracking-widest text-neutral-500 font-mono">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                    <span>{{ __('site.location') }} &bull; AVAILABLE FOR BOOKING</span>
-                </div>
-            </div>
-
-            {{-- Col 2: Navigation --}}
-            <div class="md:col-span-3 space-y-3">
-                <span class="text-[0.68rem] uppercase tracking-widest text-neutral-400 font-semibold block">
-                    Навигация
+            {{-- Big Headline --}}
+            <div class="md:col-span-6 space-y-4">
+                <span class="text-[0.68rem] uppercase tracking-widest text-crimson font-mono font-bold block">
+                    {{ __('site.location') }} &bull; INITIATE THE PROJECT
                 </span>
-                <ul class="space-y-2 text-xs">
-                    <li><a href="{{ route('home', ['locale' => app()->getLocale()]) }}" class="text-apple-text hover:text-apple-accent transition-colors">{{ __('site.nav_home') }}</a></li>
-                    <li><a href="{{ route('portfolio.index', ['locale' => app()->getLocale()]) }}" class="text-apple-text hover:text-apple-accent transition-colors">{{ __('site.nav_portfolio') }}</a></li>
-                    <li><a href="{{ route('pricing.index', ['locale' => app()->getLocale()]) }}" class="text-apple-text hover:text-apple-accent transition-colors">{{ __('site.nav_pricing') }}</a></li>
-                    <li><a href="{{ route('about.index', ['locale' => app()->getLocale()]) }}" class="text-apple-text hover:text-apple-accent transition-colors">{{ __('site.nav_about') }}</a></li>
-                    <li><a href="{{ route('contacts.index', ['locale' => app()->getLocale()]) }}" class="text-apple-text hover:text-apple-accent transition-colors">{{ __('site.nav_contacts') }}</a></li>
-                </ul>
+                <h2 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white font-display uppercase leading-tight">
+                    Готовы начать?<br>
+                    <span class="text-neutral-400">Напишите мне сегодня.</span>
+                </h2>
+                <div class="pt-2">
+                    <a href="{{ route('contacts.index', ['locale' => app()->getLocale()]) }}" 
+                       class="btn-crimson px-8 py-4 text-xs font-bold">
+                        <span>{{ __('site.hero_cta') }}</span>
+                        <span>&nearr;</span>
+                    </a>
+                </div>
             </div>
 
-            {{-- Col 3: Direct Connect --}}
-            <div class="md:col-span-4 space-y-3">
-                <span class="text-[0.68rem] uppercase tracking-widest text-neutral-400 font-semibold block">
+            {{-- Direct Contacts & Details --}}
+            <div class="md:col-span-3 space-y-4 text-xs">
+                <span class="text-[0.68rem] uppercase tracking-widest text-neutral-500 font-mono font-bold block">
                     Прямая связь
                 </span>
-                <div class="space-y-2.5 text-xs">
+                <div class="space-y-3">
                     @if(\App\Models\Setting::hasTelegram())
                         <div>
-                            <a href="{{ \App\Models\Setting::telegramUrl() }}" target="_blank" rel="noopener" class="text-apple-text hover:text-apple-accent inline-flex items-center gap-2 transition-colors">
-                                <span class="w-2 h-2 rounded-full bg-apple-accent"></span>
-                                <span>Telegram:</span>
-                                <span class="font-semibold underline underline-offset-4">{{ \App\Models\Setting::telegramHandle() }}</span>
+                            <span class="text-neutral-500 block text-[0.68rem] uppercase font-mono">Telegram</span>
+                            <a href="{{ \App\Models\Setting::telegramUrl() }}" target="_blank" rel="noopener" class="text-white hover:text-crimson font-bold text-sm transition-colors">
+                                {{ \App\Models\Setting::telegramHandle() }} &nearr;
                             </a>
                         </div>
                     @endif
 
                     @if(\App\Models\Setting::hasPhone())
                         <div>
-                            <a href="{{ \App\Models\Setting::phoneLink() }}" class="text-apple-text hover:text-apple-accent inline-flex items-center gap-2 transition-colors">
-                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                <span>Телефон:</span>
-                                <span class="font-semibold underline underline-offset-4">{{ \App\Models\Setting::phoneDisplay() }}</span>
+                            <span class="text-neutral-500 block text-[0.68rem] uppercase font-mono">Телефон</span>
+                            <a href="{{ \App\Models\Setting::phoneLink() }}" class="text-white hover:text-crimson font-bold text-sm transition-colors">
+                                {{ \App\Models\Setting::phoneDisplay() }}
                             </a>
                         </div>
                     @endif
 
-                    @if(!\App\Models\Setting::hasTelegram() && !\App\Models\Setting::hasPhone())
-                        <p class="text-[0.75rem] text-neutral-400 italic">
-                            {{ __('site.contacts_not_configured') }}
-                        </p>
-                    @endif
-
-                    <div class="pt-2">
-                        <a href="{{ route('contacts.index', ['locale' => app()->getLocale()]) }}" class="text-[0.7rem] uppercase tracking-widest text-apple-accent hover:text-apple-accentHover font-semibold inline-flex items-center gap-1 transition-colors">
-                            <span>{{ __('site.hero_cta') }}</span>
-                            <span>&rarr;</span>
-                        </a>
+                    <div>
+                        <span class="text-neutral-500 block text-[0.68rem] uppercase font-mono">Локация</span>
+                        <span class="text-white font-medium">{{ __('site.location') }}, Сибирь</span>
                     </div>
                 </div>
             </div>
 
+            {{-- Navigation Links Column --}}
+            <div class="md:col-span-3 space-y-3 text-xs">
+                <span class="text-[0.68rem] uppercase tracking-widest text-neutral-500 font-mono font-bold block">
+                    Навигация
+                </span>
+                <ul class="space-y-2 uppercase tracking-wider font-bold">
+                    <li><a href="{{ route('home', ['locale' => app()->getLocale()]) }}" class="text-neutral-400 hover:text-white transition-colors">{{ __('site.nav_home') }}</a></li>
+                    <li><a href="{{ route('portfolio.index', ['locale' => app()->getLocale()]) }}" class="text-neutral-400 hover:text-white transition-colors">{{ __('site.nav_portfolio') }}</a></li>
+                    <li><a href="{{ route('pricing.index', ['locale' => app()->getLocale()]) }}" class="text-neutral-400 hover:text-white transition-colors">{{ __('site.nav_pricing') }}</a></li>
+                    <li><a href="{{ route('about.index', ['locale' => app()->getLocale()]) }}" class="text-neutral-400 hover:text-white transition-colors">{{ __('site.nav_about') }}</a></li>
+                    <li><a href="{{ route('contacts.index', ['locale' => app()->getLocale()]) }}" class="text-neutral-400 hover:text-white transition-colors">{{ __('site.nav_contacts') }}</a></li>
+                </ul>
+            </div>
+
         </div>
 
-        {{-- Bottom Copyright & Admin link --}}
-        <div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-[0.72rem] text-neutral-400 gap-4">
+        {{-- Huge Edge-to-Edge Typography Signature (as in reference image!) --}}
+        <div class="pt-12 pb-8 overflow-hidden select-none">
+            <span class="font-display font-extrabold uppercase text-[14vw] leading-none text-white tracking-tightest block opacity-95">
+                ROMAN YUN
+            </span>
+        </div>
+
+        {{-- Bottom Copyright and Admin Access --}}
+        <div class="pt-6 border-t border-cine-border flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-500 gap-4 font-mono">
             <div>
                 &copy; {{ date('Y') }} {{ __('site.author_name') }}. {{ __('site.copyright') }}
             </div>
-            <div class="flex items-center space-x-4">
-                <a href="{{ route('sitemap') }}" class="hover:text-apple-text transition-colors">Sitemap</a>
+            <div class="flex items-center space-x-6">
+                <a href="{{ route('sitemap') }}" class="hover:text-white transition-colors">Sitemap</a>
                 <span>&bull;</span>
-                <a href="{{ route('admin.login') }}" class="hover:text-apple-text transition-colors">Вход для автора</a>
+                <a href="{{ route('admin.login') }}" class="hover:text-crimson transition-colors">Вход для автора &rarr;</a>
             </div>
         </div>
 

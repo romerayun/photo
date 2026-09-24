@@ -5,216 +5,163 @@
 
 @section('content')
 
-{{-- 1. HERO SECTION (APPLE LIGHT PRO) --}}
-<section class="relative pt-12 pb-20 md:pt-16 md:pb-28 overflow-hidden">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+{{-- ========================================================
+     1. HERO SECTION (CINEMATIC DARK WITH RED FOCUS BRACKET)
+     ======================================================== --}}
+<section class="relative min-h-[90vh] flex items-center justify-center bg-cine-black overflow-hidden pt-12 pb-24 border-b border-cine-border">
+    
+    {{-- Background Motion / Atmosphere Layer --}}
+    <div class="absolute inset-0 z-0">
+        <img src="{{ asset('storage/demo/hero-main.jpg') }}" 
+             alt="{{ __('site.author_name') }}" 
+             fetchpriority="high"
+             loading="eager"
+             class="w-full h-full object-cover object-center opacity-30 filter grayscale contrast-125 scale-105">
+        <div class="absolute inset-0 bg-gradient-to-t from-cine-black via-cine-black/60 to-cine-black/40"></div>
+        <div class="absolute inset-0 bg-radial from-transparent via-cine-black/50 to-cine-black"></div>
+    </div>
+
+    {{-- Floating Author Tag (Top Left as in Reference) --}}
+    <div class="absolute top-8 left-6 sm:left-12 z-20 hidden sm:flex items-center gap-3 bg-cine-surface/80 backdrop-blur-md p-2.5 pr-4 border border-white/10 rounded-sm shadow-xl">
+        <div class="w-10 h-10 overflow-hidden bg-neutral-800 rounded-sm relative border border-white/20">
+            <img src="{{ asset('storage/demo/portrait-2.jpg') }}" alt="Roman Yun" class="w-full h-full object-cover">
+        </div>
+        <div class="text-left font-mono">
+            <span class="text-xs font-bold text-white uppercase block leading-none tracking-wider">Роман Юн</span>
+            <span class="text-[0.62rem] text-crimson uppercase tracking-widest font-semibold">Иркутск &bull; Автор</span>
+        </div>
+    </div>
+
+    {{-- Camera Auto-Focus Frame (Center Visual Anchor from Reference) --}}
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-44 z-10 pointer-events-none">
+        <div class="camera-focus-bracket w-36 h-36 sm:w-44 sm:h-44 rounded-sm">
+            <span class="absolute -top-3 left-0 bg-crimson text-white font-mono text-[0.6rem] px-1 font-bold uppercase tracking-widest">
+                AF-C 50MM
+            </span>
+            <span class="absolute -bottom-3 right-0 bg-white/20 backdrop-blur-sm text-white font-mono text-[0.6rem] px-1 uppercase tracking-widest">
+                RAW &bull; 1/250s
+            </span>
+        </div>
+    </div>
+
+    {{-- Center Typographic Impact --}}
+    <div class="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-28">
         
-        {{-- Floating Apple Pro Eyebrow Badge --}}
-        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 border border-black/5 shadow-sm mb-6 backdrop-blur-md">
-            <span class="w-2 h-2 rounded-full bg-apple-accent shadow-[0_0_8px_#B07D53]"></span>
-            <span class="text-xs uppercase tracking-widest text-apple-text font-semibold font-mono">
-                {{ __('site.location') }} &bull; 2026
-            </span>
-            <span class="text-neutral-300">|</span>
-            <span class="text-xs text-apple-textMuted font-medium">
-                {{ __('site.author_role') }}
-            </span>
+        <div class="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md border border-white/15 mb-6 text-[0.68rem] uppercase font-mono tracking-widest text-neutral-300">
+            <span class="w-2 h-2 rounded-full bg-crimson shadow-crimson-glow"></span>
+            <span>PORTFOLIO &bull; IRKUTSK 2026</span>
         </div>
 
-        {{-- Master Typographic Title --}}
-        <div class="max-w-4xl mx-auto space-y-4">
-            <h1 class="text-5xl sm:text-7xl md:text-8xl font-extrabold tracking-tightest text-apple-text leading-none">
-                {{ __('site.author_name') }}
-            </h1>
-            <p class="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-apple-text/90">
-                {{ \App\Models\Setting::get("hero_phrase_{$locale}", __('site.hero_phrase')) }}
-            </p>
-            <p class="text-base sm:text-lg text-apple-textMuted max-w-xl mx-auto font-normal leading-relaxed pt-1">
-                {{ \App\Models\Setting::get("hero_sub_{$locale}", __('site.hero_description')) }}
-            </p>
-        </div>
+        <h1 class="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold uppercase tracking-tight text-white font-display leading-[0.95] mb-6">
+            {{ \App\Models\Setting::get("hero_phrase_{$locale}", __('site.hero_phrase')) }}
+        </h1>
 
-        {{-- Apple Dual Action Pill Buttons --}}
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
+        <p class="text-sm sm:text-base md:text-lg text-neutral-300 font-light max-w-2xl mx-auto uppercase tracking-wide font-mono mb-10 opacity-90">
+            {{ \App\Models\Setting::get("hero_sub_{$locale}", __('site.hero_description')) }}
+        </p>
+
+        {{-- Bold Crimson CTA Button with Arrow (As in Reference) --}}
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a href="{{ route('contacts.index', ['locale' => $locale]) }}" 
-               class="w-full sm:w-auto px-8 py-3.5 bg-apple-text text-white hover:bg-black active:scale-95 text-xs uppercase tracking-widest font-bold rounded-full transition-all duration-200 shadow-sm">
-                {{ __('site.hero_cta') }}
+               class="btn-crimson px-10 py-4 text-xs font-extrabold tracking-mega shadow-crimson-btn">
+                <span>{{ __('site.hero_cta') }}</span>
+                <span class="text-sm font-bold">&nearr;</span>
             </a>
             <a href="{{ route('portfolio.index', ['locale' => $locale]) }}" 
-               class="w-full sm:w-auto px-7 py-3.5 bg-white hover:bg-neutral-50 text-apple-text active:scale-95 text-xs uppercase tracking-widest font-semibold rounded-full border border-black/10 shadow-sm transition-all duration-200 inline-flex items-center justify-center gap-1.5">
+               class="px-8 py-4 bg-white/10 hover:bg-white/15 text-white border border-white/20 text-xs font-bold uppercase tracking-widest backdrop-blur-md transition-colors inline-flex items-center gap-2">
                 <span>{{ __('site.hero_portfolio') }}</span>
-                <span class="text-apple-accent font-bold">&nearr;</span>
+                <span>&rarr;</span>
             </a>
-        </div>
-
-        {{-- Cinematic Hero Visual Showcase --}}
-        <div class="mt-14 sm:mt-20 max-w-5xl mx-auto">
-            <div class="relative rounded-3xl overflow-hidden border border-black/5 shadow-apple-card bg-white group">
-                
-                {{-- Master Image --}}
-                <div class="aspect-[16/10] sm:aspect-[21/9] overflow-hidden">
-                    <img src="{{ asset('storage/demo/hero-main.jpg') }}" 
-                         alt="{{ __('site.author_name') }}" 
-                         fetchpriority="high"
-                         loading="eager"
-                         width="1400"
-                         height="600"
-                         class="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105">
-                </div>
-
-                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none"></div>
-
-                <div class="absolute bottom-6 left-6 right-6 flex items-end justify-between text-left text-white z-20">
-                    <div>
-                        <span class="text-[0.68rem] uppercase tracking-widest text-amber-200 font-mono font-semibold block mb-1">
-                            Cinematic Master &bull; 2026
-                        </span>
-                        <h2 class="text-xl sm:text-2xl font-bold tracking-tight">
-                            Естественный свет и чистая геометрия кадра
-                        </h2>
-                    </div>
-                    <div class="hidden sm:block text-right font-mono text-[0.68rem] text-neutral-300 uppercase tracking-widest">
-                        <span>IRKUTSK &bull; SIBERIA</span>
-                    </div>
-                </div>
-
-            </div>
         </div>
 
     </div>
 </section>
 
-{{-- 2. APPLE BENTO GRID (DIRECTIONS & GENRES) --}}
-<section class="py-24 border-t border-black/5 bg-white relative">
+{{-- ========================================================
+     2. EDITORIAL GRID SHOWCASE (ARCHITECTURAL LIGHT SECTION)
+     ======================================================== --}}
+<section class="bg-arch-bg text-arch-text border-b border-arch-border py-20 relative">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div class="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
-            <div>
-                <span class="text-xs uppercase tracking-widest text-apple-accent font-semibold font-mono block mb-2">
-                    {{ __('site.directions_title') }}
-                </span>
-                <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-apple-text">
-                    {{ __('site.directions_subtitle') }}
-                </h2>
-            </div>
-            <a href="{{ route('portfolio.index', ['locale' => $locale]) }}" 
-               class="text-xs uppercase tracking-widest font-semibold text-apple-textMuted hover:text-apple-text inline-flex items-center gap-1.5 transition-colors">
-                <span>{{ __('site.view_all_series') }}</span>
-                <span>&rarr;</span>
-            </a>
-        </div>
-
-        {{-- Apple Bento Grid --}}
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+        {{-- 3-Column Editorial Grid with Vertical Borders (Exact match to reference) --}}
+        <div class="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-arch-border border-y border-arch-border">
             
-            {{-- Bento Card 1: Large Featured (Portraits) --}}
-            <div class="md:col-span-8 relative rounded-3xl overflow-hidden border border-black/5 bg-apple-bg shadow-apple-card group apple-card-hover">
-                <a href="{{ route('portfolio.index', ['locale' => $locale, 'category' => 'portraits']) }}" class="block p-8 h-96 flex flex-col justify-between relative z-10 text-white">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-mono text-amber-200 uppercase tracking-widest font-bold">01 &bull; PORTRAITS</span>
-                        <span class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-xs group-hover:bg-white group-hover:text-black transition-all">
-                            &nearr;
-                        </span>
-                    </div>
-                    <div>
-                        <h3 class="text-3xl sm:text-4xl font-extrabold text-white mb-2">
-                            Портреты
-                        </h3>
-                        <p class="text-sm text-neutral-200 max-w-md font-light leading-relaxed">
-                            Индивидуальные портретные истории без заученных поз. Живой взгляд, характер и глубина света.
-                        </p>
-                    </div>
-                </a>
-                <img src="{{ asset('storage/demo/portrait-1.jpg') }}" alt="" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+            {{-- Column 1: Statement & Yearbook --}}
+            <div class="lg:col-span-4 p-8 sm:p-12 flex flex-col justify-between space-y-8">
+                <div>
+                    <span class="text-[0.68rem] uppercase tracking-widest text-neutral-400 font-mono font-bold block mb-4">
+                        01 / YEARBOOK 2026
+                    </span>
+                    <blockquote class="text-xl sm:text-2xl font-bold uppercase tracking-tight text-arch-text leading-snug">
+                        «Каждый кадр — это пойманный свет, честные эмоции и внимание к индивидуальности человека.»
+                    </blockquote>
+                </div>
+                <div>
+                    <a href="{{ route('about.index', ['locale' => $locale]) }}" 
+                       class="btn-crimson px-6 py-3 text-[0.7rem] font-bold">
+                        <span>О подходе автора</span>
+                        <span>&rarr;</span>
+                    </a>
+                </div>
             </div>
 
-            {{-- Bento Card 2: Couples --}}
-            <div class="md:col-span-4 relative rounded-3xl overflow-hidden border border-black/5 bg-apple-bg shadow-apple-card group apple-card-hover">
-                <a href="{{ route('portfolio.index', ['locale' => $locale, 'category' => 'couples']) }}" class="block p-8 h-96 flex flex-col justify-between relative z-10 text-white">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-mono text-amber-200 uppercase tracking-widest font-bold">02 &bull; LOVE STORIES</span>
-                        <span class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-xs group-hover:bg-white group-hover:text-black transition-all">
-                            &nearr;
-                        </span>
+            {{-- Column 2: Folder Tab Photo Card --}}
+            <div class="lg:col-span-4 p-8 sm:p-12 flex flex-col justify-between space-y-6">
+                <div class="flex items-center justify-between font-mono text-xs text-neutral-400">
+                    <span class="text-3xl font-extrabold text-arch-text font-display">05</span>
+                    <span class="uppercase tracking-widest">DIRECTIONS</span>
+                </div>
+
+                {{-- Folder Tab Styled Card --}}
+                <div class="bg-white p-4 border border-arch-border shadow-card-depth group">
+                    <div class="aspect-[4/5] overflow-hidden bg-neutral-100 mb-3 relative">
+                        <img src="{{ asset('storage/demo/portrait-3.jpg') }}" alt="" class="w-full h-full object-cover filter grayscale contrast-110 group-hover:scale-105 transition-transform duration-700">
+                        <div class="absolute top-2 left-2 bg-black text-white text-[0.6rem] font-mono uppercase px-2 py-0.5">
+                            PORTRAIT
+                        </div>
                     </div>
-                    <div>
-                        <h3 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">
-                            Пары
-                        </h3>
-                        <p class="text-xs text-neutral-200 font-light leading-relaxed">
-                            Искренние прогулки вдвоём на набережной Ангары или на природе.
-                        </p>
-                    </div>
-                </a>
-                <img src="{{ asset('storage/demo/couple-1.jpg') }}" alt="" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                    <p class="text-xs text-neutral-600 font-mono leading-relaxed">
+                        Естественный свет Сибири, геометрия городского пространства и искренний взгляд.
+                    </p>
+                </div>
+
+                <div class="text-[0.68rem] font-mono text-neutral-400 uppercase tracking-widest">
+                    IRKUTSK &bull; EDITORIAL ARCHIVE
+                </div>
             </div>
 
-            {{-- Bento Card 3: Families --}}
-            <div class="md:col-span-4 relative rounded-3xl overflow-hidden border border-black/5 bg-apple-bg shadow-apple-card group apple-card-hover">
-                <a href="{{ route('portfolio.index', ['locale' => $locale, 'category' => 'families']) }}" class="block p-8 h-80 flex flex-col justify-between relative z-10 text-white">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-mono text-amber-200 uppercase tracking-widest font-bold">03 &bull; FAMILIES</span>
-                        <span class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-xs group-hover:bg-white group-hover:text-black transition-all">
-                            &nearr;
-                        </span>
-                    </div>
-                    <div>
-                        <h3 class="text-2xl font-extrabold text-white mb-1">
-                            Семьи
-                        </h3>
-                        <p class="text-xs text-neutral-200 font-light">
-                            Тепло домашнего утра, детские эмоции и моменты близости.
-                        </p>
-                    </div>
-                </a>
-                <img src="{{ asset('storage/demo/family-1.jpg') }}" alt="" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
-            </div>
+            {{-- Column 3: Red Duotone Card --}}
+            <div class="lg:col-span-4 p-8 sm:p-12 flex flex-col justify-between space-y-6">
+                <div>
+                    <span class="text-[0.68rem] uppercase tracking-widest text-crimson font-mono font-bold block mb-2">
+                        02 / CONCEPT
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight uppercase font-display text-arch-text">
+                        CAPTURING LIFE BEYOND THE FRAME
+                    </h2>
+                </div>
 
-            {{-- Bento Card 4: Events --}}
-            <div class="md:col-span-4 relative rounded-3xl overflow-hidden border border-black/5 bg-apple-bg shadow-apple-card group apple-card-hover">
-                <a href="{{ route('portfolio.index', ['locale' => $locale, 'category' => 'events']) }}" class="block p-8 h-80 flex flex-col justify-between relative z-10 text-white">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-mono text-amber-200 uppercase tracking-widest font-bold">04 &bull; EVENTS</span>
-                        <span class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-xs group-hover:bg-white group-hover:text-black transition-all">
+                {{-- Crimson Duotone Editorial Highlight Card --}}
+                <a href="{{ route('portfolio.index', ['locale' => $locale]) }}" 
+                   class="block relative rounded-sm overflow-hidden group bg-crimson text-white p-8 aspect-[4/5] flex flex-col justify-between shadow-card-depth">
+                    <img src="{{ asset('storage/demo/hero-secondary.jpg') }}" alt="" class="absolute inset-0 w-full h-full object-cover mix-blend-multiply opacity-70 group-hover:scale-105 transition-transform duration-700">
+                    <div class="relative z-10 flex items-center justify-between text-xs font-mono font-bold uppercase">
+                        <span>PORTFOLIO</span>
+                        <span class="w-8 h-8 rounded-full border border-white/40 flex items-center justify-center group-hover:bg-white group-hover:text-crimson transition-colors">
                             &nearr;
                         </span>
                     </div>
-                    <div>
-                        <h3 class="text-2xl font-extrabold text-white mb-1">
-                            События
-                        </h3>
-                        <p class="text-xs text-neutral-200 font-light">
-                            Камерные выставки, лекции, фестивали и важные даты.
-                        </p>
+                    <div class="relative z-10">
+                        <span class="text-xs uppercase tracking-widest font-mono text-white/80 block mb-1">Смотреть работы</span>
+                        <span class="text-xl font-bold uppercase tracking-tight font-display">
+                            Открыть серии &rarr;
+                        </span>
                     </div>
                 </a>
-                <img src="{{ asset('storage/demo/event-1.jpg') }}" alt="" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
-            </div>
 
-            {{-- Bento Card 5: Business & Brand --}}
-            <div class="md:col-span-4 relative rounded-3xl overflow-hidden border border-black/5 bg-apple-bg shadow-apple-card group apple-card-hover">
-                <a href="{{ route('portfolio.index', ['locale' => $locale, 'category' => 'business']) }}" class="block p-8 h-80 flex flex-col justify-between relative z-10 text-white">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-mono text-amber-200 uppercase tracking-widest font-bold">05 &bull; BRANDING</span>
-                        <span class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-xs group-hover:bg-white group-hover:text-black transition-all">
-                            &nearr;
-                        </span>
-                    </div>
-                    <div>
-                        <h3 class="text-2xl font-extrabold text-white mb-1">
-                            Бизнес и контент
-                        </h3>
-                        <p class="text-xs text-neutral-200 font-light">
-                            Визуальный контент для студий, мастерских и локальных брендов.
-                        </p>
-                    </div>
-                </a>
-                <img src="{{ asset('storage/demo/business-1.jpg') }}" alt="" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                <div class="text-[0.68rem] font-mono text-neutral-400 uppercase tracking-widest">
+                    BAIKAL REGION &bull; AVAILABLE 2026
+                </div>
             </div>
 
         </div>
@@ -222,185 +169,158 @@
     </div>
 </section>
 
-{{-- 3. SELECTED STORIES (SERIES SHOWCASE) --}}
-<section class="py-24 border-t border-black/5">
+{{-- ========================================================
+     3. DIRECTIONS / WHAT I CAN OFFER (CINEMATIC DARK ACCORDION)
+     ======================================================== --}}
+<section class="bg-cine-black text-white py-24 border-b border-cine-border relative">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div class="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
-            <div>
-                <span class="text-xs uppercase tracking-widest text-apple-accent font-semibold font-mono block mb-2">
-                    {{ __('site.featured_title') }}
-                </span>
-                <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-apple-text">
-                    {{ __('site.featured_subtitle') }}
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+            
+            {{-- Left Column: Huge Headline with Camera Crosshair --}}
+            <div class="lg:col-span-5 space-y-6 sticky top-28">
+                <div class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-crimson font-bold">
+                    <span class="w-2 h-2 rounded-full bg-crimson animate-pulse"></span>
+                    <span>{{ __('site.directions_title') }}</span>
+                </div>
+                <h2 class="text-4xl sm:text-6xl font-extrabold uppercase tracking-tight text-white font-display leading-[0.95]">
+                    WHAT I CAN OFFER
                 </h2>
+                <p class="text-sm text-neutral-400 font-light max-w-md leading-relaxed font-mono">
+                    Живые моменты, чистая геометрия кадра и естественный свет. Выберите подходящее направление для вашей съёмки.
+                </p>
+                <div class="pt-4">
+                    <a href="{{ route('portfolio.index', ['locale' => $locale]) }}" class="btn-crimson px-8 py-3.5 text-xs font-bold">
+                        <span>Смотреть все серии</span>
+                        <span>&nearr;</span>
+                    </a>
+                </div>
             </div>
-            <a href="{{ route('portfolio.index', ['locale' => $locale]) }}" 
-               class="text-xs uppercase tracking-widest font-semibold text-apple-textMuted hover:text-apple-text inline-flex items-center gap-1.5 transition-colors">
-                <span>{{ __('site.view_all_series') }}</span>
-                <span>&rarr;</span>
-            </a>
-        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            @foreach($featuredSeries as $index => $series)
-                <article class="bg-white rounded-3xl overflow-hidden border border-black/5 shadow-apple-card apple-card-hover group">
-                    <a href="{{ route('series.show', ['locale' => $locale, 'slug' => $series->slug]) }}" class="block">
+            {{-- Right Column: Horizontal Accordion Rows with Thumbnails --}}
+            <div class="lg:col-span-7 divide-y divide-white/10 border-y border-white/10">
+                @foreach($categories as $cat)
+                    <a href="{{ route('portfolio.index', ['locale' => $locale, 'category' => $cat->slug]) }}" 
+                       class="py-6 px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-6 group hover:bg-white/[0.03] transition-colors">
                         
-                        <div class="overflow-hidden aspect-[16/10] relative">
-                            <img src="{{ $series->cover_url }}" 
-                                 alt="{{ $series->localizedTitle($locale) }}" 
-                                 loading="lazy"
-                                 width="800"
-                                 height="500"
-                                 class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105">
-                            
-                            {{-- Apple Tag Pill --}}
-                            <div class="absolute top-4 left-4 apple-glass rounded-full px-3.5 py-1 text-apple-text text-[0.68rem] uppercase tracking-wider font-mono font-semibold shadow-sm">
-                                {{ sprintf('%02d', $index + 1) }} &bull; {{ $series->category ? $series->category->localizedName($locale) : 'Series' }}
+                        <div class="space-y-1">
+                            <div class="text-xs font-mono text-crimson font-bold">
+                                0{{ $loop->iteration }} &bull; DIRECTION
                             </div>
-
-                            @if($series->is_demo)
-                            <div class="absolute top-4 right-4 bg-apple-accent text-white text-[0.62rem] uppercase tracking-widest px-2.5 py-0.5 rounded-full font-bold shadow-sm">
-                                Demo
-                            </div>
-                            @endif
+                            <h3 class="text-2xl font-bold uppercase tracking-tight text-white group-hover:text-crimson font-display transition-colors">
+                                {{ $cat->localizedName($locale) }}
+                            </h3>
+                            <p class="text-xs text-neutral-400 font-light font-mono">
+                                {{ $cat->series_count }} готовых историй в портфолио
+                            </p>
                         </div>
 
-                        <div class="p-6 sm:p-8 space-y-2">
-                            <div class="flex items-center justify-between text-xs text-apple-textMuted font-mono">
-                                <span>{{ $series->localizedLocation($locale) }}</span>
-                                <span>{{ $series->photos->count() }} кадров</span>
+                        {{-- Inset Preview Thumbnail & Arrow --}}
+                        <div class="flex items-center gap-4 shrink-0">
+                            <div class="w-24 h-16 overflow-hidden bg-neutral-800 rounded-sm border border-white/10">
+                                @php
+                                    $sampleImg = match($cat->slug) {
+                                        'portraits' => 'storage/demo/portrait-1.jpg',
+                                        'couples' => 'storage/demo/couple-1.jpg',
+                                        'families' => 'storage/demo/family-1.jpg',
+                                        'events' => 'storage/demo/event-1.jpg',
+                                        default => 'storage/demo/business-1.jpg',
+                                    };
+                                @endphp
+                                <img src="{{ asset($sampleImg) }}" alt="" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                             </div>
-
-                            <h3 class="text-2xl font-bold text-apple-text group-hover:text-apple-accent transition-colors">
-                                {{ $series->localizedTitle($locale) }}
-                            </h3>
-
-                            @if($series->localizedDescription($locale))
-                            <p class="text-xs text-apple-textMuted line-clamp-2 pt-1 font-light leading-relaxed">
-                                {{ $series->localizedDescription($locale) }}
-                            </p>
-                            @endif
-
-                            <div class="pt-3">
-                                <span class="text-xs font-semibold text-apple-accent inline-flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                                    {{ __('site.view_series') }} &rarr;
-                                </span>
-                            </div>
+                            <span class="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-white group-hover:bg-crimson group-hover:border-crimson transition-all text-xs font-bold">
+                                &nearr;
+                            </span>
                         </div>
 
                     </a>
-                </article>
-            @endforeach
+                @endforeach
+            </div>
+
         </div>
 
     </div>
 </section>
 
-{{-- 4. PHILOSOPHY / CREATOR STATEMENT --}}
-<section class="py-24 border-t border-black/5 bg-white text-center relative overflow-hidden">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 relative z-10">
-        <span class="text-xs uppercase tracking-widest text-apple-accent font-semibold font-mono block">
-            {{ __('site.about_preview_title') }}
-        </span>
-        <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-apple-text leading-tight">
-            Каждая съёмка — это живой разговор, а не набор искусственных поз.
-        </h2>
-        <p class="text-base sm:text-lg text-apple-textMuted font-light leading-relaxed max-w-2xl mx-auto">
-            {{ __('site.about_preview_text') }}
-        </p>
-        <div class="pt-4">
-            <a href="{{ route('about.index', ['locale' => $locale]) }}" 
-               class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-apple-bg hover:bg-neutral-200 text-apple-text text-xs uppercase tracking-widest font-semibold transition-all">
-                <span>{{ __('site.nav_about') }}</span>
-                <span>&rarr;</span>
-            </a>
-        </div>
-    </div>
-</section>
-
-{{-- 5. PRICING PACKAGES --}}
-<section class="py-24 border-t border-black/5">
+{{-- ========================================================
+     4. PANORAMIC STORIES: "SEE THE MAGIC FOR YOURSELF"
+     ======================================================== --}}
+<section class="bg-arch-bg text-arch-text py-24 border-b border-arch-border">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div class="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
+        {{-- Section Header --}}
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
             <div>
-                <span class="text-xs uppercase tracking-widest text-apple-accent font-semibold font-mono block mb-2">
-                    {{ __('site.pricing_preview_title') }}
+                <span class="text-xs uppercase tracking-widest text-crimson font-mono font-bold block mb-2">
+                    03 / CURATED ARCHIVE
                 </span>
-                <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-apple-text">
-                    {{ __('site.pricing_preview_subtitle') }}
+                <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight uppercase font-display text-arch-text">
+                    SEE THE MAGIC FOR YOURSELF
                 </h2>
             </div>
-            <a href="{{ route('pricing.index', ['locale' => $locale]) }}" 
-               class="text-xs uppercase tracking-widest font-semibold text-apple-textMuted hover:text-apple-text inline-flex items-center gap-1.5 transition-colors">
-                <span>{{ __('site.all_packages') }}</span>
+            <a href="{{ route('portfolio.index', ['locale' => $locale]) }}" 
+               class="text-xs uppercase tracking-widest font-bold text-arch-text hover:text-crimson inline-flex items-center gap-2 transition-colors font-mono">
+                <span>{{ __('site.view_all_series') }}</span>
                 <span>&rarr;</span>
             </a>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            @foreach($packages as $pkg)
-                <div class="bg-white rounded-3xl p-8 sm:p-10 flex flex-col justify-between border border-black/5 shadow-apple-card apple-card-hover relative {{ $loop->iteration === 2 ? 'ring-2 ring-apple-accent' : '' }}">
-                    
-                    @if($loop->iteration === 2)
-                    <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-apple-accent text-white text-[0.65rem] uppercase tracking-widest font-bold shadow-md">
-                        Рекомендуемый выбор
-                    </div>
-                    @endif
+        {{-- Panoramic Series Cards with Inset Overlapping Photo (Exact match to reference) --}}
+        <div class="space-y-16">
+            @foreach($featuredSeries as $index => $series)
+                <div class="bg-white border border-arch-border shadow-card-depth overflow-hidden group">
+                    <div class="relative aspect-[16/9] sm:aspect-[21/9] overflow-hidden bg-neutral-900">
+                        
+                        {{-- Panoramic Background Image --}}
+                        <img src="{{ $series->cover_url }}" 
+                             alt="{{ $series->localizedTitle($locale) }}" 
+                             loading="lazy"
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out opacity-85">
+                        
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
 
-                    <div>
-                        <div class="flex items-center justify-between pb-4 mb-4 border-b border-black/5">
-                            <span class="font-mono text-xs text-neutral-400 uppercase tracking-widest">
-                                TIER {{ sprintf('%02d', $loop->iteration) }}
-                            </span>
-                        </div>
-
-                        <h3 class="text-2xl font-bold text-apple-text mb-2">
-                            {{ $pkg->localizedTitle($locale) }}
-                        </h3>
-
-                        <p class="text-xs text-apple-textMuted mb-6 font-light">
-                            {{ $pkg->localizedSubtitle($locale) }}
-                        </p>
-
-                        {{-- Price Highlight --}}
-                        <div class="p-5 rounded-2xl bg-apple-bg border border-black/5 mb-6">
-                            <span class="text-3xl font-extrabold text-apple-text block">
-                                {{ $pkg->formattedPrice($locale) }}
-                            </span>
-                            @if(is_null($pkg->price))
-                            <span class="text-[0.68rem] text-apple-accent uppercase tracking-widest font-mono font-semibold block mt-1">
-                                Индивидуальный расчет
-                            </span>
-                            @endif
-                        </div>
-
-                        <div class="space-y-2.5 text-xs text-apple-textMuted mb-6">
-                            @if($pkg->localizedDuration($locale))
-                            <div class="flex justify-between py-1 border-b border-black/5">
-                                <span class="text-neutral-400">{{ __('site.duration') }}</span>
-                                <span class="font-semibold text-apple-text">{{ $pkg->localizedDuration($locale) }}</span>
+                        {{-- Floating Inset Inverted Secondary Card (Signature from reference!) --}}
+                        <div class="absolute bottom-6 left-6 sm:bottom-8 sm:left-8 z-20 flex flex-col sm:flex-row sm:items-end gap-6">
+                            
+                            {{-- Mini Inset Thumbnail --}}
+                            @php
+                                $secondPhoto = $series->photos->skip(1)->first();
+                            @endphp
+                            @if($secondPhoto)
+                            <div class="w-32 h-44 sm:w-40 sm:h-52 bg-black border-2 border-white shadow-2xl overflow-hidden hidden sm:block relative">
+                                <img src="{{ $secondPhoto->url }}" alt="" class="w-full h-full object-cover">
+                                <span class="absolute top-2 left-2 bg-crimson text-white font-mono text-[0.55rem] px-1 font-bold">
+                                    INSET 0{{ $index + 1 }}
+                                </span>
                             </div>
                             @endif
 
-                            @if($pkg->localizedPhotoCount($locale))
-                            <div class="flex justify-between py-1 border-b border-black/5">
-                                <span class="text-neutral-400">{{ __('site.photo_count') }}</span>
-                                <span class="font-semibold text-apple-text">{{ $pkg->localizedPhotoCount($locale) }}</span>
+                            {{-- Title and Red Action Button --}}
+                            <div class="space-y-3 text-white text-left">
+                                <span class="text-xs font-mono uppercase tracking-widest text-crimson font-bold bg-black/60 px-2 py-0.5">
+                                    {{ $series->category ? $series->category->localizedName($locale) : 'SERIES' }} &bull; {{ $series->localizedLocation($locale) }}
+                                </span>
+                                <h3 class="text-2xl sm:text-4xl font-extrabold uppercase tracking-tight font-display drop-shadow-md">
+                                    {{ $series->localizedTitle($locale) }}
+                                </h3>
+                                <div>
+                                    <a href="{{ route('series.show', ['locale' => $locale, 'slug' => $series->slug]) }}" 
+                                       class="btn-crimson px-6 py-3 text-xs tracking-wider font-bold">
+                                        <span>Смотреть серию</span>
+                                        <span>&nearr;</span>
+                                    </a>
+                                </div>
                             </div>
-                            @endif
+
                         </div>
-                    </div>
 
-                    <div class="pt-6">
-                        <a href="{{ route('contacts.index', ['locale' => $locale]) }}" 
-                           class="block w-full text-center py-3.5 {{ $loop->iteration === 2 ? 'bg-apple-text text-white hover:bg-black' : 'bg-apple-bg text-apple-text hover:bg-neutral-200 border border-black/5' }} text-xs uppercase tracking-widest font-bold rounded-full transition-all shadow-sm">
-                            {{ __('site.book_package') }}
-                        </a>
-                    </div>
+                        {{-- Top Right Badge --}}
+                        <div class="absolute top-6 right-6 font-mono text-xs text-white bg-black/70 backdrop-blur-sm px-3 py-1 uppercase tracking-widest border border-white/20">
+                            {{ $series->photos->count() }} КАДРОВ
+                        </div>
 
+                    </div>
                 </div>
             @endforeach
         </div>
@@ -408,28 +328,126 @@
     </div>
 </section>
 
-{{-- 6. FINAL CALLOUT --}}
-<section class="py-24 border-t border-black/5 bg-white text-center relative">
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        <span class="text-xs uppercase tracking-widest text-apple-accent font-semibold font-mono block">
-            {{ __('site.location') }} &bull; {{ __('site.author_name') }}
-        </span>
-        <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-apple-text leading-tight">
-            Готовы обсудить идею вашей съёмки?
-        </h2>
-        <p class="text-base text-apple-textMuted font-light max-w-xl mx-auto leading-relaxed">
-            Напишите пару слов о вашем событии или проекте в Telegram — я помогу выбрать локацию и подобрать подходящий формат.
-        </p>
-        <div class="pt-6 flex flex-col sm:flex-row justify-center gap-4">
-            <a href="{{ route('contacts.index', ['locale' => $locale]) }}" 
-               class="px-9 py-4 bg-apple-text text-white hover:bg-black text-xs uppercase tracking-widest font-bold rounded-full transition-all shadow-md">
-                {{ __('site.hero_cta') }}
-            </a>
-            <a href="{{ route('portfolio.index', ['locale' => $locale]) }}" 
-               class="px-8 py-4 bg-apple-bg hover:bg-neutral-200 text-apple-text text-xs uppercase tracking-widest font-semibold rounded-full border border-black/5 transition-all">
-                {{ __('site.hero_portfolio') }}
-            </a>
+{{-- ========================================================
+     5. PRICING & PACKAGES: "CHOOSE YOUR STORY"
+     ======================================================== --}}
+<section class="bg-arch-bg text-arch-text py-24 border-b border-arch-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-arch-border border-y border-arch-border">
+            
+            {{-- Column 1: Intro & Portrait Tag --}}
+            <div class="lg:col-span-4 p-8 sm:p-12 flex flex-col justify-between space-y-8">
+                <div>
+                    <span class="text-[0.68rem] uppercase tracking-widest text-crimson font-mono font-bold block mb-3">
+                        04 / PRICING & PACKAGES
+                    </span>
+                    <h2 class="text-3xl sm:text-5xl font-extrabold uppercase tracking-tight font-display text-arch-text mb-4">
+                        CHOOSE YOUR STORY
+                    </h2>
+                    <p class="text-xs text-neutral-600 font-mono leading-relaxed">
+                        Прозрачные форматы сотрудничества. Каждый пакет адаптируется под ваши задачи в Иркутске и окрестностях.
+                    </p>
+                </div>
+
+                {{-- Author Mini Profile Tag --}}
+                <div class="bg-white p-4 border border-arch-border flex items-center gap-3">
+                    <img src="{{ asset('storage/demo/portrait-2.jpg') }}" alt="" class="w-10 h-10 object-cover rounded-sm">
+                    <div class="text-xs font-mono">
+                        <span class="font-bold text-arch-text block">Роман Юн</span>
+                        <span class="text-neutral-500 text-[0.65rem]">Консультация и бронь</span>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Column 2 & 3: Packages with Dark Image Headers --}}
+            @foreach($packages->take(2) as $pkg)
+                <div class="lg:col-span-4 p-8 sm:p-10 flex flex-col justify-between bg-white space-y-6">
+                    <div>
+                        {{-- Dark Header Card --}}
+                        <div class="bg-neutral-950 text-white p-6 rounded-sm mb-6 relative overflow-hidden">
+                            <span class="text-[0.65rem] font-mono text-crimson uppercase tracking-widest font-bold block mb-1">
+                                PACKAGE 0{{ $loop->iteration }}
+                            </span>
+                            <h3 class="text-2xl font-bold uppercase font-display mb-2">
+                                {{ $pkg->localizedTitle($locale) }}
+                            </h3>
+                            <div class="text-2xl font-extrabold text-white">
+                                {{ $pkg->formattedPrice($locale) }}
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-neutral-600 font-mono mb-6 leading-relaxed">
+                            {{ $pkg->localizedSubtitle($locale) }}
+                        </p>
+
+                        {{-- Inclusions --}}
+                        <ul class="space-y-2 text-xs font-mono text-neutral-700 mb-8 border-t border-arch-border pt-4">
+                            @foreach($pkg->getIncludesList($locale) as $item)
+                                <li class="flex items-start gap-2">
+                                    <span class="text-crimson font-bold">&bull;</span>
+                                    <span>{{ $item }}</span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+
+                    <a href="{{ route('contacts.index', ['locale' => $locale]) }}" 
+                       class="btn-crimson w-full py-3.5 text-xs text-center font-bold">
+                        <span>{{ __('site.book_package') }}</span>
+                        <span>&nearr;</span>
+                    </a>
+                </div>
+            @endforeach
+
         </div>
+
+    </div>
+</section>
+
+{{-- ========================================================
+     6. PHILOSOPHY / CLIENT STORIES (EDITORIAL QUOTE & PORTRAIT)
+     ======================================================== --}}
+<section class="bg-arch-bg text-arch-text py-24 border-b border-arch-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            {{-- Left: Crimson Framed Portrait --}}
+            <div class="lg:col-span-4">
+                <div class="relative bg-crimson p-4 pb-12 shadow-card-depth">
+                    <div class="aspect-[3/4] overflow-hidden bg-neutral-900">
+                        <img src="{{ asset('storage/demo/portrait-2.jpg') }}" alt="Roman Yun" class="w-full h-full object-cover filter contrast-110">
+                    </div>
+                    <div class="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white font-mono text-xs uppercase font-bold">
+                        <span>Роман Юн</span>
+                        <span>Иркутск</span>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Right: Massive Editorial Quote Statement --}}
+            <div class="lg:col-span-8 space-y-6 lg:pl-6">
+                <span class="text-xs uppercase tracking-widest text-crimson font-mono font-bold block">
+                    05 / PHILOSOPHY
+                </span>
+                <span class="text-6xl text-crimson font-serif font-black block leading-none select-none">“</span>
+                <blockquote class="text-2xl sm:text-3xl lg:text-4xl font-extrabold uppercase tracking-tight text-arch-text font-display leading-snug -mt-8">
+                    «Мне важно, чтобы во время съёмки вы чувствовали себя свободно и естественно. Без навязанных поз и шаблонов — только ваши настоящие эмоции.»
+                </blockquote>
+                <div class="pt-4 flex items-center gap-6">
+                    <a href="{{ route('contacts.index', ['locale' => $locale]) }}" class="btn-crimson px-8 py-3.5 text-xs font-bold">
+                        <span>Обсудить съёмку</span>
+                        <span>&nearr;</span>
+                    </a>
+                    <a href="{{ route('about.index', ['locale' => $locale]) }}" class="text-xs font-mono uppercase tracking-widest font-bold text-arch-text hover:text-crimson transition-colors">
+                        Подробнее о фотографе &rarr;
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
     </div>
 </section>
 

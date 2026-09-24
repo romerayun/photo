@@ -11,36 +11,46 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['"Plus Jakarta Sans"', 'Inter', '-apple-system', 'BlinkMacSystemFont', ...defaultTheme.fontFamily.sans],
+                sans: ['"Plus Jakarta Sans"', 'Inter', ...defaultTheme.fontFamily.sans],
+                display: ['"Syne"', '"Plus Jakarta Sans"', 'Inter', ...defaultTheme.fontFamily.sans],
                 serif: ['"Cormorant Garamond"', 'Playfair Display', 'Georgia', ...defaultTheme.fontFamily.serif],
             },
             colors: {
-                apple: {
-                    bg: '#F5F5F7',            // Apple signature pearl background
-                    surface: '#FFFFFF',       // Pure white cards
-                    subtle: '#EBEBED',        // Subtle card / badge tint
-                    card: '#FFFFFF',
-                    border: 'rgba(0, 0, 0, 0.06)',
-                    borderHover: 'rgba(0, 0, 0, 0.15)',
-                    line: 'rgba(0, 0, 0, 0.08)',
-                    text: '#1D1D1F',          // Deepest Apple text
-                    textMuted: '#6E6E73',     // Secondary Apple text
-                    textLight: '#86868B',     // Tertiary Apple text
-                    accent: '#B07D53',        // Noble warm titanium / bronze
-                    accentHover: '#96653E',
-                    accentLight: '#FBF5EE',
+                crimson: {
+                    DEFAULT: '#E51920',
+                    hover: '#C41218',
+                    dark: '#9A0B10',
+                    light: 'rgba(229, 25, 32, 0.10)',
+                    glow: 'rgba(229, 25, 32, 0.35)',
+                },
+                cine: {
+                    black: '#09090B',
+                    surface: '#111114',
+                    card: '#18181C',
+                    border: 'rgba(255, 255, 255, 0.08)',
+                    text: '#FFFFFF',
+                    muted: '#8E8E93',
+                },
+                arch: {
+                    bg: '#F8F8FA',
+                    surface: '#FFFFFF',
+                    border: '#E4E4E8',
+                    line: '#EFEFF2',
+                    text: '#0C0C0E',
+                    muted: '#66666E',
                 },
             },
             letterSpacing: {
-                tightest: '-0.035em',
-                tighter: '-0.02em',
+                tightest: '-0.04em',
+                tighter: '-0.025em',
                 wide: '0.04em',
-                widest: '0.16em',
+                widest: '0.18em',
+                mega: '0.25em',
             },
             boxShadow: {
-                'apple-card': '0 4px 24px -2px rgba(0, 0, 0, 0.04), 0 2px 6px -1px rgba(0, 0, 0, 0.02)',
-                'apple-card-hover': '0 20px 40px -10px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.04)',
-                'apple-pill': '0 2px 10px rgba(0, 0, 0, 0.06)',
+                'crimson-glow': '0 0 25px rgba(229, 25, 32, 0.35)',
+                'crimson-btn': '0 4px 18px rgba(229, 25, 32, 0.35)',
+                'card-depth': '0 12px 32px -4px rgba(0, 0, 0, 0.08)',
             },
             aspectRatio: {
                 '4/5': '4 / 5',
