@@ -218,7 +218,7 @@
 {{-- ========================================================
      4. PANORAMIC STORIES: FULL WIDTH ARCHIVE
      ======================================================== --}}
-<section class="bg-arch-bg text-arch-text pt-24 pb-0 border-b border-arch-border">
+<section class="bg-arch-bg text-arch-text pt-24 pb-0">
     {{-- Section Header --}}
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -238,8 +238,8 @@
         </div>
     </div>
 
-    {{-- Panoramic Full-Width Series Blocks (Flush edge-to-edge, zero margin) --}}
-    <div class="w-full border-t border-arch-border divide-y divide-arch-border">
+    {{-- Panoramic Full-Width Series Blocks (Flush edge-to-edge, zero margin, zero borders) --}}
+    <div class="w-full">
         @foreach($featuredSeries as $index => $series)
             <div class="w-full relative overflow-hidden group bg-neutral-950 aspect-[16/10] sm:aspect-[21/9] lg:aspect-[24/9] min-h-[440px]">
                 
@@ -251,31 +251,18 @@
                 
                 <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
 
-                {{-- Floating Content (Clean, without author mentions) --}}
-                <div class="absolute bottom-6 left-6 sm:bottom-10 sm:left-12 lg:left-20 z-20 flex flex-col sm:flex-row sm:items-end gap-6 sm:gap-8 max-w-5xl">
+                {{-- Floating Content --}}
+                <div class="absolute bottom-6 left-6 sm:bottom-10 sm:left-12 lg:left-20 z-20 max-w-4xl">
                     
-                    {{-- Mini Inset Thumbnail (2nd photo of the series) --}}
-                    @php
-                        $secondPhoto = $series->photos->skip(1)->first();
-                    @endphp
-                    @if($secondPhoto)
-                    <div class="w-32 h-44 sm:w-40 sm:h-52 bg-black border-2 border-white shadow-2xl overflow-hidden hidden sm:block relative shrink-0">
-                        <img src="{{ $secondPhoto->url }}" alt="" class="w-full h-full object-cover">
-                        <span class="absolute top-2 left-2 bg-crimson text-white font-mono text-[0.55rem] px-1 font-bold">
-                            0{{ $index + 1 }}
-                        </span>
-                    </div>
-                    @endif
-
                     {{-- Title and Red Action Button --}}
-                    <div class="space-y-3 text-white text-left">
-                        <span class="text-xs font-mono uppercase tracking-widest text-crimson font-bold bg-black/70 px-2.5 py-1">
+                    <div class="space-y-4 text-white text-left">
+                        <span class="inline-block text-xs font-mono uppercase tracking-widest text-crimson font-bold bg-black/70 px-2.5 py-1">
                             {{ $series->category ? $series->category->localizedName($locale) : 'СЕРИЯ' }} &bull; {{ $series->localizedLocation($locale) }}
                         </span>
                         <h3 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold uppercase tracking-tight font-display drop-shadow-md">
                             {{ $series->localizedTitle($locale) }}
                         </h3>
-                        <div>
+                        <div class="pt-1">
                             <a href="{{ route('series.show', ['slug' => $series->slug]) }}" 
                                class="btn-crimson px-7 py-3.5 text-xs tracking-wider font-bold">
                                 <span>Смотреть серию</span>
@@ -287,7 +274,7 @@
                 </div>
 
                 {{-- Top Right Badge --}}
-                <div class="absolute top-6 right-6 sm:right-12 lg:right-20 font-mono text-xs text-white bg-black/70 backdrop-blur-sm px-4 py-1.5 uppercase tracking-widest border border-white/20">
+                <div class="absolute top-6 right-6 sm:right-12 lg:right-20 font-mono text-xs text-white bg-black/70 backdrop-blur-sm px-4 py-1.5 uppercase tracking-widest">
                     {{ $series->photos->count() }} КАДРОВ
                 </div>
 
