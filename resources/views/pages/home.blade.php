@@ -10,13 +10,15 @@
      ======================================================== --}}
 <section class="relative min-h-[90vh] flex items-center justify-center bg-cine-black overflow-hidden pt-12 pb-24 border-b border-cine-border">
     
-    {{-- Background Motion / Atmosphere Layer --}}
-    <div class="absolute inset-0 z-0">
-        <img src="{{ asset('images/hero-bg.jpg') }}" 
-             alt="{{ __('site.author_name') }}" 
-             fetchpriority="high"
-             loading="eager"
-             class="w-full h-full object-cover object-center opacity-50 sm:opacity-60 scale-105">
+    {{-- Background Motion / Video Atmosphere Layer --}}
+    <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <video autoplay loop muted playsinline 
+               poster="{{ asset('images/hero-bg.jpg') }}" 
+               class="w-full h-full object-cover object-center opacity-55 sm:opacity-65 scale-105">
+            <source src="{{ asset('videos/video-bg.mp4') }}" type="video/mp4">
+            <source src="{{ asset('videos/video-bg.mov') }}" type="video/quicktime">
+            <img src="{{ asset('images/hero-bg.jpg') }}" alt="{{ __('site.author_name') }}" class="w-full h-full object-cover object-center">
+        </video>
         <div class="absolute inset-0 bg-gradient-to-t from-cine-black via-cine-black/60 to-cine-black/40"></div>
         <div class="absolute inset-0 bg-radial from-transparent via-cine-black/50 to-cine-black"></div>
     </div>
