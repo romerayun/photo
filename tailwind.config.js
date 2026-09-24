@@ -12,7 +12,7 @@ export default {
         extend: {
             fontFamily: {
                 sans: ['"Plus Jakarta Sans"', 'Inter', ...defaultTheme.fontFamily.sans],
-                display: ['"Syne"', '"Plus Jakarta Sans"', 'Inter', ...defaultTheme.fontFamily.sans],
+                display: ['"Unbounded"', '"Syne"', '"Plus Jakarta Sans"', 'Inter', ...defaultTheme.fontFamily.sans],
                 serif: ['"Cormorant Garamond"', 'Playfair Display', 'Georgia', ...defaultTheme.fontFamily.serif],
             },
             colors: {
