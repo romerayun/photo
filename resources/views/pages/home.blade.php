@@ -12,11 +12,11 @@
     
     {{-- Background Motion / Atmosphere Layer --}}
     <div class="absolute inset-0 z-0">
-        <img src="{{ asset('storage/demo/hero-main.jpg') }}" 
+        <img src="{{ asset('images/hero-bg.jpg') }}" 
              alt="{{ __('site.author_name') }}" 
              fetchpriority="high"
              loading="eager"
-             class="w-full h-full object-cover object-center opacity-30 filter grayscale contrast-125 scale-105">
+             class="w-full h-full object-cover object-center opacity-50 sm:opacity-60 scale-105">
         <div class="absolute inset-0 bg-gradient-to-t from-cine-black via-cine-black/60 to-cine-black/40"></div>
         <div class="absolute inset-0 bg-radial from-transparent via-cine-black/50 to-cine-black"></div>
     </div>
