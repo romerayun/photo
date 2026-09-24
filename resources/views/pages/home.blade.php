@@ -21,25 +21,8 @@
         <div class="absolute inset-0 bg-radial from-transparent via-cine-black/50 to-cine-black"></div>
     </div>
 
-    {{-- Camera Auto-Focus Frame (Center Visual Anchor from Reference) --}}
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-44 z-10 pointer-events-none">
-        <div class="camera-focus-bracket w-36 h-36 sm:w-44 sm:h-44 rounded-sm">
-            <span class="absolute -top-3 left-0 bg-crimson text-white font-mono text-[0.6rem] px-1 font-bold uppercase tracking-widest">
-                ФОКУС 50MM
-            </span>
-            <span class="absolute -bottom-3 right-0 bg-white/20 backdrop-blur-sm text-white font-mono text-[0.6rem] px-1 uppercase tracking-widest">
-                RAW &bull; 1/250с
-            </span>
-        </div>
-    </div>
-
     {{-- Center Typographic Impact --}}
-    <div class="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-28">
-        
-        <div class="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md border border-white/15 mb-6 text-[0.68rem] uppercase font-mono tracking-widest text-neutral-300">
-            <span class="w-2 h-2 rounded-full bg-crimson shadow-crimson-glow"></span>
-            <span>ПОРТФОЛИО &bull; ИРКУТСК 2026</span>
-        </div>
+    <div class="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-20 sm:py-28">
 
         <h1 class="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold uppercase tracking-tight text-white font-display leading-[0.95] mb-6">
             {{ \App\Models\Setting::get("hero_phrase_{$locale}", __('site.hero_phrase')) }}
@@ -172,8 +155,8 @@
                     <span class="w-2 h-2 rounded-full bg-crimson animate-pulse"></span>
                     <span>{{ __('site.directions_title') }}</span>
                 </div>
-                <h2 class="text-4xl sm:text-6xl font-extrabold uppercase tracking-tight text-white font-display leading-[0.95]">
-                    НАПРАВЛЕНИЯ СЪЁМОК
+                <h2 class="text-3xl sm:text-4xl lg:text-[2.6rem] xl:text-5xl font-extrabold uppercase tracking-tight text-white font-display leading-[1.05] break-words">
+                    НАПРАВЛЕНИЯ<br>СЪЁМОК
                 </h2>
                 <p class="text-sm text-neutral-400 font-light max-w-md leading-relaxed font-mono">
                     Живые моменты, чистая геометрия кадра и естественный свет. Выберите подходящее направление для вашей съёмки.
@@ -235,7 +218,7 @@
 {{-- ========================================================
      4. PANORAMIC STORIES: FULL WIDTH ARCHIVE
      ======================================================== --}}
-<section class="bg-arch-bg text-arch-text py-24 border-b border-arch-border">
+<section class="bg-arch-bg text-arch-text pt-24 pb-0 border-b border-arch-border">
     {{-- Section Header --}}
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -255,10 +238,10 @@
         </div>
     </div>
 
-    {{-- Panoramic Full-Width Series Blocks --}}
-    <div class="w-full space-y-12">
+    {{-- Panoramic Full-Width Series Blocks (Flush edge-to-edge, zero margin) --}}
+    <div class="w-full border-t border-arch-border divide-y divide-arch-border">
         @foreach($featuredSeries as $index => $series)
-            <div class="w-full relative overflow-hidden group bg-neutral-950 border-y border-arch-border aspect-[16/10] sm:aspect-[21/9] lg:aspect-[24/9] min-h-[460px]">
+            <div class="w-full relative overflow-hidden group bg-neutral-950 aspect-[16/10] sm:aspect-[21/9] lg:aspect-[24/9] min-h-[440px]">
                 
                 {{-- Panoramic Background Image --}}
                 <img src="{{ $series->cover_url }}" 
