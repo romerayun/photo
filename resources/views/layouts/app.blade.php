@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}" class="scroll-smooth">
+<html lang="{{ app()->getLocale() }}" class="scroll-smooth bg-apple-bg text-apple-text antialiased">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -46,25 +46,28 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-canvas text-graphite-900 font-sans antialiased selection:bg-terracotta selection:text-white flex flex-col min-h-screen">
+<body class="bg-apple-bg text-apple-text font-sans antialiased selection:bg-apple-blue selection:text-white flex flex-col min-h-screen relative overflow-x-hidden">
 
-    {{-- Discrete Demo Mode Banner --}}
+    {{-- Subtle Top Spotlight Radial Glow (Apple Pro Signature) --}}
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-apple-hero-radial pointer-events-none -z-10 opacity-70"></div>
+
+    {{-- Demo Mode Notification Pill --}}
     @if(\App\Models\Setting::isDemoMode())
-    <aside class="bg-surface border-b border-editorial-border py-2 px-4 text-xs text-graphite-600">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-            <div class="flex items-center gap-2">
-                <span class="inline-block w-2 h-2 rounded-full bg-terracotta animate-pulse" aria-hidden="true"></span>
-                <span class="font-medium text-graphite-800">{{ __('site.demo_badge') }}:</span>
-                <span>{{ __('site.demo_banner_text') }}</span>
+    <aside class="w-full bg-apple-surface/90 border-b border-apple-border py-2 px-4 text-xs text-apple-textMuted z-50">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
+            <div class="flex items-center gap-2.5">
+                <span class="inline-block w-2 h-2 rounded-full bg-apple-blue shadow-[0_0_8px_#2997FF] animate-pulse" aria-hidden="true"></span>
+                <span class="font-semibold text-white tracking-wide uppercase text-[0.68rem]">{{ __('site.demo_badge') }}:</span>
+                <span class="text-apple-textMuted text-xs">{{ __('site.demo_banner_text') }}</span>
             </div>
-            <a href="{{ route('admin.login') }}" class="text-terracotta hover:text-terracotta-dark font-medium underline underline-offset-4 shrink-0 transition-colors">
-                Панель управления
+            <a href="{{ route('admin.login') }}" class="text-apple-blue hover:text-white text-xs font-medium transition-colors shrink-0 underline underline-offset-4">
+                Панель управления &rarr;
             </a>
         </div>
     </aside>
     @endif
 
-    {{-- Top Navigation --}}
+    {{-- Apple Floating Header --}}
     @include('components.navbar')
 
     {{-- Main Content --}}

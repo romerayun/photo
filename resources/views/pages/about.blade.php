@@ -4,14 +4,14 @@
 @section('description', __('site.about_subtitle') . '. ' . __('site.about_p1'))
 
 @section('content')
-<div class="py-12 md:py-20">
+<div class="py-16 md:py-24">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
             
-            {{-- Left: Portrait spot --}}
+            {{-- Left: Apple Portrait Showcase --}}
             <div class="lg:col-span-5 sticky top-28">
-                <div class="bg-subtle aspect-[3/4] overflow-hidden relative shadow-sm">
+                <div class="rounded-3xl overflow-hidden border border-white/10 shadow-apple-glow bg-neutral-900 relative group aspect-[3/4]">
                     <img src="{{ asset('storage/demo/portrait-2.jpg') }}" 
                          alt="{{ __('site.author_name') }} — {{ __('site.author_role') }}" 
                          loading="eager"
@@ -19,29 +19,29 @@
                          height="1067"
                          class="w-full h-full object-cover">
                     
-                    <div class="absolute bottom-4 left-4 bg-canvas/95 backdrop-blur-sm px-4 py-2 border border-editorial-border">
-                        <span class="font-serif text-lg text-graphite-950 block">{{ __('site.author_name') }}</span>
-                        <span class="text-xs uppercase tracking-widest text-graphite-500 font-mono">{{ __('site.location') }}</span>
+                    <div class="absolute bottom-6 left-6 right-6 apple-glass rounded-2xl p-4">
+                        <span class="text-base font-bold text-white block">{{ __('site.author_name') }}</span>
+                        <span class="text-xs uppercase tracking-widest text-apple-blue font-mono">{{ __('site.location') }} &bull; SIBERIA</span>
                     </div>
                 </div>
             </div>
 
-            {{-- Right: Sincere 1st-person statement --}}
+            {{-- Right: Narrative --}}
             <div class="lg:col-span-7 space-y-8 lg:pt-4">
                 
                 <div>
-                    <span class="text-xs uppercase tracking-widest text-terracotta font-medium block mb-2">
+                    <span class="text-xs uppercase tracking-widest text-apple-blue font-semibold font-mono block mb-2">
                         {{ __('site.nav_about') }}
                     </span>
-                    <h1 class="font-serif text-4xl sm:text-5xl text-graphite-950 editorial-heading mb-3">
+                    <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tightest apple-text-gradient mb-3">
                         {{ __('site.about_title') }}
                     </h1>
-                    <p class="font-serif italic text-xl text-graphite-600">
+                    <p class="text-xl sm:text-2xl text-neutral-400 font-light">
                         {{ __('site.about_subtitle') }}
                     </p>
                 </div>
 
-                <div class="space-y-6 text-base sm:text-lg text-graphite-700 font-light leading-relaxed border-t border-editorial-border pt-8">
+                <div class="space-y-6 text-base sm:text-lg text-neutral-300 font-light leading-relaxed border-t border-white/10 pt-8">
                     <p>
                         {{ __('site.about_p1') }}
                     </p>
@@ -54,13 +54,13 @@
                 </div>
 
                 {{-- Action links --}}
-                <div class="pt-6 border-t border-editorial-border flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                <div class="pt-6 border-t border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
                     <a href="{{ route('contacts.index', ['locale' => $locale]) }}" 
-                       class="inline-flex justify-center items-center px-8 py-4 bg-graphite-900 text-white text-xs uppercase tracking-widest font-medium hover:bg-terracotta transition-colors shadow-sm">
+                       class="inline-flex justify-center items-center px-8 py-4 bg-white text-black hover:bg-neutral-200 text-xs uppercase tracking-widest font-bold rounded-full transition-all shadow-[0_0_25px_rgba(255,255,255,0.25)]">
                         {{ __('site.about_cta') }}
                     </a>
                     <a href="{{ route('portfolio.index', ['locale' => $locale]) }}" 
-                       class="inline-flex justify-center items-center px-6 py-4 border border-editorial-border bg-surface text-graphite-800 text-xs uppercase tracking-widest font-medium hover:border-graphite-900 transition-colors">
+                       class="inline-flex justify-center items-center px-7 py-4 bg-white/10 hover:bg-white/20 text-white text-xs uppercase tracking-widest font-semibold rounded-full border border-white/15 transition-all">
                         {{ __('site.hero_portfolio') }}
                     </a>
                 </div>
