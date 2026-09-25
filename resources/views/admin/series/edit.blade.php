@@ -352,10 +352,68 @@
             }
         }
 
-        function uploadSingleFile(file, fileIndex, totalFiles) {
+        // Pre-process huge files in browser if needed, preventing 503 server memory crashes
+        async function prepareFileForUpload(file) {
+            // If file is reasonably sized (under 12 MB), upload directly
+            if (file.size <= 12 * 1024 * 1024) {
+                return file;
+            }
+
+            // If file is very heavy (e.g. 28-50 MB camera JPEG), downsample in browser using HTML5 Canvas
+            return new Promise((resolve) => {
+                const img = new Image();
+                const url = URL.createObjectURL(file);
+
+                img.onload = function () {
+                    URL.revokeObjectURL(url);
+                    const maxDim = 3200; // Ultra high-res Retina format
+                    let w = img.width;
+                    let h = img.height;
+
+                    if (w > maxDim || h > maxDim) {
+                        if (w > h) {
+                            h = Math.round((h * maxDim) / w);
+                            w = maxDim;
+                        } else {
+                            w = Math.round((w * maxDim) / h);
+                            h = maxDim;
+                        }
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+
+                    canvas.toBlob((blob) => {
+                        if (blob && blob.size > 0) {
+                            const optimizedFile = new File([blob], file.name, {
+                                type: 'image/jpeg',
+                                lastModified: Date.now()
+                            });
+                            resolve(optimizedFile);
+                        } else {
+                            resolve(file); // Fallback to original
+                        }
+                    }, 'image/jpeg', 0.92);
+                };
+
+                img.onerror = function () {
+                    URL.revokeObjectURL(url);
+                    resolve(file); // Fallback to original
+                };
+
+                img.src = url;
+            });
+        }
+
+        async function uploadSingleFile(file, fileIndex, totalFiles) {
+            const fileToUpload = await prepareFileForUpload(file);
+
             return new Promise((resolve, reject) => {
                 const formData = new FormData();
-                formData.append('photos[]', file);
+                formData.append('photos[]', fileToUpload);
 
                 const xhr = new XMLHttpRequest();
                 xhr.open('POST', uploadUrl, true);
