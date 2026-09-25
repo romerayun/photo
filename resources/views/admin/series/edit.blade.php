@@ -263,6 +263,7 @@
         const progressBar = document.getElementById('upload-progress-bar');
         const percentText = document.getElementById('upload-percent-text');
         const statusTitle = document.getElementById('upload-status-title');
+        const statusSub = document.getElementById('upload-status-sub');
         const uploadUrl = '{{ route("admin.series.photos.store", $series) }}';
         const csrfToken = '{{ csrf_token() }}';
 
@@ -304,7 +305,7 @@
             }
         });
 
-        function handleFiles(files) {
+        async function handleFiles(files) {
             const validFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
             if (!validFiles.length) {
                 alert('Пожалуйста, выберите файлы изображений (JPG, PNG или WEBP).');
@@ -313,51 +314,76 @@
 
             idleState.classList.add('hidden');
             busyState.classList.remove('hidden');
-            progressBar.style.width = '0%';
-            percentText.textContent = '0%';
-            statusTitle.textContent = `Загрузка ${validFiles.length} фото...`;
 
-            const formData = new FormData();
-            validFiles.forEach(f => formData.append('photos[]', f));
+            const total = validFiles.length;
+            let successCount = 0;
+            let failedCount = 0;
 
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', uploadUrl, true);
-            xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
-            xhr.setRequestHeader('Accept', 'application/json');
+            for (let i = 0; i < total; i++) {
+                const file = validFiles[i];
+                const fileNumber = i + 1;
+                statusTitle.textContent = `Обработка фото ${fileNumber} из ${total}: «${file.name}»`;
+                statusSub.textContent = 'Оптимизация под Retina и сохранение...';
 
-            xhr.upload.onprogress = function (e) {
-                if (e.lengthComputable) {
-                    const percent = Math.round((e.loaded / e.total) * 100);
-                    progressBar.style.width = percent + '%';
-                    percentText.textContent = percent + '%';
-                    if (percent >= 100) {
-                        statusTitle.textContent = 'Оптимизация и сохранение кадров...';
+                try {
+                    await uploadSingleFile(file, fileNumber, total);
+                    successCount++;
+                } catch (err) {
+                    console.error('Upload error for file', file.name, err);
+                    failedCount++;
+                }
+
+                const overallPercent = Math.round((fileNumber / total) * 100);
+                progressBar.style.width = overallPercent + '%';
+                percentText.textContent = overallPercent + '%';
+            }
+
+            if (failedCount > 0) {
+                alert(`Загрузка завершена. Успешно: ${successCount}, с ошибкой: ${failedCount}. Проверьте файлы.`);
+            }
+
+            window.location.reload();
+        }
+
+        function uploadSingleFile(file, fileIndex, totalFiles) {
+            return new Promise((resolve, reject) => {
+                const formData = new FormData();
+                formData.append('photos[]', file);
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', uploadUrl, true);
+                xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+                xhr.setRequestHeader('Accept', 'application/json');
+
+                xhr.upload.onprogress = function (e) {
+                    if (e.lengthComputable) {
+                        const filePercent = Math.round((e.loaded / e.total) * 100);
+                        const basePercent = Math.round(((fileIndex - 1) / totalFiles) * 100);
+                        const currentOverall = Math.round(basePercent + (filePercent / totalFiles));
+                        progressBar.style.width = currentOverall + '%';
+                        percentText.textContent = currentOverall + '%';
                     }
-                }
-            };
+                };
 
-            xhr.onload = function () {
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    window.location.reload();
-                } else {
-                    let errMsg = 'Произошла ошибка при загрузке.';
-                    try {
-                        const res = JSON.parse(xhr.responseText);
-                        if (res.message) errMsg = res.message;
-                    } catch (e) {}
-                    alert(errMsg);
-                    idleState.classList.remove('hidden');
-                    busyState.classList.add('hidden');
-                }
-            };
+                xhr.onload = function () {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        resolve(xhr.responseText);
+                    } else {
+                        let errMsg = `Ошибка сервера (HTTP ${xhr.status})`;
+                        try {
+                            const res = JSON.parse(xhr.responseText);
+                            if (res.message) errMsg += ': ' + res.message;
+                        } catch (e) {}
+                        reject(new Error(errMsg));
+                    }
+                };
 
-            xhr.onerror = function () {
-                alert('Сетевая ошибка при загрузке фотографий. Проверьте интернет-соединение или размер файлов.');
-                idleState.classList.remove('hidden');
-                busyState.classList.add('hidden');
-            };
+                xhr.onerror = function () {
+                    reject(new Error('Сетевая ошибка соединения'));
+                };
 
-            xhr.send(formData);
+                xhr.send(formData);
+            });
         }
     });
 </script>
