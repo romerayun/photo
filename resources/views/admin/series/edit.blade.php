@@ -318,6 +318,7 @@
             const total = validFiles.length;
             let successCount = 0;
             let failedCount = 0;
+            const errorsList = [];
 
             for (let i = 0; i < total; i++) {
                 const file = validFiles[i];
@@ -331,6 +332,7 @@
                 } catch (err) {
                     console.error('Upload error for file', file.name, err);
                     failedCount++;
+                    errorsList.push(`• ${file.name}: ${err.message || 'Ошибка'}`);
                 }
 
                 const overallPercent = Math.round((fileNumber / total) * 100);
@@ -339,10 +341,15 @@
             }
 
             if (failedCount > 0) {
-                alert(`Загрузка завершена. Успешно: ${successCount}, с ошибкой: ${failedCount}. Проверьте файлы.`);
+                alert(`Не удалось загрузить ${failedCount} из ${total} файлов:\n\n` + errorsList.join('\n'));
             }
 
-            window.location.reload();
+            if (successCount > 0) {
+                window.location.reload();
+            } else {
+                idleState.classList.remove('hidden');
+                busyState.classList.add('hidden');
+            }
         }
 
         function uploadSingleFile(file, fileIndex, totalFiles) {
