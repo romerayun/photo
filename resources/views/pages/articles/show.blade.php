@@ -86,17 +86,9 @@
             @endif
         </header>
 
-        {{-- Cover Image --}}
-        @if($article->cover_url)
-            <div class="rounded-xl overflow-hidden border border-cine-border bg-neutral-900 shadow-card-depth">
-                <img src="{{ $article->cover_url }}" 
-                     alt="{{ $article->title }}" 
-                     class="w-full h-auto max-h-[580px] object-cover">
-            </div>
-        @endif
 
         {{-- Article Main Content --}}
-        <div class="prose prose-invert prose-neutral max-w-none 
+        <div class="article-rich-content prose prose-invert prose-neutral max-w-none 
                     prose-headings:font-display prose-headings:tracking-tight prose-headings:text-white
                     prose-h2:text-xl sm:prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4 prose-h2:border-b prose-h2:border-cine-border prose-h2:pb-3
                     prose-h3:text-lg sm:prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-2.5 prose-h3:text-neutral-200
@@ -553,14 +545,6 @@
                 @endif
             </header>
 
-            {{-- Cover Photo in Reader --}}
-            @if($article->cover_url)
-                <div class="rounded-xl overflow-hidden shadow-md">
-                    <img src="{{ $article->cover_url }}" 
-                         alt="{{ $article->title }}" 
-                         class="w-full h-auto max-h-[460px] object-cover">
-                </div>
-            @endif
 
             {{-- Text Body with Dynamic Font Size & Family --}}
             <div class="transition-all duration-150 reader-article-content"
@@ -707,6 +691,128 @@ function articleReader() {
 
 @push('styles')
 <style>
+    /* Strict site styling overrides against pasted inline styles */
+    .article-rich-content,
+    .article-rich-content * {
+        box-sizing: border-box;
+    }
+    .article-rich-content {
+        color: #D1D5DB; /* Tailwind neutral-300 */
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+    .article-rich-content [style*="color: black"],
+    .article-rich-content [style*="color: #000"],
+    .article-rich-content [style*="color: rgb(0, 0, 0)"],
+    .article-rich-content [style*="color: rgb(0,0,0)"],
+    .article-rich-content [style*="color:#000"],
+    .article-rich-content [style*="color:#000000"] {
+        color: inherit !important;
+    }
+    .article-rich-content [style*="background"],
+    .article-rich-content [style*="background-color"] {
+        background-color: transparent !important;
+    }
+    .article-rich-content [style*="font-family"] {
+        font-family: inherit !important;
+    }
+    .article-rich-content p,
+    .article-rich-content span,
+    .article-rich-content li {
+        color: #D1D5DB;
+        font-size: 1.0625rem;
+        line-height: 1.8;
+    }
+    .article-rich-content h1,
+    .article-rich-content h2,
+    .article-rich-content h3,
+    .article-rich-content h4 {
+        font-family: 'Unbounded', 'Syne', sans-serif !important;
+        color: #FFFFFF !important;
+        letter-spacing: -0.02em;
+    }
+    .article-rich-content h2 {
+        font-size: 1.5rem !important;
+        line-height: 1.35;
+        margin-top: 2rem !important;
+        margin-bottom: 1rem !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding-bottom: 0.75rem;
+    }
+    @media (min-width: 640px) {
+        .article-rich-content h2 {
+            font-size: 1.75rem !important;
+        }
+    }
+    .article-rich-content h3 {
+        font-size: 1.25rem !important;
+        line-height: 1.4;
+        margin-top: 1.5rem !important;
+        margin-bottom: 0.75rem !important;
+        color: #F3F4F6 !important;
+    }
+    .article-rich-content ul {
+        list-style-type: disc !important;
+        padding-left: 1.5rem !important;
+        margin: 1.25rem 0 !important;
+    }
+    .article-rich-content ol {
+        list-style-type: decimal !important;
+        padding-left: 1.5rem !important;
+        margin: 1.25rem 0 !important;
+    }
+    .article-rich-content li {
+        margin-bottom: 0.5rem;
+    }
+    .article-rich-content blockquote {
+        border-left: 3px solid #E51920 !important;
+        background: rgba(255, 255, 255, 0.03) !important;
+        padding: 1rem 1.25rem !important;
+        margin: 1.75rem 0 !important;
+        border-radius: 0 0.75rem 0.75rem 0;
+        color: #E5E7EB !important;
+        font-style: italic;
+    }
+    .article-rich-content blockquote p {
+        color: inherit !important;
+        margin-bottom: 0 !important;
+    }
+    .article-rich-content strong,
+    .article-rich-content b {
+        color: #FFFFFF !important;
+        font-weight: 700;
+    }
+    .article-rich-content a {
+        color: #E51920 !important;
+        text-decoration: underline;
+        text-underline-offset: 4px;
+        transition: opacity 0.2s;
+    }
+    .article-rich-content a:hover {
+        opacity: 0.8;
+    }
+    .article-rich-content img {
+        border-radius: 0.75rem !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
+        margin: 1.75rem 0 !important;
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* Reader Mode Overrides */
+    .reader-article-content [style*="color: black"],
+    .reader-article-content [style*="color: #000"],
+    .reader-article-content [style*="color: rgb(0, 0, 0)"],
+    .reader-article-content [style*="color: rgb(0,0,0)"] {
+        color: inherit !important;
+    }
+    .reader-article-content [style*="background"],
+    .reader-article-content [style*="background-color"] {
+        background-color: transparent !important;
+    }
+    .reader-article-content [style*="font-family"] {
+        font-family: inherit !important;
+    }
     .reader-article-content p {
         margin-bottom: 1.25em;
     }

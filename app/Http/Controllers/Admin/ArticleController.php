@@ -81,6 +81,8 @@ class ArticleController extends Controller
             $validated['cover_image'] = $optimized['path'];
         }
 
+        $validated['content'] = $this->sanitizeContent($validated['content']);
+
         $article = Article::create($validated);
 
         // Upload additional gallery photos if provided
@@ -160,6 +162,8 @@ class ArticleController extends Controller
             );
             $validated['cover_image'] = $optimized['path'];
         }
+
+        $validated['content'] = $this->sanitizeContent($validated['content']);
 
         $article->update($validated);
 
@@ -246,4 +250,25 @@ class ArticleController extends Controller
             'url' => asset('storage/' . $optimized['path']),
         ]);
     }
+
+    /**
+     * Clean pasted rich text content from foreign inline styles, font families, and fixed colors.
+     */
+    protected function sanitizeContent(string $html): string
+    {
+        // Remove style tags and script tags completely
+        $clean = preg_replace('#<(script|style|meta|link)[^>]*?>.*?</\1>#si', '', $html);
+
+        // Strip inline style attributes
+        $clean = preg_replace('/\s*style\s*=\s*(["\']).*?\1/si', '', $clean);
+
+        // Strip color, face, size, dir, class attributes that often come from Word or other CMS
+        $clean = preg_replace('/\s*(face|color|size|dir|class)\s*=\s*(["\']).*?\1/si', '', $clean);
+
+        // Remove empty spans or unwrap spans
+        $clean = preg_replace('/<span[^>]*>(.*?)<\/span>/si', '$1', $clean);
+
+        return trim($clean);
+    }
 }
+

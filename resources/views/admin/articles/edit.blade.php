@@ -161,13 +161,11 @@
                             <div class="relative group rounded-lg overflow-hidden border border-slate-200 aspect-[4/3] bg-slate-100 shadow-sm">
                                 <img src="{{ $img->image_url }}" alt="" class="w-full h-full object-cover">
                                 <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-2">
-                                    <form action="{{ route('admin.articles.photos.destroy', [$article, $img]) }}" method="POST" onsubmit="return confirm('Удалить эту фотографию из статьи?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="px-2.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded text-xs font-bold transition-colors">
-                                            Удалить
-                                        </button>
-                                    </form>
+                                    <button type="button" 
+                                            onclick="if(confirm('Удалить эту фотографию из статьи?')) document.getElementById('delete-photo-{{ $img->id }}').submit();"
+                                            class="px-2.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded text-xs font-bold transition-colors cursor-pointer">
+                                        Удалить
+                                    </button>
                                 </div>
                             </div>
                         @endforeach
@@ -233,25 +231,41 @@
         </div>
 
         <div class="flex items-center justify-between gap-3 pt-2">
-            <form action="{{ route('admin.articles.destroy', $article) }}" method="POST" onsubmit="return confirm('Вы действительно хотите удалить статью «{{ $article->title }}»?');">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="px-4 py-2.5 text-xs uppercase font-bold text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer">
+            <div>
+                <button type="button" 
+                        onclick="if(confirm('Вы действительно хотите удалить статью «{{ $article->title }}»?')) document.getElementById('delete-article-form').submit();"
+                        class="px-4 py-2.5 text-xs uppercase font-bold text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer">
                     Удалить статью
                 </button>
-            </form>
+            </div>
 
             <div class="flex items-center gap-3">
                 <a href="{{ route('admin.articles.index') }}" class="px-5 py-2.5 border border-slate-300 rounded-lg text-xs uppercase font-bold text-slate-700 hover:bg-slate-50 transition-colors">
                     Отмена
                 </a>
-                <button type="submit" class="px-6 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-white text-xs uppercase tracking-wider font-bold rounded-lg shadow-sm hover:shadow transition-all inline-flex items-center gap-2">
+                <button type="submit" class="px-6 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-white text-xs uppercase tracking-wider font-bold rounded-lg shadow-sm hover:shadow transition-all inline-flex items-center gap-2 cursor-pointer">
                     <span>Сохранить изменения</span>
                     <span>&rarr;</span>
                 </button>
             </div>
         </div>
     </form>
+
+    {{-- Standalone Delete Article Form (outside main form to prevent invalid nested forms) --}}
+    <form id="delete-article-form" action="{{ route('admin.articles.destroy', $article) }}" method="POST" class="hidden">
+        @csrf
+        @method('DELETE')
+    </form>
+
+    {{-- Standalone Photo Delete Forms --}}
+    @if($article->images && $article->images->count() > 0)
+        @foreach($article->images as $img)
+            <form id="delete-photo-{{ $img->id }}" action="{{ route('admin.articles.photos.destroy', [$article, $img]) }}" method="POST" class="hidden">
+                @csrf
+                @method('DELETE')
+            </form>
+        @endforeach
+    @endif
 
     {{-- Comments Moderation Block --}}
     <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm space-y-4 pt-6">
@@ -470,6 +484,45 @@
                 if (file.type.startsWith('image/')) {
                     e.preventDefault();
                     uploadImageFile(file);
+                    return;
+                }
+            }
+
+            // Clean pasted text from dirty inline styles (Word/Docs/web styles)
+            const html = e.clipboardData.getData('text/html');
+            if (html) {
+                e.preventDefault();
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+
+                // Remove problematic style tags, scripts, font tags, classes, and inline styles
+                tempDiv.querySelectorAll('style, script, meta, link').forEach(el => el.remove());
+                tempDiv.querySelectorAll('*').forEach(el => {
+                    el.removeAttribute('style');
+                    el.removeAttribute('class');
+                    el.removeAttribute('face');
+                    el.removeAttribute('color');
+                    el.removeAttribute('size');
+                    el.removeAttribute('id');
+                    el.removeAttribute('dir');
+                    el.removeAttribute('align');
+                });
+
+                // Convert spans without semantic value to unwrapped text
+                tempDiv.querySelectorAll('span').forEach(span => {
+                    span.replaceWith(...span.childNodes);
+                });
+
+                const cleanHtml = tempDiv.innerHTML.trim();
+                if (cleanHtml) {
+                    const range = quill.getSelection(true) || { index: quill.getLength() };
+                    quill.clipboard.dangerouslyPasteHTML(range.index, cleanHtml, 'user');
+                } else {
+                    const plainText = e.clipboardData.getData('text/plain');
+                    if (plainText) {
+                        const range = quill.getSelection(true) || { index: quill.getLength() };
+                        quill.insertText(range.index, plainText, 'user');
+                    }
                 }
             }
         });
