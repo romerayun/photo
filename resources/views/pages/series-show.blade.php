@@ -23,11 +23,11 @@
          @keydown.escape.window="close()" 
          @keydown.arrow-right.window="if(isOpen) next()" 
          @keydown.arrow-left.window="if(isOpen) prev()"
-         class="bg-arch-bg text-arch-text py-16 md:py-24">
+         class="bg-arch-bg text-arch-text pt-8 pb-16 md:pt-12 md:pb-24">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {{-- Breadcrumb --}}
-        <div class="mb-8">
+        <div class="mb-4 sm:mb-6">
             <a href="{{ route('portfolio.index') }}" 
                class="text-xs uppercase tracking-widest text-neutral-500 hover:text-crimson inline-flex items-center gap-1.5 transition-colors font-mono font-bold">
                 <span>&larr;</span>
@@ -36,41 +36,32 @@
         </div>
 
         {{-- Series Master Header --}}
-        <div class="border-b border-arch-border pb-12 mb-16">
-            <div class="max-w-4xl space-y-4">
+        <div class="border-b border-arch-border pb-5 mb-5 sm:pb-6 sm:mb-6">
+            <div class="max-w-4xl space-y-2.5 sm:space-y-3">
                 
-                {{-- HUD Tags --}}
-                <div class="flex flex-wrap items-center gap-3 text-xs uppercase tracking-widest text-neutral-500 font-mono">
+                {{-- HUD Tags: Only Category and Location --}}
+                @if($series->category || $series->localizedLocation($locale))
+                <div class="flex flex-wrap items-center gap-2 text-xs uppercase tracking-widest text-neutral-500 font-mono font-medium">
                     @if($series->category)
                     <span class="text-crimson font-bold">{{ $series->category->localizedName($locale) }}</span>
-                    <span>&bull;</span>
+                    @endif
+
+                    @if($series->category && $series->localizedLocation($locale))
+                    <span class="text-neutral-300">&bull;</span>
                     @endif
 
                     @if($series->localizedLocation($locale))
                     <span>{{ $series->localizedLocation($locale) }}</span>
-                    <span>&bull;</span>
-                    @endif
-
-                    @if($series->shooting_date)
-                    <span>{{ $series->shooting_date }}</span>
-                    <span>&bull;</span>
-                    @endif
-
-                    <span>{{ $series->photos->count() }} кадров</span>
-
-                    @if($series->is_demo)
-                    <span class="bg-crimson/10 text-crimson px-2.5 py-0.5 text-[0.65rem] font-bold">
-                        ДЕМО
-                    </span>
                     @endif
                 </div>
+                @endif
 
-                <h1 class="text-4xl sm:text-6xl md:text-7xl font-extrabold uppercase tracking-tightest font-display text-arch-text">
+                <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold uppercase tracking-tight font-display text-arch-text leading-tight">
                     {{ $series->localizedTitle($locale) }}
                 </h1>
 
                 @if($series->localizedDescription($locale))
-                <p class="text-base sm:text-lg text-neutral-700 leading-relaxed max-w-2xl font-mono pt-2">
+                <p class="text-xs sm:text-sm text-neutral-600 font-mono leading-relaxed line-clamp-2 max-w-3xl">
                     {{ $series->localizedDescription($locale) }}
                 </p>
                 @endif
@@ -78,14 +69,10 @@
             </div>
         </div>
 
-        {{-- High-Fashion Photo Stream --}}
-        <div class="space-y-12 md:space-y-16">
+        {{-- Masonry Photo Grid --}}
+        <div class="columns-2 md:columns-3 gap-[5px]">
             @foreach($series->photos as $index => $photo)
-                @php
-                    $isWide = $photo->width && $photo->height && ($photo->width / $photo->height > 1.2);
-                @endphp
-
-                <figure class="relative group cursor-pointer {{ $isWide ? 'max-w-6xl mx-auto' : 'max-w-4xl mx-auto' }}" 
+                <figure class="break-inside-avoid inline-block w-full mb-[5px] relative group cursor-pointer overflow-hidden bg-neutral-100" 
                         @click="open({{ $index }})"
                         role="button"
                         tabindex="0"
@@ -93,23 +80,23 @@
                         @keydown.space.prevent="open({{ $index }})"
                         aria-label="Открыть фото в увеличенном размере">
                     
-                    <div class="overflow-hidden bg-white border border-arch-border shadow-card-depth relative">
+                    <div class="relative overflow-hidden bg-white">
                         <img src="{{ $photo->url }}" 
                              alt="{{ $photo->localizedAlt($locale) ?: $series->localizedTitle($locale) }}" 
-                             loading="{{ $index < 2 ? 'eager' : 'lazy' }}"
+                             loading="{{ $index < 4 ? 'eager' : 'lazy' }}"
                              width="{{ $photo->width ?: 1200 }}"
                              height="{{ $photo->height ?: 800 }}"
-                             class="w-full h-auto object-cover transition-transform duration-700 ease-out group-hover:scale-[1.01]">
+                             class="w-full h-auto block object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]">
                         
-                        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-end justify-end p-6 opacity-0 group-hover:opacity-100">
-                            <span class="bg-crimson text-white text-xs px-4 py-2 font-mono uppercase tracking-wider font-bold">
+                        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-all duration-300 flex items-center justify-center p-3 opacity-0 group-hover:opacity-100">
+                            <span class="bg-crimson/90 backdrop-blur-sm text-white text-[10px] sm:text-xs px-2.5 py-1.5 font-mono uppercase tracking-wider font-bold shadow-sm">
                                 Увеличить &plus;
                             </span>
                         </div>
                     </div>
 
                     @if($photo->localizedCaption($locale))
-                    <figcaption class="mt-3 text-xs text-neutral-500 font-mono italic text-center">
+                    <figcaption class="p-1.5 text-[11px] text-neutral-500 font-mono italic text-center bg-white">
                         {{ $photo->localizedCaption($locale) }}
                     </figcaption>
                     @endif
@@ -118,7 +105,7 @@
         </div>
 
         {{-- Bottom CTA & Next Series --}}
-        <div class="mt-24 pt-16 border-t border-arch-border">
+        <div class="mt-14 pt-12 sm:mt-16 sm:pt-14 border-t border-arch-border">
             <div class="flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
                 
                 <div class="space-y-2">

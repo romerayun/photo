@@ -5,12 +5,12 @@
 
 @section('content')
 <div class="bg-arch-bg text-arch-text py-16 md:py-24">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {{-- Header --}}
-        <div class="mb-14 text-center md:text-left">
+        <div class="mb-12 text-center md:text-left">
             <span class="text-xs uppercase tracking-widest text-crimson font-mono font-bold block mb-2">
-                06 / КОНТАКТЫ
+                06 / СВЯЗЬ И БРОНИРОВАНИЕ
             </span>
             <h1 class="text-4xl sm:text-6xl font-extrabold uppercase tracking-tightest font-display text-arch-text mb-4">
                 {{ __('site.contacts_title') }}
@@ -20,94 +20,410 @@
             </p>
         </div>
 
-        {{-- Contact Cards --}}
-        <div class="space-y-6">
+        {{-- Response Time Guarantee Badge --}}
+        <div class="mb-10 p-5 bg-white border border-arch-border shadow-sm flex items-center gap-3 font-mono text-xs">
+            <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+            <div>
+                <span class="font-bold text-arch-text uppercase tracking-wider block">
+                    Срок ответа: в течение 1–2 часов
+                </span>
+                <span class="text-neutral-500 text-[0.72rem] leading-relaxed">
+                    Ежедневно с 09:00 до 21:00 (Иркутск, UTC+8 / МСК+5). Во время съёмок на Байкале вне зоны сети — сразу по возвращении.
+                </span>
+            </div>
+        </div>
 
-            {{-- 1. Telegram Card --}}
-            @if($telegramUrl)
-                <div class="bg-white p-8 sm:p-10 flex flex-col md:flex-row md:items-center justify-between gap-6 border border-arch-border shadow-card-depth">
-                    <div class="space-y-2">
-                        <div class="flex items-center gap-2">
-                            <span class="text-[0.65rem] uppercase tracking-widest bg-crimson text-white px-3 py-1 font-bold font-mono">
-                                ПРЯМАЯ СВЯЗЬ
-                            </span>
-                            <span class="text-xs font-mono text-neutral-500 font-bold">TELEGRAM</span>
-                        </div>
-                        <h2 class="text-2xl sm:text-3xl font-extrabold uppercase font-display text-arch-text">
-                            {{ $telegramHandle ?: 'Telegram' }}
-                        </h2>
-                        <p class="text-xs text-neutral-600 font-mono">
-                            {{ __('site.telegram_desc') }}
-                        </p>
-                    </div>
-
-                    <a href="{{ $telegramUrl }}" 
-                       target="_blank" 
-                       rel="noopener" 
-                       class="btn-crimson px-8 py-4 text-xs font-bold shrink-0">
-                        <span>{{ __('site.telegram_btn') }}</span>
-                        <span>&nearr;</span>
-                    </a>
-                </div>
-            @endif
-
-            {{-- 2. Phone Card --}}
-            @if($phoneLink && $phoneDisplay)
-                <div class="bg-white p-8 sm:p-10 flex flex-col md:flex-row md:items-center justify-between gap-6 border border-arch-border shadow-card-depth">
-                    <div class="space-y-2">
-                        <span class="text-xs uppercase tracking-widest text-neutral-400 font-mono block">
-                            {{ __('site.phone_title') }}
-                        </span>
-                        <h2 class="text-2xl sm:text-3xl font-extrabold uppercase font-display text-arch-text">
-                            {{ $phoneDisplay }}
-                        </h2>
-                        <p class="text-xs text-neutral-600 font-mono">
-                            Для звонков и срочных вопросов по текущим съёмкам
-                        </p>
-                    </div>
-
-                    <a href="{{ $phoneLink }}" 
-                       class="px-8 py-4 bg-arch-bg hover:bg-neutral-200 text-arch-text text-xs uppercase tracking-widest font-bold border border-arch-border transition-all shrink-0 font-mono">
-                        Позвонить &rarr;
-                    </a>
-                </div>
-            @endif
-
-            {{-- 3. City & Location Card --}}
-            <div class="bg-white p-8 sm:p-10 flex flex-col md:flex-row md:items-center justify-between gap-6 border border-arch-border shadow-card-depth">
-                <div class="space-y-2">
-                    <span class="text-xs uppercase tracking-widest text-neutral-400 font-mono block">
-                        {{ __('site.city_title') }}
+        {{-- Selected Package Banner (if user came from Pricing or Home) --}}
+        @if(!empty($selectedPackage))
+            <div class="mb-10 p-5 sm:p-6 bg-neutral-950 text-white border-l-4 border-crimson flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-card-depth">
+                <div>
+                    <span class="text-[0.65rem] font-mono uppercase tracking-widest text-crimson font-bold block mb-1">
+                        Выбранный формат съёмки
                     </span>
-                    <h2 class="text-2xl sm:text-3xl font-extrabold uppercase font-display text-arch-text">
-                        {{ $city }}
+                    <h2 class="text-xl sm:text-2xl font-bold uppercase font-display text-white">
+                        {{ $selectedPackage }}
                     </h2>
-                    <p class="text-xs text-neutral-600 font-mono">
-                        Локации в Иркутске, на побережье Байкала и выездные проекты по области.
+                    <p class="text-xs text-neutral-400 font-mono mt-1">
+                        Название пакета уже подставлено в форму заявки и в текст сообщения для Telegram.
                     </p>
                 </div>
-                <div class="text-xs font-mono text-crimson uppercase tracking-widest px-4 py-2 border border-crimson/30 shrink-0 font-bold">
-                    ИРКУТСК &bull; ЧАСОВОЙ ПОЯС МСК+5 (UTC+8)
+                <div class="flex items-center gap-3 shrink-0">
+                    @if($telegramUrl)
+                        <a href="{{ $telegramUrl }}" 
+                           target="_blank" 
+                           rel="noopener" 
+                           class="btn-crimson px-5 py-3 text-xs font-bold font-mono">
+                            <span>Написать в Telegram</span>
+                            <span>&nearr;</span>
+                        </a>
+                    @endif
+                    <a href="{{ route('contacts.index') }}" 
+                       class="text-xs text-neutral-400 hover:text-white font-mono uppercase tracking-wider underline">
+                        Сбросить выбор
+                    </a>
                 </div>
             </div>
+        @endif
 
-            {{-- Missing contacts prompt for demo mode --}}
-            @if(!$telegramUrl && !$phoneLink)
-                <div class="p-8 border border-dashed border-crimson/40 bg-crimson/5 space-y-3 font-mono">
-                    <div class="flex items-center gap-2 text-crimson font-bold text-sm">
-                        <span class="w-2.5 h-2.5 rounded-full bg-crimson animate-pulse"></span>
-                        <span>Контакты ожидают настройки автором</span>
-                    </div>
-                    <p class="text-xs text-neutral-600 leading-relaxed font-light">
-                        Владелец сайта ещё не внёс номер телефона и Telegram в панели управления. Для проверки работы сайта авторизуйтесь в административной панели и укажите свой контактный Telegram и телефон.
-                    </p>
-                    <div class="pt-2">
-                        <a href="{{ route('admin.login') }}" class="text-xs uppercase tracking-widest text-crimson font-bold hover:underline">
-                            Перейти к настройке контактов в панели управления &rarr;
+        {{-- Success / Error Alerts --}}
+        @if(session('contact_success'))
+            <div class="mb-10 p-6 bg-emerald-950 border border-emerald-700 text-emerald-100 flex items-start gap-4">
+                <span class="text-emerald-400 font-bold text-xl">&check;</span>
+                <div class="space-y-1 font-mono">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-emerald-300">Заявка успешно отправлена!</h3>
+                    <p class="text-xs text-emerald-200 leading-relaxed">{{ session('contact_success') }}</p>
+                </div>
+            </div>
+        @endif
+
+        @if(session('contact_error'))
+            <div class="mb-10 p-6 bg-rose-950 border border-rose-700 text-rose-100 flex items-start gap-4">
+                <span class="text-rose-400 font-bold text-xl">&cross;</span>
+                <div class="space-y-1 font-mono">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-rose-300">Ошибка отправки</h3>
+                    <p class="text-xs text-rose-200 leading-relaxed">{{ session('contact_error') }}</p>
+                </div>
+            </div>
+        @endif
+
+        {{-- Main Two-Column Layout --}}
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+
+            {{-- Left Column: Direct Contacts & Channels --}}
+            <div class="lg:col-span-5 space-y-6">
+
+                {{-- Telegram Card --}}
+                @if($telegramUrl)
+                    <div class="bg-white p-6 sm:p-8 border border-arch-border shadow-card-depth space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[0.65rem] uppercase tracking-widest bg-crimson text-white px-3 py-1 font-bold font-mono">
+                                БЫСТРЫЙ ОТВЕТ
+                            </span>
+                            <span class="text-xs font-mono text-neutral-400 font-bold">TELEGRAM</span>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-extrabold uppercase font-display text-arch-text">
+                                {{ $telegramHandle ?: 'Telegram' }}
+                            </h2>
+                            <p class="text-xs text-neutral-600 font-mono mt-1">
+                                Удобно обсудить референсы, детали съёмки, тайминг и задать любые вопросы.
+                            </p>
+                        </div>
+                        <a href="{{ $telegramUrl }}" 
+                           target="_blank" 
+                           rel="noopener" 
+                           class="btn-crimson w-full py-3.5 text-xs font-bold text-center block">
+                            <span>{{ $selectedPackage ? 'Обсудить пакет в Telegram' : 'Написать в Telegram' }}</span>
+                            <span>&nearr;</span>
                         </a>
                     </div>
+                @endif
+
+                {{-- Phone Card --}}
+                @if($phoneLink && $phoneDisplay)
+                    <div class="bg-white p-6 sm:p-8 border border-arch-border shadow-card-depth space-y-4">
+                        <span class="text-xs uppercase tracking-widest text-neutral-400 font-mono block">
+                            Телефон для связи
+                        </span>
+                        <div>
+                            <h2 class="text-2xl font-extrabold uppercase font-display text-arch-text">
+                                {{ $phoneDisplay }}
+                            </h2>
+                            <p class="text-xs text-neutral-600 font-mono mt-1">
+                                Для звонков, срочных согласований и вопросов по съёмкам на текущий день.
+                            </p>
+                        </div>
+                        <a href="{{ $phoneLink }}" 
+                           class="w-full py-3 bg-arch-bg hover:bg-neutral-200 text-arch-text text-xs uppercase tracking-widest font-bold border border-arch-border transition-colors block text-center font-mono">
+                            Позвонить &rarr;
+                        </a>
+                    </div>
+                @endif
+
+                {{-- Location & Geography Card --}}
+                <div class="bg-white p-6 sm:p-8 border border-arch-border shadow-card-depth space-y-3 font-mono">
+                    <span class="text-xs uppercase tracking-widest text-neutral-400 block font-bold">
+                        География съёмок
+                    </span>
+                    <h3 class="text-xl font-bold uppercase font-display text-arch-text">
+                        {{ $city }} и Байкал
+                    </h3>
+                    <p class="text-xs text-neutral-600 leading-relaxed">
+                        Студии и городские локации Иркутска, Листвянка, Большое Голоустное, Малое Море, Ольхон и выездные проекты.
+                    </p>
+                    <div class="pt-2 text-[0.7rem] text-crimson uppercase tracking-wider font-bold">
+                        ЕЖЕДНЕВНО С 09:00 ДО 21:00 (UTC+8)
+                    </div>
                 </div>
-            @endif
+
+            </div>
+
+            {{-- Right Column: Feedback & Booking Form --}}
+            <div id="feedback-form" class="lg:col-span-7 bg-white p-8 sm:p-10 border border-arch-border shadow-card-depth">
+                
+                <div class="mb-8 border-b border-arch-border pb-6">
+                    <span class="text-xs uppercase tracking-widest text-crimson font-mono font-bold block mb-1">
+                        ФОРМА ОБРАТНОЙ СВЯЗИ
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold uppercase font-display text-arch-text">
+                        Оставить заявку на съёмку
+                    </h2>
+                    <p class="text-xs text-neutral-600 font-mono mt-2 leading-relaxed">
+                        Заполните форму, и я свяжусь с вами по почте или в Telegram в течение 1–2 часов с подробной информацией.
+                    </p>
+                </div>
+
+                <form action="{{ route('contacts.send') }}" method="POST" class="space-y-6">
+                    @csrf
+
+                    {{-- Honeypot anti-spam field --}}
+                    <input type="text" name="_hp" value="" style="display:none !important;" tabindex="-1" autocomplete="off">
+
+                    {{-- Name --}}
+                    <div>
+                        <label for="name" class="block text-xs uppercase tracking-widest font-mono font-bold text-arch-text mb-2">
+                            Ваше имя <span class="text-crimson">*</span>
+                        </label>
+                        <input type="text" 
+                               name="name" 
+                               id="name" 
+                               value="{{ old('name') }}" 
+                               required 
+                               placeholder="Как к вам обращаться"
+                               class="w-full px-4 py-3 bg-arch-bg border border-arch-border text-arch-text text-sm font-mono focus:border-crimson focus:bg-white focus:outline-none transition-colors @error('name') border-crimson @enderror">
+                        @error('name')
+                            <p class="text-xs text-crimson font-mono mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- Email & Phone/Telegram row --}}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label for="email" class="block text-xs uppercase tracking-widest font-mono font-bold text-arch-text mb-2">
+                                Email для ответа <span class="text-crimson">*</span>
+                            </label>
+                            <input type="email" 
+                                   name="email" 
+                                   id="email" 
+                                   value="{{ old('email') }}" 
+                                   required 
+                                   placeholder="example@mail.ru"
+                                   class="w-full px-4 py-3 bg-arch-bg border border-arch-border text-arch-text text-sm font-mono focus:border-crimson focus:bg-white focus:outline-none transition-colors @error('email') border-crimson @enderror">
+                            @error('email')
+                                <p class="text-xs text-crimson font-mono mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label for="telegram_input" class="block text-xs uppercase tracking-widest font-mono font-bold text-arch-text mb-2">
+                                Телефон или Telegram
+                            </label>
+                            <input type="text" 
+                                   name="telegram" 
+                                   id="telegram_input" 
+                                   value="{{ old('telegram') }}" 
+                                   placeholder="@username или +7..."
+                                   class="w-full px-4 py-3 bg-arch-bg border border-arch-border text-arch-text text-sm font-mono focus:border-crimson focus:bg-white focus:outline-none transition-colors">
+                            <span class="text-[0.68rem] text-neutral-400 font-mono mt-1 block">Для более оперативной связи</span>
+                        </div>
+                    </div>
+
+                    {{-- Package Selection (Custom Stylized Dropdown) --}}
+                    @php
+                        $initialPackage = old('package', $selectedPackage);
+                    @endphp
+                    <div x-data="{ 
+                            open: false, 
+                            selected: '{{ addslashes($initialPackage) }}',
+                            selectedLabel: '{{ addslashes($initialPackage ?: '— Выберите формат или укажите свой —') }}',
+                            selectPackage(val, label) {
+                                this.selected = val;
+                                this.selectedLabel = label;
+                                this.open = false;
+                            }
+                         }" 
+                         @click.away="open = false" 
+                         class="relative">
+                        
+                        <label class="block text-xs uppercase tracking-widest font-mono font-bold text-arch-text mb-2">
+                            Формат съёмки / Пакет
+                        </label>
+
+                        {{-- Hidden input for standard form submission --}}
+                        <input type="hidden" name="package" :value="selected" value="{{ $initialPackage }}">
+
+                        {{-- Stylized Trigger Button --}}
+                        <button type="button" 
+                                @click="open = !open" 
+                                class="w-full px-4 py-3.5 bg-arch-bg hover:bg-white border text-left flex items-center justify-between transition-all focus:outline-none"
+                                :class="open ? 'border-crimson bg-white ring-1 ring-crimson shadow-sm' : 'border-arch-border hover:border-neutral-400'">
+                            
+                            <div class="flex items-center gap-3 overflow-hidden">
+                                <span class="w-2.5 h-2.5 rounded-full shrink-0 transition-colors"
+                                      :class="selected ? 'bg-crimson' : 'bg-neutral-300'"></span>
+                                <span class="truncate font-mono text-sm"
+                                      :class="selected ? 'font-bold text-arch-text uppercase tracking-tight' : 'text-neutral-500 font-normal'"
+                                      x-text="selectedLabel">
+                                    {{ $initialPackage ?: '— Выберите формат или укажите свой —' }}
+                                </span>
+                            </div>
+
+                            <div class="flex items-center gap-2 pl-3 shrink-0">
+                                <span x-show="selected" 
+                                      x-cloak
+                                      @click.stop="selectPackage('', '— Выберите формат или укажите свой —')" 
+                                      title="Очистить выбор"
+                                      class="text-xs text-neutral-400 hover:text-crimson p-1 font-mono">
+                                    &times;
+                                </span>
+                                <svg class="w-4 h-4 text-neutral-500 transition-transform duration-200"
+                                     :class="open ? 'rotate-180 text-crimson' : ''"
+                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+                        </button>
+
+                        {{-- Stylized Dropdown Menu --}}
+                        <div x-show="open" 
+                             x-cloak 
+                             x-transition:enter="transition ease-out duration-150"
+                             x-transition:enter-start="opacity-0 -translate-y-1 scale-[0.99]"
+                             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                             x-transition:leave="transition ease-in duration-100"
+                             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                             x-transition:leave-end="opacity-0 -translate-y-1 scale-[0.99]"
+                             class="absolute z-30 left-0 right-0 mt-1.5 bg-white border border-arch-border shadow-card-depth divide-y divide-arch-border max-h-80 overflow-y-auto">
+                            
+                            {{-- Option: Reset / Clear --}}
+                            <div @click="selectPackage('', '— Выберите формат или укажите свой —')"
+                                 class="p-3.5 hover:bg-neutral-50 cursor-pointer flex items-center justify-between text-xs font-mono transition-colors"
+                                 :class="selected === '' ? 'bg-neutral-100 font-bold text-arch-text selected' : 'text-neutral-500'">
+                                <span>— Не выбран (уточнить в сообщении) —</span>
+                                <span x-show="selected === ''" class="text-crimson font-bold">&check;</span>
+                            </div>
+
+                            {{-- Packages list --}}
+                            @if($packages->count() > 0)
+                                @foreach($packages as $pkg)
+                                    @php
+                                        $pkgTitle = $pkg->localizedTitle($locale);
+                                        $pkgPrice = $pkg->formattedPrice($locale);
+                                        $pkgDuration = $pkg->localizedDuration($locale);
+                                        $pkgPhotos = $pkg->localizedPhotoCount($locale);
+                                    @endphp
+                                    <div @click="selectPackage('{{ addslashes($pkgTitle) }}', '{{ addslashes($pkgTitle) }}')"
+                                         class="p-4 hover:bg-neutral-950 group cursor-pointer transition-colors"
+                                         :class="selected === '{{ addslashes($pkgTitle) }}' ? 'bg-neutral-900 text-white selected' : 'bg-white text-arch-text'">
+                                        
+                                        <div class="flex items-start justify-between gap-4">
+                                            <div class="space-y-1">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-[0.62rem] font-mono uppercase tracking-widest text-crimson font-bold">
+                                                        ФОРМАТ 0{{ $loop->iteration }}
+                                                    </span>
+                                                    @if($pkg->localizedSubtitle($locale))
+                                                        <span class="text-[0.65rem] text-neutral-400 group-hover:text-neutral-300 font-mono hidden sm:inline">
+                                                            &bull; {{ $pkg->localizedSubtitle($locale) }}
+                                                        </span>
+                                                    @endif
+                                                </div>
+
+                                                <h4 class="text-sm font-extrabold uppercase font-display tracking-tight group-hover:text-white"
+                                                    :class="selected === '{{ addslashes($pkgTitle) }}' ? 'text-white' : 'text-arch-text'">
+                                                    {{ $pkgTitle }}
+                                                </h4>
+
+                                                @if($pkgDuration || $pkgPhotos)
+                                                    <div class="text-[0.68rem] text-neutral-500 group-hover:text-neutral-300 font-mono flex items-center gap-2 pt-0.5">
+                                                        @if($pkgDuration) <span>{{ $pkgDuration }}</span> @endif
+                                                        @if($pkgDuration && $pkgPhotos) <span>&bull;</span> @endif
+                                                        @if($pkgPhotos) <span>{{ $pkgPhotos }}</span> @endif
+                                                    </div>
+                                                @endif
+                                            </div>
+
+                                            <div class="flex items-center gap-3 shrink-0 pt-0.5">
+                                                <span class="px-2.5 py-1 text-xs font-mono font-bold rounded-sm border transition-colors"
+                                                      :class="selected === '{{ addslashes($pkgTitle) }}' 
+                                                            ? 'bg-neutral-800 text-white border-neutral-700' 
+                                                            : 'bg-arch-bg text-arch-text border-arch-border group-hover:bg-neutral-800 group-hover:text-white group-hover:border-neutral-700'">
+                                                    {{ $pkgPrice }}
+                                                </span>
+                                                <span x-show="selected === '{{ addslashes($pkgTitle) }}'" 
+                                                      x-cloak 
+                                                      class="text-crimson font-bold text-sm">
+                                                    &check;
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                @endforeach
+                            @endif
+
+                            {{-- Option: Custom project --}}
+                            <div @click="selectPackage('Индивидуальный проект', 'Индивидуальный проект')"
+                                 class="p-4 hover:bg-neutral-950 group cursor-pointer transition-colors"
+                                 :class="selected === 'Индивидуальный проект' ? 'bg-neutral-900 text-white selected' : 'bg-white text-arch-text'">
+                                <div class="flex items-center justify-between">
+                                    <div class="space-y-0.5">
+                                        <span class="text-[0.62rem] font-mono uppercase tracking-widest text-crimson font-bold block">
+                                            СПЕЦИАЛЬНЫЙ ЗАПРОС
+                                        </span>
+                                        <h4 class="text-sm font-extrabold uppercase font-display tracking-tight group-hover:text-white"
+                                            :class="selected === 'Индивидуальный проект' ? 'text-white' : 'text-arch-text'">
+                                            Индивидуальный проект / Другое
+                                        </h4>
+                                        <p class="text-[0.68rem] text-neutral-500 group-hover:text-neutral-300 font-mono">
+                                            Выездные серии, нестандартный тайминг, контент для брендов
+                                        </p>
+                                    </div>
+                                    <span x-show="selected === 'Индивидуальный проект'" 
+                                          x-cloak 
+                                          class="text-crimson font-bold text-sm ml-3">
+                                        &check;
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    {{-- Message / Details --}}
+                    <div>
+                        <label for="message" class="block text-xs uppercase tracking-widest font-mono font-bold text-arch-text mb-2">
+                            Сообщение / пожелания к съёмке <span class="text-crimson">*</span>
+                        </label>
+                        <textarea name="message" 
+                                  id="message" 
+                                  rows="4" 
+                                  required 
+                                  placeholder="Расскажите о вашей идее: желаемые даты, локация, количество участников или стиль кадра..."
+                                  class="w-full px-4 py-3 bg-arch-bg border border-arch-border text-arch-text text-sm font-mono focus:border-crimson focus:bg-white focus:outline-none transition-colors @error('message') border-crimson @enderror">{{ old('message') }}</textarea>
+                        @error('message')
+                            <p class="text-xs text-crimson font-mono mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- Submit Button & Response Time note --}}
+                    <div class="pt-2 space-y-4">
+                        <button type="submit" 
+                                class="btn-crimson w-full py-4 text-xs font-bold uppercase tracking-wider font-mono shadow-crimson-btn">
+                            <span>Отправить заявку</span>
+                            <span>&rarr;</span>
+                        </button>
+
+                        <div class="flex items-center justify-between text-[0.68rem] text-neutral-500 font-mono">
+                            <span>⏱ Ответ в течение 1–2 часов</span>
+                            <span>Конфиденциальность гарантирована</span>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
 
         </div>
 

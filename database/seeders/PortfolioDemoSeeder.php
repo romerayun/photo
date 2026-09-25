@@ -18,12 +18,12 @@ class PortfolioDemoSeeder extends Seeder
     {
         // 1. Initial Settings
         Setting::set('demo_mode', '1');
-        Setting::set('telegram', ''); // Unfilled initially per specs
-        Setting::set('phone', '');    // Unfilled initially per specs
+        Setting::set('telegram', '@romerayun');
+        Setting::set('phone', '+7 914 808-95-55');
         Setting::set('city_ru', 'Иркутск');
         Setting::set('city_en', 'Irkutsk');
-        Setting::set('hero_phrase_ru', 'Ваши истории. Мой взгляд.');
-        Setting::set('hero_phrase_en', 'Your stories. My perspective.');
+        Setting::set('hero_phrase_ru', 'Фотограф в Иркутске – Роман Юн');
+        Setting::set('hero_phrase_en', 'Photographer in Irkutsk – Roman Yun');
         Setting::set('hero_sub_ru', 'Портреты, съёмки для пар и семей, события и контент для бизнеса. Иркутск.');
         Setting::set('hero_sub_en', 'Portraits, sessions for couples and families, events, and business content. Irkutsk.');
 

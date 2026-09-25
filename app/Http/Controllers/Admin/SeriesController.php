@@ -48,6 +48,9 @@ class SeriesController extends Controller
         if (empty($validated['slug'])) {
             $slugBase = !empty($validated['title_en']) ? $validated['title_en'] : $validated['title_ru'];
             $slug = Str::slug($slugBase);
+            if (empty($slug)) {
+                $slug = 'series-' . time();
+            }
             $count = Series::where('slug', 'like', "{$slug}%")->count();
             $validated['slug'] = $count ? "{$slug}-" . ($count + 1) : $slug;
         }

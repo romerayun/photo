@@ -19,6 +19,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'set_locale' => \App\Http\Middleware\SetLocale::class,
         ]);
+
+        $middleware->validateCsrfTokens(except: [
+            'api/max/webhook',
+            'webhook/max',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

@@ -24,6 +24,10 @@
                    class="transition-colors hover:text-crimson {{ request()->routeIs('portfolio.*') || request()->routeIs('series.*') ? 'text-crimson' : 'text-neutral-300' }}">
                     {{ __('site.nav_portfolio') }}
                 </a>
+                <a href="{{ route('articles.index') }}" 
+                   class="transition-colors hover:text-crimson {{ request()->routeIs('articles.*') ? 'text-crimson' : 'text-neutral-300' }}">
+                    {{ __('site.nav_articles') }}
+                </a>
                 <a href="{{ route('pricing.index') }}" 
                    class="transition-colors hover:text-crimson {{ request()->routeIs('pricing.*') ? 'text-crimson' : 'text-neutral-300' }}">
                     {{ __('site.nav_pricing') }}
@@ -38,10 +42,11 @@
                 </a>
             </nav>
 
-            {{-- Right Controls: Crimson CTA Button --}}
-            <div class="hidden md:flex items-center space-x-6">
-                <a href="{{ route('contacts.index') }}" 
-                   class="btn-crimson px-6 py-3 text-xs tracking-wider font-bold">
+            {{-- Right Controls: Direct CTA to Telegram --}}
+            <div class="hidden md:flex items-center space-x-3">
+                <a href="{{ \App\Models\Setting::hasTelegram() ? \App\Models\Setting::telegramUrl('Здравствуйте, Роман! Хочу обсудить съёмку.') : route('contacts.index') }}" 
+                   @if(\App\Models\Setting::hasTelegram()) target="_blank" rel="noopener" @endif
+                   class="btn-crimson px-5 py-2.5 text-xs tracking-wider font-bold">
                     <span>{{ __('site.nav_discuss') }}</span>
                     <span>&nearr;</span>
                 </a>
@@ -82,6 +87,11 @@
                class="text-white hover:text-crimson py-1">
                 {{ __('site.nav_portfolio') }}
             </a>
+            <a href="{{ route('articles.index') }}" 
+               @click="mobileOpen = false"
+               class="text-white hover:text-crimson py-1 {{ request()->routeIs('articles.*') ? 'text-crimson' : '' }}">
+                {{ __('site.nav_articles') }}
+            </a>
             <a href="{{ route('pricing.index') }}" 
                @click="mobileOpen = false"
                class="text-white hover:text-crimson py-1">
@@ -100,9 +110,10 @@
         </nav>
 
         <div class="pt-4 border-t border-cine-border">
-            <a href="{{ route('contacts.index') }}" 
+            <a href="{{ \App\Models\Setting::hasTelegram() ? \App\Models\Setting::telegramUrl('Здравствуйте, Роман! Хочу обсудить съёмку.') : route('contacts.index') }}" 
+               @if(\App\Models\Setting::hasTelegram()) target="_blank" rel="noopener" @endif
                @click="mobileOpen = false"
-               class="btn-crimson block w-full text-center py-3 text-xs tracking-wider">
+               class="btn-crimson block w-full text-center py-3 text-xs tracking-wider font-bold">
                 <span>{{ __('site.nav_discuss') }}</span>
                 <span>&nearr;</span>
             </a>

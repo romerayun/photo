@@ -52,4 +52,12 @@ class PackageController extends Controller
 
         return redirect()->route('admin.packages.index')->with('success', "Пакет '{$package->title_ru}' успешно обновлён.");
     }
+
+    public function destroy(Package $package): RedirectResponse
+    {
+        $title = $package->title_ru;
+        $package->delete();
+
+        return redirect()->route('admin.packages.index')->with('success', "Пакет '{$title}' успешно удалён.");
+    }
 }

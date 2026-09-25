@@ -5,45 +5,40 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Series;
 use App\Models\Setting;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class PortfolioController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request): View|JsonResponse
     {
         $locale = 'ru';
         $isDemo = Setting::isDemoMode();
-        $selectedCategorySlug = $request->query('category');
-
-        $categories = Category::query()
-            ->orderBy('sort_order')
-            ->withCount(['series' => function ($q) use ($isDemo) {
-                $q->visible($isDemo);
-            }])
-            ->get();
-
-        $selectedCategory = null;
-        if ($selectedCategorySlug) {
-            $selectedCategory = $categories->firstWhere('slug', $selectedCategorySlug);
-        }
 
         $query = Series::query()
             ->visible($isDemo)
             ->with(['category', 'photos'])
             ->orderBy('sort_order');
 
-        if ($selectedCategory) {
-            $query->where('category_id', $selectedCategory->id);
-        }
+        $seriesList = $query->paginate(6)->withQueryString();
 
-        $seriesList = $query->get();
+        if ($request->ajax() || $request->wantsJson() || $request->has('ajax')) {
+            $html = view('pages.partials.series-cards', [
+                'seriesList' => $seriesList,
+                'locale' => $locale,
+            ])->render();
+
+            return response()->json([
+                'html' => $html,
+                'hasMore' => $seriesList->hasMorePages(),
+                'nextPage' => $seriesList->currentPage() + 1,
+                'total' => $seriesList->total(),
+            ]);
+        }
 
         return view('pages.portfolio', [
             'seriesList' => $seriesList,
-            'categories' => $categories,
-            'selectedCategory' => $selectedCategory,
-            'selectedCategorySlug' => $selectedCategorySlug,
             'isDemo' => $isDemo,
             'locale' => $locale,
         ]);

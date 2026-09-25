@@ -37,17 +37,48 @@ class LocalizationAndPublicRoutesTest extends TestCase
         $this->get('/en/pricing')->assertRedirect('/pricing');
     }
 
-    public function test_portfolio_page_with_category_filtering(): void
+    public function test_portfolio_page_with_load_more_pagination(): void
     {
+        // Seed 2 extra series so total is 7 (> 6)
+        Series::create([
+            'slug' => 'test-extra-series-1',
+            'title_ru' => 'Тест Серия 1',
+            'title_en' => 'Test Series 1',
+            'is_published' => true,
+            'is_demo' => true,
+            'sort_order' => 10,
+        ]);
+        Series::create([
+            'slug' => 'test-extra-series-2',
+            'title_ru' => 'Тест Серия 2',
+            'title_en' => 'Test Series 2',
+            'is_published' => true,
+            'is_demo' => true,
+            'sort_order' => 11,
+        ]);
+
         $response = $this->get('/portfolio');
         $response->assertStatus(200);
-        $response->assertSee('Портфолио и серии');
-        $response->assertSee('Все направления');
+        $response->assertSee('ПОРТФОЛИО');
+        $response->assertSee('Загрузить ещё');
+        $response->assertDontSee('Все направления');
 
-        // Filter by portraits
-        $responsePortraits = $this->get('/portfolio?category=portraits');
-        $responsePortraits->assertStatus(200);
-        $responsePortraits->assertSee('Северный свет');
+        // Ajax load more request (page 1 - initial)
+        $ajaxPage1 = $this->getJson('/portfolio?page=1');
+        $ajaxPage1->assertStatus(200);
+        $ajaxPage1->assertJsonStructure([
+            'html',
+            'hasMore',
+            'nextPage',
+            'total',
+        ]);
+        $this->assertTrue($ajaxPage1->json('hasMore'));
+        $this->assertEquals(2, $ajaxPage1->json('nextPage'));
+
+        // Ajax load more request (page 2 - last)
+        $ajaxPage2 = $this->getJson('/portfolio?page=2');
+        $ajaxPage2->assertStatus(200);
+        $this->assertFalse($ajaxPage2->json('hasMore'));
     }
 
     public function test_series_detail_page_loads_with_photos(): void
@@ -92,6 +123,18 @@ class LocalizationAndPublicRoutesTest extends TestCase
 
         $responseRobots = $this->get('/robots.txt');
         $responseRobots->assertStatus(200);
-        $responseRobots->assertSee('Disallow: /');
+        $responseRobots->assertSee("Allow: /\n");
+        $responseRobots->assertSee("Disallow: /admin");
+        $responseRobots->assertDontSee("Disallow: /\n");
+
+        // Public pages should have index, follow
+        $responseHome = $this->get('/');
+        $responseHome->assertStatus(200);
+        $responseHome->assertSee('<meta name="robots" content="index, follow">', false);
+
+        // Admin login page should have noindex, nofollow
+        $responseLogin = $this->get('/admin/login');
+        $responseLogin->assertStatus(200);
+        $responseLogin->assertSee('<meta name="robots" content="noindex, nofollow">', false);
     }
 }

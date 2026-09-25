@@ -10,54 +10,52 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
+use App\Services\ImageOptimizer;
+
 class PhotoController extends Controller
 {
-    public function store(Request $request, Series $series): RedirectResponse
+    public function store(Request $request, Series $series, ImageOptimizer $optimizer): RedirectResponse
     {
         $request->validate([
             'photos' => ['required', 'array'],
-            'photos.*' => ['file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:10240'],
+            'photos.*' => ['file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:51200'],
         ], [
             'photos.*.image' => 'Файл должен быть изображением.',
             'photos.*.mimes' => 'Поддерживаются только форматы JPG, PNG и WEBP.',
-            'photos.*.max' => 'Максимальный размер одного файла: 10 МБ.',
+            'photos.*.max' => 'Максимальный размер одного файла: 50 МБ.',
         ]);
 
         $currentMaxOrder = $series->photos()->max('sort_order') ?? 0;
+        $semanticSlug = $series->slug ?: $series->title_ru;
 
         foreach ($request->file('photos') as $uploadedFile) {
             $currentMaxOrder++;
-            $path = $uploadedFile->store("series/{$series->id}", 'public');
 
-            // Detect dimensions
-            $fullPath = storage_path("app/public/{$path}");
-            $width = null;
-            $height = null;
-            if (file_exists($fullPath)) {
-                $imageInfo = @getimagesize($fullPath);
-                if ($imageInfo) {
-                    $width = $imageInfo[0];
-                    $height = $imageInfo[1];
-                }
-            }
+            // Optimize for SEO: progressive JPEG, max 2560px, orientation auto-correction, semantic filename
+            $optimized = $optimizer->optimizeAndStore(
+                $uploadedFile,
+                "series/{$series->id}",
+                $semanticSlug,
+                ImageOptimizer::MAX_SERIES_DIMENSION
+            );
 
             $photo = Photo::create([
                 'series_id' => $series->id,
-                'image_path' => $path,
+                'image_path' => $optimized['path'],
                 'alt_ru' => $series->title_ru,
                 'alt_en' => $series->title_en,
-                'width' => $width,
-                'height' => $height,
+                'width' => $optimized['width'],
+                'height' => $optimized['height'],
                 'sort_order' => $currentMaxOrder,
             ]);
 
             // Auto set cover if none is chosen
             if (empty($series->cover_image)) {
-                $series->update(['cover_image' => $path]);
+                $series->update(['cover_image' => $optimized['path']]);
             }
         }
 
-        return back()->with('success', 'Фотографии успешно загружены.');
+        return back()->with('success', 'Фотографии успешно загружены и оптимизированы для SEO.');
     }
 
     public function setCover(Photo $photo): RedirectResponse

@@ -34,11 +34,36 @@ class HomeController extends Controller
                 ->get();
         }
 
+        // Spotlight series for the 2nd column in editorial grid
+        $spotlightSeries = null;
+        $spotlightSeriesId = Setting::get('home_spotlight_series_id');
+        if ($spotlightSeriesId) {
+            $spotlightSeries = Series::query()
+                ->visible($isDemo)
+                ->with(['category', 'photos'])
+                ->find($spotlightSeriesId);
+        }
+
+        if (!$spotlightSeries) {
+            $spotlightSeries = Series::query()
+                ->visible($isDemo)
+                ->with(['category', 'photos'])
+                ->orderBy('sort_order')
+                ->first();
+        }
+
         $categories = Category::query()
             ->orderBy('sort_order')
             ->withCount(['series' => function ($q) use ($isDemo) {
                 $q->visible($isDemo);
             }])
+            ->get();
+
+        $directionSeries = Series::query()
+            ->visible($isDemo)
+            ->with(['category', 'photos'])
+            ->orderBy('sort_order')
+            ->take(5)
             ->get();
 
         $packages = Package::query()
@@ -47,8 +72,10 @@ class HomeController extends Controller
             ->get();
 
         return view('pages.home', [
+            'spotlightSeries' => $spotlightSeries,
             'featuredSeries' => $featuredSeries,
             'categories' => $categories,
+            'directionSeries' => $directionSeries,
             'packages' => $packages,
             'isDemo' => $isDemo,
             'locale' => $locale,

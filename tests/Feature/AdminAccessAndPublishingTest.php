@@ -132,4 +132,88 @@ class AdminAccessAndPublishingTest extends TestCase
 
         $this->assertDatabaseHas('users', ['email' => 'newowner@example.com']);
     }
+
+    public function test_guest_cannot_delete_package(): void
+    {
+        $package = \App\Models\Package::first();
+        $this->assertNotNull($package);
+
+        $response = $this->delete("/admin/packages/{$package->id}");
+        $response->assertRedirect('/admin/login');
+        $this->assertDatabaseHas('packages', ['id' => $package->id]);
+    }
+
+    public function test_admin_can_delete_package(): void
+    {
+        $package = \App\Models\Package::first();
+        $this->assertNotNull($package);
+        $packageId = $package->id;
+
+        $response = $this->actingAs($this->admin)->delete("/admin/packages/{$packageId}");
+        $response->assertRedirect('/admin/packages');
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseMissing('packages', ['id' => $packageId]);
+    }
+
+    public function test_admin_forms_do_not_contain_english_fields_and_have_save_buttons(): void
+    {
+        // 1. Settings page
+        $settingsResponse = $this->actingAs($this->admin)->get('/admin/settings');
+        $settingsResponse->assertStatus(200);
+        $settingsResponse->assertDontSee('name="city_en"', false);
+        $settingsResponse->assertDontSee('name="hero_phrase_en"', false);
+        $settingsResponse->assertDontSee('name="hero_sub_en"', false);
+        $settingsResponse->assertSee('Сохранить все настройки');
+
+        // 2. Categories page
+        $categoriesResponse = $this->actingAs($this->admin)->get('/admin/categories');
+        $categoriesResponse->assertStatus(200);
+        $categoriesResponse->assertDontSee('name="name_en"', false);
+        $categoriesResponse->assertDontSee('name="description_en"', false);
+        $categoriesResponse->assertSee('Добавить категорию');
+
+        // 3. Package edit page
+        $package = \App\Models\Package::first();
+        if ($package) {
+            $packageResponse = $this->actingAs($this->admin)->get("/admin/packages/{$package->id}/edit");
+            $packageResponse->assertStatus(200);
+            $packageResponse->assertDontSee('name="title_en"', false);
+            $packageResponse->assertDontSee('name="includes_en"', false);
+            $packageResponse->assertSee('Сохранить пакет');
+        }
+
+        // 4. Series create page
+        $seriesCreateResponse = $this->actingAs($this->admin)->get('/admin/series/create');
+        $seriesCreateResponse->assertStatus(200);
+        $seriesCreateResponse->assertDontSee('name="title_en"', false);
+        $seriesCreateResponse->assertDontSee('name="location_en"', false);
+        $seriesCreateResponse->assertDontSee('name="description_en"', false);
+        $seriesCreateResponse->assertSee('Создать и перейти к загрузке фото');
+    }
+
+    public function test_admin_can_save_settings_and_categories_without_english_fields(): void
+    {
+        // Save settings without any _en inputs
+        $response = $this->actingAs($this->admin)->post('/admin/settings', [
+            'city_ru' => 'Иркутск и Байкал',
+            'hero_phrase_ru' => 'Новая ключевая фраза',
+            'hero_sub_ru' => 'Новое описание',
+            'telegram' => '@romanyun_test',
+            'phone' => '+7 (900) 000-00-00',
+            'contact_email' => 'test@romanyun.ru',
+        ]);
+        $response->assertSessionHas('success');
+        $this->assertEquals('Иркутск и Байкал', Setting::get('city_ru'));
+
+        // Save category without _en inputs
+        $catResponse = $this->actingAs($this->admin)->post('/admin/categories', [
+            'name_ru' => 'Свадебные истории',
+            'slug' => 'wedding-stories',
+            'description_ru' => 'Эмоциональные кадры свадебного дня',
+            'sort_order' => 5,
+        ]);
+        $catResponse->assertSessionHas('success');
+        $this->assertDatabaseHas('categories', ['name_ru' => 'Свадебные истории']);
+    }
 }

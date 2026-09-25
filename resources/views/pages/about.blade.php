@@ -13,11 +13,11 @@
             <div class="lg:col-span-5 sticky top-28">
                 <div class="bg-crimson p-4 pb-14 shadow-card-depth relative group">
                     <div class="aspect-[3/4] overflow-hidden bg-neutral-900">
-                        <img src="{{ asset('storage/demo/portrait-2.jpg') }}" 
+                        <img src="{{ asset('images/romanyun.jpg') }}" 
                              alt="{{ __('site.author_name') }} — {{ __('site.author_role') }}" 
                              loading="eager"
-                             width="800"
-                             height="1067"
+                             width="928"
+                             height="1152"
                              class="w-full h-full object-cover filter contrast-110">
                     </div>
                     
@@ -39,7 +39,7 @@
                         {{ __('site.about_title') }}
                     </h1>
                     <p class="text-xl font-mono text-neutral-500 uppercase tracking-wide">
-                        {{ __('site.about_subtitle') }}
+                       Фотограф в Иркутске
                     </p>
                 </div>
 
@@ -52,6 +52,9 @@
                     </p>
                     <p>
                         {{ __('site.about_p3') }}
+                    </p>
+                    <p>
+                        {{ __('site.about_p4') }}
                     </p>
                 </div>
 

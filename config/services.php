@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'max' => [
+        'bot_token' => env('MAX_BOT_TOKEN'),
+        'bot_username' => env('MAX_BOT_USERNAME', 'se14454241_bot'),
+        'api_url' => env('MAX_API_URL', 'https://api.max.ru'),
+    ],
+
 ];
