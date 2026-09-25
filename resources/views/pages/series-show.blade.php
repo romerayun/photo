@@ -72,7 +72,7 @@
         {{-- Masonry Photo Grid --}}
         <div class="columns-2 md:columns-3 gap-[5px]">
             @foreach($series->photos as $index => $photo)
-                <figure class="break-inside-avoid inline-block w-full mb-[5px] relative group cursor-pointer overflow-hidden bg-neutral-100" 
+                <figure class="break-inside-avoid block w-full mb-[5px] relative group cursor-pointer overflow-hidden bg-neutral-100" 
                         @click="open({{ $index }})"
                         role="button"
                         tabindex="0"
