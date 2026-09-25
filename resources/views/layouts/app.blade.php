@@ -21,6 +21,11 @@
 
     <meta name="robots" content="@yield('robots', 'index, follow')">
 
+    {{-- Favicon --}}
+    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="32x32">
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
+
     @stack('meta_links')
 
     {{-- Structured Data (Schema.org) --}}
