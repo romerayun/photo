@@ -157,25 +157,39 @@
         </div>
 
         {{-- Upload Form --}}
-        <form method="POST" action="{{ route('admin.series.photos.store', $series) }}" enctype="multipart/form-data" 
-              class="p-8 border-2 border-dashed border-slate-300 hover:border-crimson rounded-xl bg-slate-50/70 text-center transition-colors">
-            @csrf
-            <div class="space-y-3">
+        <div id="drop-zone" class="p-8 border-2 border-dashed border-slate-300 hover:border-crimson rounded-xl bg-slate-50/70 text-center transition-all cursor-pointer relative">
+            <div id="upload-idle-state" class="space-y-3">
                 <div class="w-12 h-12 rounded-full bg-slate-200/80 mx-auto flex items-center justify-center text-slate-600">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                 </div>
                 <div class="text-sm text-slate-700">
-                    <label for="photos-input" class="cursor-pointer font-bold text-crimson hover:underline">
-                        Выберите фотографии
-                    </label>
+                    <span class="font-bold text-crimson hover:underline">Выберите фотографии</span>
                     <span class="text-slate-500"> или перетащите их сюда</span>
-                    <input id="photos-input" name="photos[]" type="file" multiple accept="image/jpeg,image/png,image/webp" class="sr-only" onchange="this.form.submit()">
                 </div>
-                <p class="text-xs text-slate-400">JPG, PNG, WEBP до 50 МБ. Оригинальные пропорции и качество сохраняются.</p>
+                <p class="text-xs text-slate-400">JPG, PNG, WEBP до 50 МБ. Автоматическая оптимизация для Retina и SEO.</p>
+                <input id="photos-input" type="file" multiple accept="image/jpeg,image/png,image/webp" class="sr-only">
             </div>
-        </form>
+
+            {{-- Uploading & Progress State --}}
+            <div id="upload-busy-state" class="hidden py-4 space-y-4">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-crimson/10 text-crimson">
+                    <svg class="animate-spin h-6 w-6" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 id="upload-status-title" class="text-sm font-bold text-slate-900">Загрузка и оптимизация кадров...</h3>
+                    <p id="upload-status-sub" class="text-xs text-slate-500 mt-0.5">Пожалуйста, подождите. Создаются веб-версии высокого разрешения.</p>
+                </div>
+                <div class="w-full max-w-md mx-auto bg-slate-200 rounded-full h-2 overflow-hidden">
+                    <div id="upload-progress-bar" class="bg-crimson h-full w-0 transition-all duration-300"></div>
+                </div>
+                <div id="upload-percent-text" class="text-xs font-mono text-slate-600 font-bold">0%</div>
+            </div>
+        </div>
 
         {{-- Photos Grid --}}
         @if($series->photos->count() > 0)
@@ -196,9 +210,11 @@
                                 </div>
                             @endif
 
-                            <div class="absolute bottom-2 right-2 bg-black/70 text-white text-[0.65rem] font-mono px-2 py-0.5 rounded backdrop-blur-xs">
-                                {{ $photo->width }}x{{ $photo->height }}
-                            </div>
+                            @if($photo->width && $photo->height)
+                                <div class="absolute bottom-2 right-2 bg-black/70 text-white text-[0.65rem] font-mono px-2 py-0.5 rounded backdrop-blur-xs">
+                                    {{ $photo->width }}x{{ $photo->height }}
+                                </div>
+                            @endif
                         </div>
 
                         {{-- Actions Bar --}}
@@ -236,3 +252,113 @@
 
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('photos-input');
+        const idleState = document.getElementById('upload-idle-state');
+        const busyState = document.getElementById('upload-busy-state');
+        const progressBar = document.getElementById('upload-progress-bar');
+        const percentText = document.getElementById('upload-percent-text');
+        const statusTitle = document.getElementById('upload-status-title');
+        const uploadUrl = '{{ route("admin.series.photos.store", $series) }}';
+        const csrfToken = '{{ csrf_token() }}';
+
+        if (!dropZone || !fileInput) return;
+
+        dropZone.addEventListener('click', () => {
+            if (busyState.classList.contains('hidden')) {
+                fileInput.click();
+            }
+        });
+
+        // Drag and drop highlights
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.add('border-crimson', 'bg-red-50/20');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.remove('border-crimson', 'bg-red-50/20');
+            }, false);
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            if (dt && dt.files && dt.files.length) {
+                handleFiles(dt.files);
+            }
+        });
+
+        fileInput.addEventListener('change', function () {
+            if (this.files && this.files.length) {
+                handleFiles(this.files);
+            }
+        });
+
+        function handleFiles(files) {
+            const validFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+            if (!validFiles.length) {
+                alert('Пожалуйста, выберите файлы изображений (JPG, PNG или WEBP).');
+                return;
+            }
+
+            idleState.classList.add('hidden');
+            busyState.classList.remove('hidden');
+            progressBar.style.width = '0%';
+            percentText.textContent = '0%';
+            statusTitle.textContent = `Загрузка ${validFiles.length} фото...`;
+
+            const formData = new FormData();
+            validFiles.forEach(f => formData.append('photos[]', f));
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', uploadUrl, true);
+            xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+            xhr.setRequestHeader('Accept', 'application/json');
+
+            xhr.upload.onprogress = function (e) {
+                if (e.lengthComputable) {
+                    const percent = Math.round((e.loaded / e.total) * 100);
+                    progressBar.style.width = percent + '%';
+                    percentText.textContent = percent + '%';
+                    if (percent >= 100) {
+                        statusTitle.textContent = 'Оптимизация и сохранение кадров...';
+                    }
+                }
+            };
+
+            xhr.onload = function () {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    window.location.reload();
+                } else {
+                    let errMsg = 'Произошла ошибка при загрузке.';
+                    try {
+                        const res = JSON.parse(xhr.responseText);
+                        if (res.message) errMsg = res.message;
+                    } catch (e) {}
+                    alert(errMsg);
+                    idleState.classList.remove('hidden');
+                    busyState.classList.add('hidden');
+                }
+            };
+
+            xhr.onerror = function () {
+                alert('Сетевая ошибка при загрузке фотографий. Проверьте интернет-соединение или размер файлов.');
+                idleState.classList.remove('hidden');
+                busyState.classList.add('hidden');
+            };
+
+            xhr.send(formData);
+        }
+    });
+</script>
+@endpush

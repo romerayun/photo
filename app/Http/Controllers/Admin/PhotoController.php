@@ -14,8 +14,13 @@ use App\Services\ImageOptimizer;
 
 class PhotoController extends Controller
 {
-    public function store(Request $request, Series $series, ImageOptimizer $optimizer): RedirectResponse
+    public function store(Request $request, Series $series, ImageOptimizer $optimizer): RedirectResponse|JsonResponse
     {
+        // Increase time & memory limit for heavy camera RAW/high-res JPEG batch processing
+        @ini_set('max_execution_time', '300');
+        @set_time_limit(300);
+        @ini_set('memory_limit', '1024M');
+
         $request->validate([
             'photos' => ['required', 'array'],
             'photos.*' => ['file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:51200'],
@@ -27,32 +32,60 @@ class PhotoController extends Controller
 
         $currentMaxOrder = $series->photos()->max('sort_order') ?? 0;
         $semanticSlug = $series->slug ?: $series->title_ru;
+        $savedPhotos = [];
 
         foreach ($request->file('photos') as $uploadedFile) {
             $currentMaxOrder++;
 
-            // Optimize for SEO: progressive JPEG, max 2560px, orientation auto-correction, semantic filename
-            $optimized = $optimizer->optimizeAndStore(
-                $uploadedFile,
-                "series/{$series->id}",
-                $semanticSlug,
-                ImageOptimizer::MAX_SERIES_DIMENSION
-            );
+            try {
+                // Optimize for SEO: progressive JPEG, max 2560px, orientation auto-correction, semantic filename
+                $optimized = $optimizer->optimizeAndStore(
+                    $uploadedFile,
+                    "series/{$series->id}",
+                    $semanticSlug,
+                    ImageOptimizer::MAX_SERIES_DIMENSION
+                );
 
-            $photo = Photo::create([
-                'series_id' => $series->id,
-                'image_path' => $optimized['path'],
-                'alt_ru' => $series->title_ru,
-                'alt_en' => $series->title_en,
-                'width' => $optimized['width'],
-                'height' => $optimized['height'],
-                'sort_order' => $currentMaxOrder,
-            ]);
+                $photo = Photo::create([
+                    'series_id' => $series->id,
+                    'image_path' => $optimized['path'],
+                    'alt_ru' => $series->title_ru,
+                    'alt_en' => $series->title_en,
+                    'width' => $optimized['width'],
+                    'height' => $optimized['height'],
+                    'sort_order' => $currentMaxOrder,
+                ]);
 
-            // Auto set cover if none is chosen
-            if (empty($series->cover_image)) {
-                $series->update(['cover_image' => $optimized['path']]);
+                // Auto set cover if none is chosen
+                if (empty($series->cover_image)) {
+                    $series->update(['cover_image' => $optimized['path']]);
+                }
+
+                $savedPhotos[] = $photo;
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error('Error processing photo for series ' . $series->id . ': ' . $e->getMessage());
+                // Fallback: direct store without optimization if GD crashed
+                $path = $uploadedFile->store("series/{$series->id}", 'public');
+                $photo = Photo::create([
+                    'series_id' => $series->id,
+                    'image_path' => $path,
+                    'alt_ru' => $series->title_ru,
+                    'alt_en' => $series->title_en,
+                    'sort_order' => $currentMaxOrder,
+                ]);
+                if (empty($series->cover_image)) {
+                    $series->update(['cover_image' => $path]);
+                }
+                $savedPhotos[] = $photo;
             }
+        }
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'count' => count($savedPhotos),
+                'message' => 'Фотографии успешно загружены!',
+            ]);
         }
 
         return back()->with('success', 'Фотографии успешно загружены и оптимизированы для SEO.');
