@@ -70,9 +70,12 @@ class SeriesController extends Controller
         $series->load(['category', 'photos']);
         $categories = Category::orderBy('sort_order')->get();
 
+        $seoMeta = \App\Models\SeoMeta::findByPath('/series/' . $series->slug);
+
         return view('admin.series.edit', [
             'series' => $series,
             'categories' => $categories,
+            'seoMeta' => $seoMeta,
         ]);
     }
 

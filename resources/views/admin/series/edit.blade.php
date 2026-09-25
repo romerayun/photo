@@ -137,6 +137,27 @@
                 </label>
             </div>
 
+            {{-- SEO Section Info --}}
+            <div class="border-t border-slate-200 pt-6">
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="space-y-0.5">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs uppercase font-bold text-slate-700">SEO настройки страницы серии</span>
+                            <span class="text-[0.65rem] px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded font-bold font-mono">/series/{{ $series->slug }}</span>
+                        </div>
+                        <p class="text-xs text-slate-500">
+                            {{ $seoMeta ? 'SEO заголовок: ' . ($seoMeta->title ?: 'Автоматический') : 'Генерируется автоматически на основе названия и фото.' }}
+                        </p>
+                    </div>
+                    @if($seoMeta)
+                        <a href="{{ route('admin.seo.edit', $seoMeta) }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-slate-300 hover:border-slate-800 text-slate-800 text-xs font-bold rounded-lg shadow-sm transition-all shrink-0">
+                            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                            <span>Настроить SEO теги</span>
+                        </a>
+                    @endif
+                </div>
+            </div>
+
             <div class="border-t border-slate-200 pt-6 flex justify-end">
                 <button type="submit" class="px-8 py-3 bg-neutral-900 hover:bg-neutral-800 text-white text-xs uppercase tracking-wider font-bold rounded-lg shadow-sm hover:shadow transition-all inline-flex items-center gap-2 cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>

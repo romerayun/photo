@@ -13,10 +13,6 @@
 @push('meta_links')
     <meta property="article:published_time" content="{{ $article->published_at?->toIso8601String() ?? $article->created_at->toIso8601String() }}">
     <meta property="article:author" content="Роман Юн">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ $article->meta_title ?: $article->title }}">
-    <meta name="twitter:description" content="{{ $article->meta_description ?: ($article->excerpt ?: Str::limit(strip_tags($article->content), 160)) }}">
-    <meta name="twitter:image" content="{{ $article->cover_url }}">
 @endpush
 
 @section('content')

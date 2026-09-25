@@ -4,22 +4,29 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', __('site.meta_title'))</title>
-    <meta name="description" content="@yield('description', __('site.meta_description'))">
+    @php
+        $currentPath = \App\Models\SeoMeta::normalizePath(request()->path());
+        $seoMeta = \App\Models\SeoMeta::findByPath($currentPath);
+    @endphp
+    <title>{{ ($seoMeta && $seoMeta->title) ? $seoMeta->title : (app()->view->getSections()['title'] ?? __('site.meta_title')) }}</title>
+    <meta name="description" content="{{ ($seoMeta && $seoMeta->description) ? $seoMeta->description : (app()->view->getSections()['description'] ?? __('site.meta_description')) }}">
     
     {{-- Canonical --}}
-    <link rel="canonical" href="@yield('canonical', url()->current())">
+    <link rel="canonical" href="{{ ($seoMeta && $seoMeta->canonical) ? $seoMeta->canonical : (app()->view->getSections()['canonical'] ?? url()->current()) }}">
 
     {{-- Open Graph --}}
     <meta property="og:site_name" content="{{ __('site.author_name') }}">
-    <meta property="og:title" content="@yield('og_title', __('site.meta_title'))">
-    <meta property="og:description" content="@yield('og_description', __('site.meta_description'))">
-    <meta property="og:url" content="@yield('og_url', url()->current())">
-    <meta property="og:type" content="@yield('og_type', 'website')">
-    <meta property="og:image" content="@yield('og_image', asset('storage/demo/hero-main.jpg'))">
+    <meta property="og:title" content="{{ ($seoMeta && $seoMeta->og_title) ? $seoMeta->og_title : (($seoMeta && $seoMeta->title) ? $seoMeta->title : (app()->view->getSections()['og_title'] ?? (app()->view->getSections()['title'] ?? __('site.meta_title')))) }}">
+    <meta property="og:description" content="{{ ($seoMeta && $seoMeta->og_description) ? $seoMeta->og_description : (($seoMeta && $seoMeta->description) ? $seoMeta->description : (app()->view->getSections()['og_description'] ?? (app()->view->getSections()['description'] ?? __('site.meta_description')))) }}">
+    <meta property="og:url" content="{{ app()->view->getSections()['og_url'] ?? url()->current() }}">
+    <meta property="og:type" content="{{ app()->view->getSections()['og_type'] ?? 'website' }}">
+    <meta property="og:image" content="{{ ($seoMeta && $seoMeta->og_image) ? $seoMeta->og_image : (app()->view->getSections()['og_image'] ?? asset('storage/demo/hero-main.jpg')) }}">
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ ($seoMeta && $seoMeta->og_title) ? $seoMeta->og_title : (($seoMeta && $seoMeta->title) ? $seoMeta->title : (app()->view->getSections()['og_title'] ?? (app()->view->getSections()['title'] ?? __('site.meta_title')))) }}">
+    <meta name="twitter:description" content="{{ ($seoMeta && $seoMeta->og_description) ? $seoMeta->og_description : (($seoMeta && $seoMeta->description) ? $seoMeta->description : (app()->view->getSections()['og_description'] ?? (app()->view->getSections()['description'] ?? __('site.meta_description')))) }}">
+    <meta name="twitter:image" content="{{ ($seoMeta && $seoMeta->og_image) ? $seoMeta->og_image : (app()->view->getSections()['og_image'] ?? asset('storage/demo/hero-main.jpg')) }}">
 
-    <meta name="robots" content="@yield('robots', 'index, follow')">
+    <meta name="robots" content="{{ ($seoMeta && $seoMeta->robots) ? $seoMeta->robots : (app()->view->getSections()['robots'] ?? 'index, follow') }}">
     <meta name="yandex-verification" content="1969fa24207a6a63">
 
     {{-- Favicon --}}

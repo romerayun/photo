@@ -27,6 +27,18 @@ class Article extends Model
         'meta_description',
     ];
 
+    protected static function booted(): void
+    {
+        static::saved(function (Article $article) {
+            \App\Services\SeoService::syncArticle($article, $article->getOriginal('slug'));
+        });
+
+        static::deleted(function (Article $article) {
+            $path = \App\Models\SeoMeta::normalizePath('/articles/' . $article->slug);
+            \App\Models\SeoMeta::where('path', $path)->delete();
+        });
+    }
+
     protected $casts = [
         'reading_time' => 'integer',
         'views_count' => 'integer',

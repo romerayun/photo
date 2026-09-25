@@ -29,6 +29,18 @@ class Series extends Model
         'sort_order',
     ];
 
+    protected static function booted(): void
+    {
+        static::saved(function (Series $series) {
+            \App\Services\SeoService::syncSeries($series, $series->getOriginal('slug'));
+        });
+
+        static::deleted(function (Series $series) {
+            $path = \App\Models\SeoMeta::normalizePath('/series/' . $series->slug);
+            \App\Models\SeoMeta::where('path', $path)->delete();
+        });
+    }
+
     protected $casts = [
         'is_featured' => 'boolean',
         'is_published' => 'boolean',

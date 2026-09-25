@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\CommentController as AdminCommentController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\PackageController as AdminPackageController;
 use App\Http\Controllers\Admin\PhotoController as AdminPhotoController;
+use App\Http\Controllers\Admin\SeoController as AdminSeoController;
 use App\Http\Controllers\Admin\SeriesController as AdminSeriesController;
 use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Admin\ShootController as AdminShootController;
@@ -97,6 +98,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/packages/{package}/edit', [AdminPackageController::class, 'edit'])->name('packages.edit');
         Route::put('/packages/{package}', [AdminPackageController::class, 'update'])->name('packages.update');
         Route::delete('/packages/{package}', [AdminPackageController::class, 'destroy'])->name('packages.destroy');
+
+        // SEO Management
+        Route::get('/seo', [AdminSeoController::class, 'index'])->name('seo.index');
+        Route::post('/seo/sync', [AdminSeoController::class, 'sync'])->name('seo.sync');
+        Route::get('/seo/{seo}/edit', [AdminSeoController::class, 'edit'])->name('seo.edit');
+        Route::put('/seo/{seo}', [AdminSeoController::class, 'update'])->name('seo.update');
+        Route::post('/seo/{seo}/reset', [AdminSeoController::class, 'reset'])->name('seo.reset');
 
         // Settings
         Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings.index');
