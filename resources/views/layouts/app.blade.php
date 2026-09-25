@@ -20,6 +20,7 @@
     <meta name="twitter:card" content="summary_large_image">
 
     <meta name="robots" content="@yield('robots', 'index, follow')">
+    <meta name="yandex-verification" content="1969fa24207a6a63">
 
     {{-- Favicon --}}
     <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="32x32">
