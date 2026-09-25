@@ -10,6 +10,10 @@
             <h1 class="text-2xl font-serif font-bold text-slate-900">Пакеты услуг и цены</h1>
             <p class="text-xs text-slate-500 mt-0.5">Управление форматами съёмок, включёнными услугами и стоимостью.</p>
         </div>
+        <a href="{{ route('admin.packages.create') }}" class="px-4 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-white text-xs uppercase tracking-wider font-bold rounded-lg shadow-sm hover:shadow transition-all inline-flex items-center gap-2 self-start sm:self-auto cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+            <span>Добавить пакет</span>
+        </a>
     </div>
 
     <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">

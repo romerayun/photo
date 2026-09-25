@@ -92,6 +92,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Packages
         Route::get('/packages', [AdminPackageController::class, 'index'])->name('packages.index');
+        Route::get('/packages/create', [AdminPackageController::class, 'create'])->name('packages.create');
+        Route::post('/packages', [AdminPackageController::class, 'store'])->name('packages.store');
         Route::get('/packages/{package}/edit', [AdminPackageController::class, 'edit'])->name('packages.edit');
         Route::put('/packages/{package}', [AdminPackageController::class, 'update'])->name('packages.update');
         Route::delete('/packages/{package}', [AdminPackageController::class, 'destroy'])->name('packages.destroy');
