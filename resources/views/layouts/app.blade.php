@@ -59,7 +59,9 @@
 <body class="bg-cine-black text-white font-sans antialiased selection:bg-crimson selection:text-white flex flex-col min-h-screen relative overflow-x-hidden">
 
     {{-- Kinetic Typographic Preloader --}}
-    @include('components.preloader')
+    @unless(View::hasSection('no_preloader'))
+        @include('components.preloader')
+    @endunless
 
     {{-- Avant-Garde Header --}}
     @include('components.navbar')
