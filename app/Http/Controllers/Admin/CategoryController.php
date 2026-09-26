@@ -38,6 +38,8 @@ class CategoryController extends Controller
             'content' => ['nullable', 'string'],
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string', 'max:500'],
+            'banner_title' => ['nullable', 'string', 'max:255'],
+            'banner_description' => ['nullable', 'string', 'max:1000'],
             'image' => ['nullable', 'file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:51200'],
             'sort_order' => ['nullable', 'integer'],
         ], [
@@ -83,6 +85,8 @@ class CategoryController extends Controller
             'content' => ['nullable', 'string'],
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string', 'max:500'],
+            'banner_title' => ['nullable', 'string', 'max:255'],
+            'banner_description' => ['nullable', 'string', 'max:1000'],
             'image' => ['nullable', 'file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:51200'],
             'sort_order' => ['nullable', 'integer'],
         ], [

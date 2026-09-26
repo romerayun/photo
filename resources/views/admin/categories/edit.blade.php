@@ -158,6 +158,45 @@
             </div>
         </div>
 
+        {{-- Banner & CTA Settings --}}
+        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm space-y-4">
+            <div>
+                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-700 border-b border-slate-100 pb-2">
+                    Нижний баннер заявки («Запись на съёмку»)
+                </h2>
+                <p class="text-xs text-slate-500 mt-1">
+                    Индивидуальный призыв к действию внизу страницы категории. Если поля не заполнены, используются стандартные тексты для категории.
+                </p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label for="banner_title" class="block text-xs uppercase tracking-wider font-bold text-slate-700 mb-1">
+                        Заголовок баннера
+                    </label>
+                    <input type="text" 
+                           id="banner_title" 
+                           name="banner_title" 
+                           value="{{ old('banner_title', $category->banner_title) }}" 
+                           placeholder="По умолчанию: Хотите съёмку в стиле «{{ $category->name_ru }}»?" 
+                           class="w-full text-xs px-3.5 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:border-neutral-900">
+                    <p class="text-[0.68rem] text-slate-400 mt-1">Например: <em>Нужен контент для бренда или эксперта?</em> или оставьте пустым для значения по умолчанию.</p>
+                </div>
+
+                <div>
+                    <label for="banner_description" class="block text-xs uppercase tracking-wider font-bold text-slate-700 mb-1">
+                        Текст описания в баннере
+                    </label>
+                    <textarea id="banner_description" 
+                              name="banner_description" 
+                              rows="3" 
+                              placeholder="Текст описания для этой категории..." 
+                              class="w-full text-xs px-3.5 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:border-neutral-900 leading-relaxed">{{ old('banner_description', $category->banner_description) }}</textarea>
+                    <p class="text-[0.68rem] text-slate-400 mt-1">Например для коммерческих съёмок: расскажите про подбор локации (офис/производство/студия), согласование концепции, тайминга и подготовку визуала под задачи бизнеса.</p>
+                </div>
+            </div>
+        </div>
+
         {{-- SEO Settings --}}
         <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm space-y-4">
             <h2 class="text-sm font-bold uppercase tracking-wider text-slate-700 border-b border-slate-100 pb-2">

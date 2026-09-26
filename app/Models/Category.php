@@ -20,6 +20,8 @@ class Category extends Model
         'content_en',
         'meta_title',
         'meta_description',
+        'banner_title',
+        'banner_description',
         'image',
         'sort_order',
     ];
@@ -54,6 +56,25 @@ class Category extends Model
             return $this->content_en;
         }
         return $this->content;
+    }
+
+    public function bannerTitle(?string $locale = null): string
+    {
+        if (!empty($this->banner_title)) {
+            return $this->banner_title;
+        }
+        return 'Хотите съёмку в стиле «' . $this->localizedName($locale) . '»?';
+    }
+
+    public function bannerDescription(?string $locale = null): string
+    {
+        if (!empty($this->banner_description)) {
+            return $this->banner_description;
+        }
+        if ($this->slug === 'business') {
+            return 'Обсудим концепцию и задачи вашего бизнеса или личного бренда. Подберём локацию (студия, офис, производство), согласуем тайминг и референсы. Подготовлю качественный визуал для сайта, соцсетей и рекламы.';
+        }
+        return 'Подскажу подходящие места в Иркутске или на природе, посоветую одежду и время суток с красивым светом. На съёмке будет легко и комфортно.';
     }
 
     public function getImageUrlAttribute(): string

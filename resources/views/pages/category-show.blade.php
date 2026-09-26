@@ -250,10 +250,10 @@
                         ЗАПИСЬ НА СЪЁМКУ
                     </span>
                     <h3 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold uppercase font-display tracking-tight text-white leading-tight">
-                        Хотите съёмку в стиле «{{ $category->localizedName($locale) }}»?
+                        {{ $category->bannerTitle($locale) }}
                     </h3>
                     <p class="text-xs sm:text-sm text-neutral-400 font-mono leading-relaxed max-w-2xl">
-                        Подскажу подходящие места в Иркутске или на природе, посоветую одежду и время суток с красивым светом. На съёмке будет легко и комфортно.
+                        {{ $category->bannerDescription($locale) }}
                     </p>
                 </div>
 
