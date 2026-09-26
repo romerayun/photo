@@ -27,6 +27,7 @@ class DashboardController extends Controller
             'total_comments' => Comment::count(),
             'total_photos' => Photo::count(),
             'total_packages' => Package::count(),
+            'total_faqs' => \App\Models\Faq::count(),
             'total_categories' => Category::count(),
             'total_shoots' => Shoot::count(),
             'upcoming_shoots' => Shoot::upcoming()->count(),

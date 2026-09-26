@@ -102,6 +102,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('/packages/{package}', [AdminPackageController::class, 'update'])->name('packages.update');
         Route::delete('/packages/{package}', [AdminPackageController::class, 'destroy'])->name('packages.destroy');
 
+        // FAQs
+        Route::resource('faqs', \App\Http\Controllers\Admin\FaqController::class)->except(['show']);
+        Route::post('/faqs/{faq}/toggle', [\App\Http\Controllers\Admin\FaqController::class, 'toggle'])->name('faqs.toggle');
+
         // SEO Management
         Route::get('/seo', [AdminSeoController::class, 'index'])->name('seo.index');
         Route::post('/seo/sync', [AdminSeoController::class, 'sync'])->name('seo.sync');

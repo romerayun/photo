@@ -47,6 +47,10 @@
                        class="px-3.5 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.packages.*') ? 'bg-white/15 text-white shadow-sm' : 'hover:bg-white/5 hover:text-white' }}">
                         Пакеты
                     </a>
+                    <a href="{{ route('admin.faqs.index') }}" 
+                       class="px-3.5 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.faqs.*') ? 'bg-white/15 text-white shadow-sm' : 'hover:bg-white/5 hover:text-white' }}">
+                        FAQ
+                    </a>
                     <a href="{{ route('admin.seo.index') }}" 
                        class="px-3.5 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.seo.*') ? 'bg-white/15 text-white shadow-sm' : 'hover:bg-white/5 hover:text-white' }}">
                         SEO
@@ -84,6 +88,7 @@
             <a href="{{ route('admin.articles.index') }}" class="px-2.5 py-1 rounded {{ request()->routeIs('admin.articles.*') ? 'bg-white/15 text-white' : '' }}">Статьи</a>
             <a href="{{ route('admin.categories.index') }}" class="px-2.5 py-1 rounded {{ request()->routeIs('admin.categories.*') ? 'bg-white/15 text-white' : '' }}">Категории</a>
             <a href="{{ route('admin.packages.index') }}" class="px-2.5 py-1 rounded {{ request()->routeIs('admin.packages.*') ? 'bg-white/15 text-white' : '' }}">Пакеты</a>
+            <a href="{{ route('admin.faqs.index') }}" class="px-2.5 py-1 rounded {{ request()->routeIs('admin.faqs.*') ? 'bg-white/15 text-white' : '' }}">FAQ</a>
             <a href="{{ route('admin.seo.index') }}" class="px-2.5 py-1 rounded {{ request()->routeIs('admin.seo.*') ? 'bg-white/15 text-white' : '' }}">SEO</a>
             <a href="{{ route('admin.settings.index') }}" class="px-2.5 py-1 rounded {{ request()->routeIs('admin.settings.*') ? 'bg-white/15 text-white' : '' }}">Настройки</a>
         </div>
