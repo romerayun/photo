@@ -13,12 +13,17 @@
             <div class="lg:col-span-5 sticky top-28">
                 <div class="bg-crimson p-4 pb-14 shadow-card-depth relative group">
                     <div class="aspect-[3/4] overflow-hidden bg-neutral-900">
-                        <img src="{{ asset('images/romanyun.jpg') }}" 
-                             alt="{{ __('site.author_name') }} — {{ __('site.author_role') }}" 
-                             loading="eager"
-                             width="928"
-                             height="1152"
-                             class="w-full h-full object-cover filter contrast-110">
+                        <picture>
+                            <source srcset="{{ asset('images/romanyun.avif') }}" type="image/avif">
+                            <source srcset="{{ asset('images/romanyun.webp') }}" type="image/webp">
+                            <img src="{{ asset('images/romanyun.jpg') }}" 
+                                 alt="{{ __('site.author_name') }} — {{ __('site.author_role') }}" 
+                                 loading="eager"
+                                 decoding="async"
+                                 width="928"
+                                 height="1152"
+                                 class="w-full h-full object-cover filter contrast-110">
+                        </picture>
                     </div>
                     
                     <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white font-mono text-xs uppercase font-bold">

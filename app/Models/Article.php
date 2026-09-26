@@ -101,6 +101,65 @@ class Article extends Model
     }
 
     /**
+     * Get URL for specific cover variant (thumb, md, or original) and format (avif, webp, original).
+     */
+    public function getVariantCoverUrl(string $size = 'original', ?string $format = null): string
+    {
+        if (empty($this->cover_image)) {
+            return $this->cover_url;
+        }
+
+        if (str_starts_with($this->cover_image, 'http://') || str_starts_with($this->cover_image, 'https://')) {
+            return $this->cover_image;
+        }
+
+        $imagePath = ltrim($this->cover_image, '/');
+        $pathInfo = pathinfo($imagePath);
+        $dirname = $pathInfo['dirname'] !== '.' ? $pathInfo['dirname'] . '/' : '';
+        $filename = $pathInfo['filename'];
+        $ext = $pathInfo['extension'] ?? 'jpg';
+
+        $suffix = match($size) {
+            'thumb' => '-thumb',
+            'md' => '-md',
+            default => '',
+        };
+
+        $targetExt = $format ?: $ext;
+        $targetPath = "{$dirname}{$filename}{$suffix}.{$targetExt}";
+
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($targetPath)) {
+            return asset('storage/' . $targetPath);
+        }
+
+        if ($format && \Illuminate\Support\Facades\Storage::disk('public')->exists("{$dirname}{$filename}{$suffix}.{$ext}")) {
+            return asset('storage/' . "{$dirname}{$filename}{$suffix}.{$ext}");
+        }
+
+        return $this->cover_url;
+    }
+
+    public function getThumbnailCoverUrlAttribute(): string
+    {
+        return $this->getVariantCoverUrl('thumb');
+    }
+
+    public function getMediumCoverUrlAttribute(): string
+    {
+        return $this->getVariantCoverUrl('md');
+    }
+
+    public function getCoverSrcsetAttribute(?string $format = null): string
+    {
+        $thumb = $this->getVariantCoverUrl('thumb', $format);
+        $md = $this->getVariantCoverUrl('md', $format);
+        $full = $this->getVariantCoverUrl('original', $format);
+
+        return "{$thumb} 600w, {$md} 1200w, {$full} 2560w";
+    }
+
+
+    /**
      * Calculate reading time in minutes based on Russian text word count.
      */
     public function getEstimatedReadingTimeAttribute(): int

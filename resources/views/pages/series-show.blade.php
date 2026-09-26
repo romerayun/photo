@@ -83,12 +83,23 @@
                         aria-label="Открыть фото в увеличенном размере">
                     
                     <div class="relative overflow-hidden bg-white">
-                        <img src="{{ $photo->url }}" 
-                             alt="{{ $photo->localizedAlt($locale) ?: $series->localizedTitle($locale) }}" 
-                             loading="{{ $index < 4 ? 'eager' : 'lazy' }}"
-                             width="{{ $photo->width ?: 1200 }}"
-                             height="{{ $photo->height ?: 800 }}"
-                             class="w-full h-auto block object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]">
+                        <picture>
+                            <source type="image/avif" 
+                                    srcset="{{ $photo->getSrcsetAttribute('avif') }}" 
+                                    sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 450px">
+                            <source type="image/webp" 
+                                    srcset="{{ $photo->getSrcsetAttribute('webp') }}" 
+                                    sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 450px">
+                            <img src="{{ $photo->medium_url }}" 
+                                 srcset="{{ $photo->getSrcsetAttribute() }}"
+                                 sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 450px"
+                                 alt="{{ $photo->localizedAlt($locale) ?: $series->localizedTitle($locale) }}" 
+                                 loading="{{ $index < 4 ? 'eager' : 'lazy' }}"
+                                 decoding="async"
+                                 width="{{ $photo->width ?: 1200 }}"
+                                 height="{{ $photo->height ?: 800 }}"
+                                 class="w-full h-auto block object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]">
+                        </picture>
                         
                         <div class="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-all duration-300 flex items-center justify-center p-3 opacity-0 group-hover:opacity-100">
                             <span class="bg-crimson/90 backdrop-blur-sm text-white text-[10px] sm:text-xs px-2.5 py-1.5 font-mono uppercase tracking-wider font-bold shadow-sm">

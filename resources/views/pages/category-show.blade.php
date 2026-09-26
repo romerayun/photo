@@ -98,10 +98,21 @@
                 {{-- Right Visual Banner --}}
                 <div class="lg:col-span-5">
                     <div class="relative aspect-[4/3] sm:aspect-[16/10] overflow-hidden bg-neutral-900 border border-arch-border shadow-card-depth group">
-                        <img src="{{ $category->image_url }}" 
-                             alt="{{ $category->localizedName($locale) }}" 
-                             loading="eager" 
-                             class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105">
+                        <picture>
+                            <source type="image/avif" 
+                                    srcset="{{ $category->getImageSrcsetAttribute('avif') }}" 
+                                    sizes="(max-width: 1024px) 100vw, 600px">
+                            <source type="image/webp" 
+                                    srcset="{{ $category->getImageSrcsetAttribute('webp') }}" 
+                                    sizes="(max-width: 1024px) 100vw, 600px">
+                            <img src="{{ $category->medium_image_url }}" 
+                                 srcset="{{ $category->getImageSrcsetAttribute() }}"
+                                 sizes="(max-width: 1024px) 100vw, 600px"
+                                 alt="{{ $category->localizedName($locale) }}" 
+                                 loading="eager" 
+                                 decoding="async"
+                                 class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105">
+                        </picture>
                         
                         <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
                         <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white font-mono text-xs uppercase font-bold">

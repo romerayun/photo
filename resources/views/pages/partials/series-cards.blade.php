@@ -7,10 +7,21 @@
             
             {{-- Cover Image in 3:4 aspect ratio --}}
             <div class="overflow-hidden aspect-[3/4] relative bg-neutral-900">
-                <img src="{{ $series->cover_url }}" 
-                     alt="{{ $series->localizedTitle($locale) }}" 
-                     loading="lazy"
-                     class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105">
+                <picture>
+                    <source type="image/avif" 
+                            srcset="{{ $series->getCoverSrcsetAttribute('avif') }}" 
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px">
+                    <source type="image/webp" 
+                            srcset="{{ $series->getCoverSrcsetAttribute('webp') }}" 
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px">
+                    <img src="{{ $series->medium_cover_url }}" 
+                         srcset="{{ $series->getCoverSrcsetAttribute() }}"
+                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
+                         alt="{{ $series->localizedTitle($locale) }}" 
+                         loading="lazy"
+                         decoding="async"
+                         class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105">
+                </picture>
                 
                 <div class="absolute top-3.5 left-3.5 bg-black/80 text-white text-[0.65rem] uppercase tracking-wider font-mono font-bold px-2.5 py-1 backdrop-blur-sm">
                     {{ sprintf('%02d', $orderNumber) }} &bull; {{ $series->category ? $series->category->localizedName($locale) : 'СЕРИЯ' }}

@@ -76,4 +76,67 @@ class Category extends Model
 
         return asset($sampleImg);
     }
+
+    public function getVariantImageUrl(string $size = 'original', ?string $format = null): string
+    {
+        $imagePath = $this->image;
+        if (empty($imagePath)) {
+            $imagePath = match($this->slug) {
+                'portraits' => 'demo/portrait-1.jpg',
+                'couples' => 'demo/couple-1.jpg',
+                'families' => 'demo/family-1.jpg',
+                'events' => 'demo/event-1.jpg',
+                default => 'demo/business-1.jpg',
+            };
+        }
+
+        if (str_starts_with($imagePath, 'http') || str_starts_with($imagePath, '/')) {
+            return $imagePath;
+        }
+
+        $imagePath = ltrim($imagePath, '/');
+        $pathInfo = pathinfo($imagePath);
+        $dirname = $pathInfo['dirname'] !== '.' ? $pathInfo['dirname'] . '/' : '';
+        $filename = $pathInfo['filename'];
+        $ext = $pathInfo['extension'] ?? 'jpg';
+
+        $suffix = match($size) {
+            'thumb' => '-thumb',
+            'md' => '-md',
+            default => '',
+        };
+
+        $targetExt = $format ?: $ext;
+        $targetPath = "{$dirname}{$filename}{$suffix}.{$targetExt}";
+
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($targetPath)) {
+            return asset('storage/' . $targetPath);
+        }
+
+        if ($format && \Illuminate\Support\Facades\Storage::disk('public')->exists("{$dirname}{$filename}{$suffix}.{$ext}")) {
+            return asset('storage/' . "{$dirname}{$filename}{$suffix}.{$ext}");
+        }
+
+        return $this->image_url;
+    }
+
+    public function getMediumImageUrlAttribute(): string
+    {
+        return $this->getVariantImageUrl('md');
+    }
+
+    public function getThumbnailImageUrlAttribute(): string
+    {
+        return $this->getVariantImageUrl('thumb');
+    }
+
+    public function getImageSrcsetAttribute(?string $format = null): string
+    {
+        $thumb = $this->getVariantImageUrl('thumb', $format);
+        $md = $this->getVariantImageUrl('md', $format);
+        $full = $this->getVariantImageUrl('original', $format);
+
+        return "{$thumb} 600w, {$md} 1200w, {$full} 1920w";
+    }
 }
+

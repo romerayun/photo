@@ -11,14 +11,55 @@
 <section class="relative min-h-[75vh] sm:min-h-[80vh] flex items-center justify-center bg-cine-black overflow-hidden pt-8 pb-16 sm:pt-10 sm:pb-20 border-b border-cine-border">
     
     {{-- Background Motion / Video Atmosphere Layer --}}
-    <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <video autoplay loop muted playsinline 
-               poster="{{ asset('images/hero-bg.jpg') }}" 
-               class="w-full h-full object-cover object-center opacity-95 sm:opacity-100 scale-105">
-            <source src="{{ asset('videos/video-bg.mp4') }}" type="video/mp4">
-            <source src="{{ asset('videos/video-bg.mov') }}" type="video/quicktime">
-            <img src="{{ asset('images/hero-bg.jpg') }}" alt="{{ __('site.author_name') }}" class="w-full h-full object-cover object-center">
+    <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none" id="hero-media-container">
+        {{-- Mobile & Fallback Crisp Poster (AVIF / WebP / JPEG) --}}
+        <picture class="absolute inset-0 w-full h-full block">
+            <source srcset="{{ asset('images/hero-bg.avif') }}" type="image/avif">
+            <source srcset="{{ asset('images/hero-bg.webp') }}" type="image/webp">
+            <img src="{{ asset('images/hero-bg.jpg') }}" 
+                 alt="{{ __('site.author_name') }}" 
+                 fetchpriority="high"
+                 class="w-full h-full object-cover object-center scale-105" 
+                 id="hero-poster-img">
+        </picture>
+
+        {{-- Desktop Video: loaded only on screens >= 768px and when connection allows to save 15MB mobile traffic --}}
+        <video id="hero-desktop-video"
+               autoplay loop muted playsinline preload="none"
+               poster="{{ asset('images/hero-bg.webp') }}" 
+               class="hidden md:block absolute inset-0 w-full h-full object-cover object-center opacity-95 sm:opacity-100 scale-105 transition-opacity duration-1000">
         </video>
+
+        <script>
+            (function() {
+                // Only load the 15MB background video on desktop (>=768px) and if Save-Data is not requested
+                var isDesktop = window.innerWidth >= 768;
+                var saveData = navigator.connection && navigator.connection.saveData;
+                if (isDesktop && !saveData) {
+                    var vid = document.getElementById('hero-desktop-video');
+                    if (vid) {
+                        var srcMp4 = document.createElement('source');
+                        srcMp4.src = "{{ asset('videos/video-bg.mp4') }}";
+                        srcMp4.type = 'video/mp4';
+                        vid.appendChild(srcMp4);
+
+                        var srcMov = document.createElement('source');
+                        srcMov.src = "{{ asset('videos/video-bg.mov') }}";
+                        srcMov.type = 'video/quicktime';
+                        vid.appendChild(srcMov);
+
+                        vid.load();
+                        var playPromise = vid.play();
+                        if (playPromise !== undefined) {
+                            playPromise.catch(function() {
+                                // Autoplay policy silently handled; fallback poster remains visible
+                            });
+                        }
+                    }
+                }
+            })();
+        </script>
+
         {{-- Subtle edge transition gradients only --}}
         <div class="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-cine-black/60 to-transparent"></div>
         <div class="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-cine-black/80 to-transparent"></div>
@@ -133,10 +174,21 @@
                         {{-- Prominent Large Photo (Clean, without distracting badges) --}}
                         <a href="{{ route('series.show', ['slug' => $spotlightSeries->slug]) }}" 
                            class="block relative overflow-hidden bg-neutral-900 border border-arch-border shadow-card-depth aspect-[4/5] group mb-4">
-                            <img src="{{ $spotlightSeries->cover_url }}" 
-                                 alt="{{ $spotlightSeries->localizedTitle($locale) }}" 
-                                 loading="lazy" 
-                                 class="w-full h-full object-cover filter contrast-105 group-hover:scale-105 transition-transform duration-700 ease-out">
+                            <picture>
+                                <source type="image/avif" 
+                                        srcset="{{ $spotlightSeries->getCoverSrcsetAttribute('avif') }}" 
+                                        sizes="(max-width: 1024px) 100vw, 450px">
+                                <source type="image/webp" 
+                                        srcset="{{ $spotlightSeries->getCoverSrcsetAttribute('webp') }}" 
+                                        sizes="(max-width: 1024px) 100vw, 450px">
+                                <img src="{{ $spotlightSeries->medium_cover_url }}" 
+                                     srcset="{{ $spotlightSeries->getCoverSrcsetAttribute() }}"
+                                     sizes="(max-width: 1024px) 100vw, 450px"
+                                     alt="{{ $spotlightSeries->localizedTitle($locale) }}" 
+                                     loading="lazy" 
+                                     decoding="async"
+                                     class="w-full h-full object-cover filter contrast-105 group-hover:scale-105 transition-transform duration-700 ease-out">
+                            </picture>
                         </a>
 
                         {{-- Specific Caption: Type, Real Location, Story --}}
@@ -199,10 +251,15 @@
                     {{-- Highlight Portfolio Photo (Clean, No overlay text) --}}
                     <a href="{{ route('portfolio.index') }}" 
                        class="block relative overflow-hidden bg-neutral-900 border border-arch-border shadow-card-depth aspect-[4/5] group mb-4">
-                        <img src="{{ asset('images/photo-portfolio.jpg') }}" 
-                             alt="Посмотрите, как я снимаю" 
-                             loading="lazy" 
-                             class="w-full h-full object-cover filter contrast-105 group-hover:scale-105 transition-transform duration-700 ease-out">
+                        <picture>
+                            <source srcset="{{ asset('images/photo-portfolio.avif') }}" type="image/avif">
+                            <source srcset="{{ asset('images/photo-portfolio.webp') }}" type="image/webp">
+                            <img src="{{ asset('images/photo-portfolio.jpg') }}" 
+                                 alt="Посмотрите, как я снимаю" 
+                                 loading="lazy" 
+                                 decoding="async"
+                                 class="w-full h-full object-cover filter contrast-105 group-hover:scale-105 transition-transform duration-700 ease-out">
+                        </picture>
                     </a>
                 </div>
 
@@ -272,7 +329,15 @@
                         {{-- Inset Preview Thumbnail & Arrow --}}
                         <div class="flex items-center gap-4 shrink-0">
                             <div class="w-32 sm:w-40 h-20 sm:h-24 overflow-hidden bg-neutral-800 rounded-sm border border-white/10">
-                                <img src="{{ $cat->image_url }}" alt="{{ $cat->localizedName($locale) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                <picture>
+                                    <source srcset="{{ $cat->getVariantImageUrl('thumb', 'avif') }}" type="image/avif">
+                                    <source srcset="{{ $cat->getVariantImageUrl('thumb', 'webp') }}" type="image/webp">
+                                    <img src="{{ $cat->thumbnail_image_url }}" 
+                                         alt="{{ $cat->localizedName($locale) }}" 
+                                         loading="lazy"
+                                         decoding="async"
+                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                </picture>
                             </div>
                             <span class="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-white group-hover:bg-crimson group-hover:border-crimson transition-all text-xs font-bold">
                                 &rarr;
@@ -345,10 +410,21 @@
                     {{-- 3:4 Aspect Ratio Photo --}}
                     <a href="{{ route('series.show', ['slug' => $series->slug]) }}" 
                        class="block relative aspect-[3/4] overflow-hidden bg-neutral-900">
-                        <img src="{{ $series->cover_url }}" 
-                             alt="{{ $series->localizedTitle($locale) }}" 
-                             loading="lazy" 
-                             class="w-full h-full object-cover filter contrast-[1.02] group-hover:scale-105 transition-transform duration-700 ease-out">
+                        <picture>
+                            <source type="image/avif" 
+                                    srcset="{{ $series->getCoverSrcsetAttribute('avif') }}" 
+                                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px">
+                            <source type="image/webp" 
+                                    srcset="{{ $series->getCoverSrcsetAttribute('webp') }}" 
+                                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px">
+                            <img src="{{ $series->medium_cover_url }}" 
+                                 srcset="{{ $series->getCoverSrcsetAttribute() }}"
+                                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
+                                 alt="{{ $series->localizedTitle($locale) }}" 
+                                 loading="lazy" 
+                                 decoding="async"
+                                 class="w-full h-full object-cover filter contrast-[1.02] group-hover:scale-105 transition-transform duration-700 ease-out">
+                        </picture>
                         
                         @if($series->category)
                             <span class="absolute top-3 left-3 text-[0.62rem] font-mono uppercase tracking-widest text-white bg-black/80 backdrop-blur-sm px-2.5 py-1 font-bold">

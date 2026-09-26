@@ -34,10 +34,21 @@
                     <article class="group flex flex-col bg-cine-surface border border-cine-border hover:border-neutral-500 transition-all duration-300 rounded-xl overflow-hidden shadow-sm hover:shadow-card-depth">
                         {{-- Cover Image Link --}}
                         <a href="{{ route('articles.show', $article->slug) }}" class="relative aspect-[16/10] overflow-hidden bg-neutral-900 block">
-                            <img src="{{ $article->cover_url }}" 
-                                 alt="{{ $article->title }}" 
-                                 loading="lazy" 
-                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
+                            <picture>
+                                <source type="image/avif" 
+                                        srcset="{{ $article->getCoverSrcsetAttribute('avif') }}" 
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px">
+                                <source type="image/webp" 
+                                        srcset="{{ $article->getCoverSrcsetAttribute('webp') }}" 
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px">
+                                <img src="{{ $article->medium_cover_url }}" 
+                                     srcset="{{ $article->getCoverSrcsetAttribute() }}"
+                                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
+                                     alt="{{ $article->title }}" 
+                                     loading="lazy" 
+                                     decoding="async"
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
+                            </picture>
                             <div class="absolute inset-0 bg-gradient-to-t from-cine-black/70 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
                             
                             {{-- Reading time pill --}}

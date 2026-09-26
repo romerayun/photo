@@ -105,10 +105,21 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     @foreach($article->images as $photo)
                         <div class="group relative aspect-[4/3] rounded-lg overflow-hidden bg-neutral-900 border border-cine-border">
-                            <img src="{{ $photo->image_url }}" 
-                                 alt="{{ $photo->caption ?: $article->title }}" 
-                                 loading="lazy" 
-                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <picture>
+                                <source type="image/avif" 
+                                        srcset="{{ $photo->getSrcsetAttribute('avif') }}" 
+                                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 350px">
+                                <source type="image/webp" 
+                                        srcset="{{ $photo->getSrcsetAttribute('webp') }}" 
+                                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 350px">
+                                <img src="{{ $photo->medium_url }}" 
+                                     srcset="{{ $photo->getSrcsetAttribute() }}"
+                                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 350px"
+                                     alt="{{ $photo->caption ?: $article->title }}" 
+                                     loading="lazy" 
+                                     decoding="async"
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            </picture>
                             @if($photo->caption)
                                 <div class="absolute bottom-0 inset-x-0 bg-black/80 backdrop-blur-sm p-2 text-[0.7rem] font-mono text-neutral-300 truncate">
                                     {{ $photo->caption }}
