@@ -65,26 +65,7 @@
             </div>
         @endif
 
-        {{-- Success / Error Alerts --}}
-        @if(session('contact_success'))
-            <div class="mb-10 p-6 bg-emerald-950 border border-emerald-700 text-emerald-100 flex items-start gap-4">
-                <span class="text-emerald-400 font-bold text-xl">&check;</span>
-                <div class="space-y-1 font-mono">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-emerald-300">Заявка успешно отправлена!</h3>
-                    <p class="text-xs text-emerald-200 leading-relaxed">{{ session('contact_success') }}</p>
-                </div>
-            </div>
-        @endif
 
-        @if(session('contact_error'))
-            <div class="mb-10 p-6 bg-rose-950 border border-rose-700 text-rose-100 flex items-start gap-4">
-                <span class="text-rose-400 font-bold text-xl">&cross;</span>
-                <div class="space-y-1 font-mono">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-rose-300">Ошибка отправки</h3>
-                    <p class="text-xs text-rose-200 leading-relaxed">{{ session('contact_error') }}</p>
-                </div>
-            </div>
-        @endif
 
         {{-- Main Two-Column Layout --}}
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
