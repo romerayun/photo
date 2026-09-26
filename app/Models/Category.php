@@ -16,6 +16,10 @@ class Category extends Model
         'name_en',
         'description_ru',
         'description_en',
+        'content',
+        'content_en',
+        'meta_title',
+        'meta_description',
         'image',
         'sort_order',
     ];
@@ -41,6 +45,15 @@ class Category extends Model
             return $this->description_en;
         }
         return $this->description_ru;
+    }
+
+    public function localizedContent(?string $locale = null): ?string
+    {
+        $locale = $locale ?: app()->getLocale();
+        if ($locale === 'en' && !empty($this->content_en)) {
+            return $this->content_en;
+        }
+        return $this->content;
     }
 
     public function getImageUrlAttribute(): string

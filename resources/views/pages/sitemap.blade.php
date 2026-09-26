@@ -178,9 +178,9 @@
                                 @endif
                             </div>
                             <div class="pt-4 mt-3 border-t border-neutral-100 flex items-center justify-between text-xs font-mono">
-                                <span class="text-neutral-400">В портфолио:</span>
-                                <a href="{{ route('portfolio.index') }}" class="text-crimson hover:underline font-bold flex items-center gap-1">
-                                    <span>Смотреть</span>
+                                <span class="text-neutral-400">Страница услуги:</span>
+                                <a href="{{ route('categories.show', $category->slug) }}" class="text-crimson hover:underline font-bold flex items-center gap-1">
+                                    <span>Перейти</span>
                                     <span>&rarr;</span>
                                 </a>
                             </div>

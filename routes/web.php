@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\SeriesController as AdminSeriesController;
 use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Admin\ShootController as AdminShootController;
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PortfolioController;
@@ -29,6 +30,7 @@ Route::get('/robots.txt', [RobotsController::class, 'index'])->name('robots');
 
 // Public routes (Russian only)
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/category/{slug}', [CategoryController::class, 'show'])->name('categories.show');
 Route::get('/portfolio', [PortfolioController::class, 'index'])->name('portfolio.index');
 Route::get('/series/{slug}', [PortfolioController::class, 'showSeries'])->name('series.show');
 Route::get('/articles', [ArticleController::class, 'index'])->name('articles.index');
@@ -89,7 +91,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/comments/{comment}/toggle', [AdminCommentController::class, 'toggle'])->name('comments.toggle');
 
         // Categories
-        Route::resource('categories', AdminCategoryController::class)->except(['create', 'show', 'edit']);
+        Route::post('/categories/upload-image', [AdminCategoryController::class, 'uploadInlineImage'])->name('categories.upload_image');
+        Route::resource('categories', AdminCategoryController::class)->except(['create', 'show']);
 
         // Packages
         Route::get('/packages', [AdminPackageController::class, 'index'])->name('packages.index');

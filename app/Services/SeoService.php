@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Article;
+use App\Models\Category;
 use App\Models\SeoMeta;
 use App\Models\Series;
 use Illuminate\Support\Facades\Route;
@@ -137,6 +138,34 @@ class SeoService
             }
         }
 
+        // 4. Category pages
+        $allCategories = Category::all();
+        foreach ($allCategories as $cat) {
+            $path = SeoMeta::normalizePath('/category/' . $cat->slug);
+            $record = SeoMeta::where('path', $path)->first();
+            if (!$record) {
+                $title = ($cat->meta_title ?: ($cat->name_ru . ' — Фотограф Роман Юн • Иркутск'));
+                $desc = $cat->meta_description ?: ($cat->description_ru ?: ('Услуги фотосъёмки в категории ' . $cat->name_ru . ' в Иркутске.'));
+                $description = mb_substr(trim(preg_replace('/\s+/', ' ', $desc)), 0, 160);
+                $ogImage = $cat->image_url ?: null;
+
+                SeoMeta::create([
+                    'path' => $path,
+                    'title' => $title,
+                    'description' => $description,
+                    'og_title' => $title,
+                    'og_description' => $description,
+                    'og_image' => $ogImage,
+                    'canonical' => route('categories.show', ['slug' => $cat->slug]),
+                    'robots' => 'index, follow',
+                    'is_auto_generated' => true,
+                ]);
+                $createdCount++;
+            } else {
+                $existingCount++;
+            }
+        }
+
         return [
             'created' => $createdCount,
             'existing' => $existingCount,
@@ -234,6 +263,52 @@ class SeoService
                 'og_image' => $ogImage,
                 'canonical' => route('articles.show', ['slug' => $article->slug]),
                 'robots' => $robots,
+            ]);
+        }
+
+        return $record;
+    }
+
+    /**
+     * Auto-sync or update SEO when a Category is created/updated.
+     */
+    public static function syncCategory(Category $category, ?string $oldSlug = null): SeoMeta
+    {
+        if ($oldSlug && $oldSlug !== $category->slug) {
+            $oldPath = SeoMeta::normalizePath('/category/' . $oldSlug);
+            SeoMeta::where('path', $oldPath)->delete();
+        }
+
+        $path = SeoMeta::normalizePath('/category/' . $category->slug);
+        $record = SeoMeta::where('path', $path)->first();
+
+        $defaultTitle = ($category->meta_title ?: ($category->name_ru . ' — Фотограф Роман Юн • Иркутск'));
+        $desc = $category->meta_description ?: ($category->description_ru ?: ('Услуги фотосъёмки в категории ' . $category->name_ru . ' в Иркутске.'));
+        $defaultDesc = mb_substr(trim(preg_replace('/\s+/', ' ', $desc)), 0, 160);
+        $ogImage = $category->image_url ?: null;
+
+        if (!$record) {
+            return SeoMeta::create([
+                'path' => $path,
+                'title' => $defaultTitle,
+                'description' => $defaultDesc,
+                'og_title' => $defaultTitle,
+                'og_description' => $defaultDesc,
+                'og_image' => $ogImage,
+                'canonical' => route('categories.show', ['slug' => $category->slug]),
+                'robots' => 'index, follow',
+                'is_auto_generated' => true,
+            ]);
+        }
+
+        if ($record->is_auto_generated) {
+            $record->update([
+                'title' => $defaultTitle,
+                'description' => $defaultDesc,
+                'og_title' => $defaultTitle,
+                'og_description' => $defaultDesc,
+                'og_image' => $ogImage,
+                'canonical' => route('categories.show', ['slug' => $category->slug]),
             ]);
         }
 

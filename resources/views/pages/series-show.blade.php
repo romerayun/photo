@@ -43,7 +43,9 @@
                 @if($series->category || $series->localizedLocation($locale))
                 <div class="flex flex-wrap items-center gap-2 text-xs uppercase tracking-widest text-neutral-500 font-mono font-medium">
                     @if($series->category)
-                    <span class="text-crimson font-bold">{{ $series->category->localizedName($locale) }}</span>
+                    <a href="{{ route('categories.show', $series->category->slug) }}" class="text-crimson hover:underline font-bold transition-all">
+                        {{ $series->category->localizedName($locale) }}
+                    </a>
                     @endif
 
                     @if($series->category && $series->localizedLocation($locale))

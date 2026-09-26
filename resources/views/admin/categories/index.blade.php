@@ -109,10 +109,20 @@
                                 </div>
 
                                 <div class="flex items-center justify-between pt-3 border-t border-slate-100">
-                                    <button type="submit" form="update-cat-{{ $category->id }}" class="px-5 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-white text-xs uppercase tracking-wider font-bold rounded-lg shadow-sm hover:shadow transition-all inline-flex items-center gap-1.5 cursor-pointer">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                                        <span>Сохранить</span>
-                                    </button>
+                                    <div class="flex items-center gap-2">
+                                        <button type="submit" form="update-cat-{{ $category->id }}" class="px-4 py-2 bg-neutral-900 hover:bg-neutral-800 text-white text-xs uppercase tracking-wider font-bold rounded-lg shadow-sm hover:shadow transition-all inline-flex items-center gap-1.5 cursor-pointer">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                            <span>Сохранить</span>
+                                        </button>
+                                        <a href="{{ route('admin.categories.edit', $category) }}" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs uppercase tracking-wider font-bold rounded-lg transition-colors inline-flex items-center gap-1.5">
+                                            <svg class="w-3.5 h-3.5 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                            <span>Редактор Quill & SEO</span>
+                                        </a>
+                                        <a href="{{ route('categories.show', $category->slug) }}" target="_blank" class="px-2.5 py-2 text-slate-500 hover:text-crimson text-xs font-mono transition-colors inline-flex items-center gap-1" title="Открыть страницу на сайте">
+                                            <span>На сайт</span>
+                                            <span>&nearr;</span>
+                                        </a>
+                                    </div>
 
                                     <button type="submit" form="delete-cat-{{ $category->id }}" class="text-xs text-rose-600 hover:text-rose-800 hover:underline font-bold transition-colors cursor-pointer">
                                         Удалить категорию

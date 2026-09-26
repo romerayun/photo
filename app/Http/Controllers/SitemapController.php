@@ -85,6 +85,16 @@ class SitemapController extends Controller
             ];
         }
 
+        $categories = Category::query()->orderBy('sort_order')->get();
+        foreach ($categories as $cat) {
+            $urls[] = [
+                'loc' => route('categories.show', ['slug' => $cat->slug]),
+                'lastmod' => $cat->updated_at?->toDateString() ?? now()->toDateString(),
+                'changefreq' => 'weekly',
+                'priority' => '0.8',
+            ];
+        }
+
         foreach ($series as $s) {
             $urls[] = [
                 'loc' => route('series.show', ['slug' => $s->slug]),

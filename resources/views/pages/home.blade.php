@@ -252,7 +252,7 @@
             {{-- Right Column: Horizontal Accordion Rows with Categories & Custom Format Card --}}
             <div class="lg:col-span-7 divide-y divide-white/10 border-y border-white/10">
                 @foreach($categories as $cat)
-                    <a href="{{ route('portfolio.index') }}" 
+                    <a href="{{ route('categories.show', $cat->slug) }}" 
                        class="py-6 sm:py-7 px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-6 group hover:bg-white/[0.03] transition-colors">
                         
                         <div class="space-y-1.5 max-w-md">
