@@ -20,11 +20,11 @@
     <meta property="og:description" content="{{ ($seoMeta && $seoMeta->og_description) ? $seoMeta->og_description : (($seoMeta && $seoMeta->description) ? $seoMeta->description : (app()->view->getSections()['og_description'] ?? (app()->view->getSections()['description'] ?? __('site.meta_description')))) }}">
     <meta property="og:url" content="{{ app()->view->getSections()['og_url'] ?? url()->current() }}">
     <meta property="og:type" content="{{ app()->view->getSections()['og_type'] ?? 'website' }}">
-    <meta property="og:image" content="{{ ($seoMeta && $seoMeta->og_image) ? $seoMeta->og_image : (app()->view->getSections()['og_image'] ?? asset('storage/demo/hero-main.jpg')) }}">
+    <meta property="og:image" content="{{ ($seoMeta && $seoMeta->og_image) ? $seoMeta->og_image : (app()->view->getSections()['og_image'] ?? asset('og.png')) }}">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ ($seoMeta && $seoMeta->og_title) ? $seoMeta->og_title : (($seoMeta && $seoMeta->title) ? $seoMeta->title : (app()->view->getSections()['og_title'] ?? (app()->view->getSections()['title'] ?? __('site.meta_title')))) }}">
     <meta name="twitter:description" content="{{ ($seoMeta && $seoMeta->og_description) ? $seoMeta->og_description : (($seoMeta && $seoMeta->description) ? $seoMeta->description : (app()->view->getSections()['og_description'] ?? (app()->view->getSections()['description'] ?? __('site.meta_description')))) }}">
-    <meta name="twitter:image" content="{{ ($seoMeta && $seoMeta->og_image) ? $seoMeta->og_image : (app()->view->getSections()['og_image'] ?? asset('storage/demo/hero-main.jpg')) }}">
+    <meta name="twitter:image" content="{{ ($seoMeta && $seoMeta->og_image) ? $seoMeta->og_image : (app()->view->getSections()['og_image'] ?? asset('og.png')) }}">
 
     <meta name="robots" content="{{ ($seoMeta && $seoMeta->robots) ? $seoMeta->robots : (app()->view->getSections()['robots'] ?? 'index, follow') }}">
     <meta name="yandex-verification" content="1969fa24207a6a63">
