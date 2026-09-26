@@ -235,7 +235,7 @@
                             methodOpen: false,
                             value: '{{ addslashes($oldValue) }}',
                             methods: [
-                                { id: 'phone', label: 'Телефон (Звонок / SMS)', shortLabel: 'Телефон', placeholder: '+7 (999) 000-00-00', helper: 'Введите номер телефона для звонка или SMS' },
+                                { id: 'phone', label: 'Телефон (РФ: +7)', shortLabel: 'Телефон (РФ)', placeholder: '+7 (999) 000-00-00', helper: 'Номер телефона РФ (+7)' },
                                 { id: 'telegram', label: 'Telegram (@username)', shortLabel: 'Telegram', placeholder: '@username', helper: 'Укажите никнейм в Telegram' },
                                 { id: 'max', label: 'MAX (Мессенджер)', shortLabel: 'MAX', placeholder: 'ID или номер в MAX', helper: 'Укажите ID или номер в мессенджере MAX' },
                                 { id: 'email', label: 'Электронная почта', shortLabel: 'Email', placeholder: 'name@example.com', helper: 'Для ответа на электронную почту' }
@@ -243,7 +243,7 @@
                             selectMethod(m) {
                                 this.method = m.id;
                                 this.methodOpen = false;
-                                if (m.id === 'phone' && this.value) {
+                                if (m.id === 'phone') {
                                     this.value = this.formatPhone(this.value);
                                 }
                             },
@@ -256,34 +256,46 @@
                                 }
                                 e.target.value = this.value;
                             },
+                            handleFocus(e) {
+                                if (this.method === 'phone' && (!this.value || this.value.trim() === '')) {
+                                    this.value = '+7 (';
+                                    e.target.value = this.value;
+                                }
+                            },
+                            handleBlur(e) {
+                                if (this.method === 'phone' && (this.value === '+7 (' || this.value === '+7')) {
+                                    this.value = '';
+                                    e.target.value = '';
+                                }
+                            },
                             formatPhone(input) {
                                 if (!input) return '';
-                                // Keep only digits
+                                // Extract all digits
                                 let digits = input.replace(/\D/g, '');
                                 if (!digits.length) return '';
-
-                                // If user started typing 8 or 7, normalize to 7
-                                if (digits[0] === '8' || digits[0] === '7') {
+                                
+                                // In Russian format, leading 7 or 8 represents the country code
+                                if (digits.startsWith('7') || digits.startsWith('8')) {
                                     digits = digits.substring(1);
                                 }
-
-                                // Cap at 10 national digits
+                                
+                                // Limit to 10 Russian national digits (excluding +7)
                                 digits = digits.substring(0, 10);
-
-                                let result = '+7';
+                                
+                                let formatted = '+7 (';
                                 if (digits.length > 0) {
-                                    result += ' (' + digits.substring(0, 3);
+                                    formatted += digits.substring(0, Math.min(3, digits.length));
                                 }
                                 if (digits.length >= 3) {
-                                    result += ') ' + digits.substring(3, 6);
+                                    formatted += ') ' + digits.substring(3, Math.min(6, digits.length));
                                 }
                                 if (digits.length >= 6) {
-                                    result += '-' + digits.substring(6, 8);
+                                    formatted += '-' + digits.substring(6, Math.min(8, digits.length));
                                 }
                                 if (digits.length >= 8) {
-                                    result += '-' + digits.substring(8, 10);
+                                    formatted += '-' + digits.substring(8, 10);
                                 }
-                                return result;
+                                return formatted;
                             },
                             get current() {
                                 return this.methods.find(m => m.id === this.method) || this.methods[0];
@@ -356,6 +368,8 @@
                                    id="contact_value_input" 
                                    :value="value"
                                    @input="handleInput($event)"
+                                   @focus="handleFocus($event)"
+                                   @blur="handleBlur($event)"
                                    required 
                                    :placeholder="current.placeholder"
                                    class="w-full px-4 py-3 bg-arch-bg border border-arch-border text-arch-text text-sm font-mono focus:border-crimson focus:bg-white focus:outline-none transition-colors @error('contact_value') border-crimson @enderror">
