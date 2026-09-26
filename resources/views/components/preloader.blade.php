@@ -1,23 +1,23 @@
 {{-- Kinetic Typographic Preloader with Focus Arrow & Exact Reference Blur/Alignment --}}
 <div id="site-preloader"
-     class="fixed inset-0 z-[99999] flex items-center justify-center bg-black select-none pointer-events-auto transition-opacity duration-600 ease-out"
+     style="position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: 100vw !important; height: 100vh !important; z-index: 2147483647 !important; background-color: #000000 !important; display: flex !important; align-items: center !important; justify-content: center !important; overflow: hidden !important; user-select: none !important; -webkit-user-select: none !important; opacity: 1; transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);"
      aria-hidden="false"
      role="progressbar"
      aria-label="Загрузка сайта">
 
-    {{-- Clean deep black background exactly like in reference video --}}
-    <div class="relative w-full max-w-2xl px-4 flex flex-col items-center justify-center">
+    {{-- Clean deep black stage exactly like in reference video --}}
+    <div style="position: relative; display: flex; align-items: center; justify-content: center; width: 100%; max-width: 700px; padding: 0 16px;">
 
         {{-- Center Row Stage: Arrow + Kinetic Drum --}}
-        <div class="relative flex items-center justify-center w-full">
+        <div style="position: relative; display: flex; align-items: center; justify-content: center; width: 100%;">
             
-            {{-- Thick Clean Reference Arrow: Locked perfectly to middle active baseline --}}
-            <div class="mr-4 sm:mr-6 flex items-center justify-center shrink-0">
-                <svg class="w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 text-white" 
+            {{-- Thick Clean Reference Arrow: Locked strictly to middle active line --}}
+            <div style="margin-right: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <svg class="preloader-arrow-svg"
                      viewBox="0 0 24 24" 
                      fill="none" 
-                     stroke="currentColor" 
-                     stroke-width="3.2" 
+                     stroke="#FFFFFF" 
+                     stroke-width="3.5" 
                      stroke-linecap="round" 
                      stroke-linejoin="round">
                     <line x1="3" y1="12" x2="20" y2="12"></line>
@@ -25,13 +25,12 @@
                 </svg>
             </div>
 
-            {{-- Slot Viewport: Fixed window showing 5 lines (-2, -1, 0, +1, +2) --}}
-            <div class="slot-viewport relative h-[240px] sm:h-[300px] md:h-[340px] w-[260px] sm:w-[380px] md:w-[460px] overflow-hidden">
+            {{-- Slot Viewport: Fixed window showing 5 lines --}}
+            <div class="slot-viewport">
                 <div id="slot-track" class="slot-track">
                     @php
                         $words = [
                             'фокус',
-                            'эстетика',
                             'стиль',
                             'атмосфера',
                             'энергия',
@@ -40,8 +39,8 @@
                             'история',
                             'искусство',
                             'свет',
-                            'результат',
-                            'качество'
+                            'качество',
+                            'эстетика'
                         ];
                     @endphp
 
@@ -58,16 +57,47 @@
 </div>
 
 <style>
-/* Exact recreation of reference typography and rolling blur reel */
-#site-preloader {
-    background-color: #000000;
+/* Exact recreation of reference typography, viewport, and rolling blur layers */
+.preloader-arrow-svg {
+    width: 38px;
+    height: 38px;
+}
+
+@media (min-width: 640px) {
+    .preloader-arrow-svg {
+        width: 52px;
+        height: 52px;
+    }
+}
+
+@media (min-width: 768px) {
+    .preloader-arrow-svg {
+        width: 62px;
+        height: 62px;
+    }
 }
 
 .slot-viewport {
     position: relative;
-    /* Soft edge fade like in video */
-    mask-image: linear-gradient(to bottom, transparent 0%, black 22%, black 78%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 22%, black 78%, transparent 100%);
+    height: 250px;
+    width: 250px;
+    overflow: hidden;
+    mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%);
+}
+
+@media (min-width: 640px) {
+    .slot-viewport {
+        height: 310px;
+        width: 360px;
+    }
+}
+
+@media (min-width: 768px) {
+    .slot-viewport {
+        height: 350px;
+        width: 440px;
+    }
 }
 
 .slot-track {
@@ -78,38 +108,39 @@
     display: flex;
     flex-direction: column;
     will-change: transform;
-    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .slot-item {
-    height: 48px;
+    height: 50px;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding-left: 0.25rem;
+    padding-left: 6px;
     box-sizing: border-box;
     will-change: transform, opacity, filter;
-    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-                opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-                filter 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-                color 0.28s ease;
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                filter 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @media (min-width: 640px) {
     .slot-item {
-        height: 60px;
+        height: 62px;
+        padding-left: 8px;
     }
 }
 
 @media (min-width: 768px) {
     .slot-item {
-        height: 68px;
+        height: 70px;
+        padding-left: 10px;
     }
 }
 
 .slot-text {
-    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 2.25rem;
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 2.2rem;
     font-weight: 800;
     line-height: 1;
     letter-spacing: -0.04em;
@@ -119,43 +150,43 @@
 
 @media (min-width: 640px) {
     .slot-text {
-        font-size: 3.25rem;
+        font-size: 3.1rem;
     }
 }
 
 @media (min-width: 768px) {
     .slot-text {
-        font-size: 3.85rem;
+        font-size: 3.8rem;
     }
 }
 
 /* Reference blur & scale stages relative to active center item */
 .slot-item.item-active {
-    opacity: 1;
-    filter: blur(0px);
-    transform: scale(1);
+    opacity: 1 !important;
+    filter: blur(0px) !important;
+    transform: scale(1) translateZ(0) !important;
 }
 
 .slot-item.item-near {
-    opacity: 0.32;
-    filter: blur(3.5px);
-    transform: scale(0.96);
+    opacity: 0.35 !important;
+    filter: blur(3.5px) !important;
+    transform: scale(0.96) translateZ(0) !important;
 }
 
 .slot-item.item-far {
-    opacity: 0.12;
-    filter: blur(7px);
-    transform: scale(0.92);
+    opacity: 0.12 !important;
+    filter: blur(7px) !important;
+    transform: scale(0.91) translateZ(0) !important;
 }
 
 .slot-item.item-hidden {
-    opacity: 0;
-    filter: blur(12px);
-    transform: scale(0.88);
+    opacity: 0 !important;
+    filter: blur(12px) !important;
+    transform: scale(0.85) translateZ(0) !important;
 }
 
 #site-preloader.preloader-fade-out {
-    opacity: 0;
+    opacity: 0 !important;
     pointer-events: none !important;
 }
 </style>
@@ -164,6 +195,11 @@
 (function() {
     var preloader = document.getElementById('site-preloader');
     if (!preloader) return;
+
+    // Safety: ensure it is always top-level in body
+    if (preloader.parentNode !== document.body) {
+        document.body.prepend(preloader);
+    }
 
     var track = document.getElementById('slot-track');
     var items = Array.from(document.querySelectorAll('.slot-item'));
@@ -175,11 +211,13 @@
     var isDone = false;
 
     function getItemHeight() {
-        return items[0].getBoundingClientRect().height || (window.innerWidth < 640 ? 48 : (window.innerWidth < 768 ? 60 : 68));
+        var rect = items[0].getBoundingClientRect();
+        return rect.height || (window.innerWidth < 640 ? 50 : (window.innerWidth < 768 ? 62 : 70));
     }
 
     function getViewportHeight() {
-        return viewport.getBoundingClientRect().height || (window.innerWidth < 640 ? 240 : (window.innerWidth < 768 ? 300 : 340));
+        var rect = viewport.getBoundingClientRect();
+        return rect.height || (window.innerWidth < 640 ? 250 : (window.innerWidth < 768 ? 310 : 350));
     }
 
     function setIndex(index) {
@@ -187,7 +225,7 @@
         var viewH = getViewportHeight();
         // Exact center alignment: active item is centered vertically in viewport exactly opposite the arrow
         var offset = (viewH / 2) - (index * itemH) - (itemH / 2);
-        track.style.transform = 'translate3d(0, ' + offset + 'px, 0)';
+        track.style.transform = 'translate3d(0, ' + Math.round(offset) + 'px, 0)';
 
         items.forEach(function(item, idx) {
             var diff = Math.abs(idx - index);
@@ -204,15 +242,18 @@
         });
     }
 
-    // Set initial position
+    // Lock page scrolling while preloader runs
+    document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
+
+    // Set initial active state
     setIndex(0);
 
-    // Roll through words fast and punchy like jitter video (every 220ms)
+    // Fast snappy slot roll every 200ms
     var rollTimer = setInterval(function() {
         currentIndex = (currentIndex + 1) % totalItems;
         setIndex(currentIndex);
-    }, 220);
+    }, 200);
 
     function closePreloader() {
         if (isDone) return;
@@ -220,12 +261,14 @@
 
         setTimeout(function() {
             clearInterval(rollTimer);
-            // Snap to prominent word (e.g. 'эстетика' or 'фокус')
-            setIndex(1); // 'эстетика'
+            // Snap to climax word ('эстетика' - last word)
+            setIndex(totalItems - 1);
 
             setTimeout(function() {
                 preloader.classList.add('preloader-fade-out');
+                document.documentElement.style.overflow = '';
                 document.body.style.overflow = '';
+
                 setTimeout(function() {
                     if (preloader.parentNode) preloader.parentNode.removeChild(preloader);
                 }, 650);
@@ -237,7 +280,7 @@
         closePreloader();
     } else {
         window.addEventListener('load', closePreloader);
-        setTimeout(closePreloader, 2800);
+        setTimeout(closePreloader, 2600);
     }
 
     window.addEventListener('resize', function() {
