@@ -65,13 +65,12 @@ class ContactController extends Controller
             'contact_method' => ['required', 'string', 'in:phone,telegram,max,email'],
             'contact_value' => ['required', 'string', 'max:150'],
             'package' => ['nullable', 'string', 'max:150'],
-            'message' => ['required', 'string', 'max:3000'],
+            'message' => ['nullable', 'string', 'max:3000'],
             'email' => ['nullable', 'email', 'max:150'],
         ], [
             'name.required' => 'Пожалуйста, укажите ваше имя.',
             'contact_method.required' => 'Пожалуйста, выберите удобный способ связи.',
             'contact_value.required' => 'Пожалуйста, укажите контактные данные для выбранного способа связи.',
-            'message.required' => 'Пожалуйста, напишите пару слов о желаемой съёмке.',
             'email.email' => 'Пожалуйста, укажите корректный email адрес.',
         ]);
 

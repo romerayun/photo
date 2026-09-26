@@ -161,6 +161,26 @@
             {{-- Right Column: Feedback & Booking Form --}}
             <div id="feedback-form" class="lg:col-span-7 bg-white p-8 sm:p-10 border border-arch-border shadow-card-depth">
                 
+                {{-- Inline Success / Error Alerts directly above the form --}}
+                @if(session('contact_success'))
+                    <div class="mb-6 p-5 bg-emerald-50 border border-emerald-500 text-emerald-900 rounded-sm flex items-start gap-3">
+                        <span class="text-emerald-600 font-bold text-lg leading-none">&check;</span>
+                        <div class="space-y-1 font-mono">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-800">Заявка успешно отправлена!</h3>
+                            <p class="text-xs text-emerald-700 leading-relaxed">{{ session('contact_success') }}</p>
+                        </div>
+                    </div>
+                @endif
+                @if(session('contact_error'))
+                    <div class="mb-6 p-5 bg-rose-50 border border-rose-500 text-rose-900 rounded-sm flex items-start gap-3">
+                        <span class="text-rose-600 font-bold text-lg leading-none">&cross;</span>
+                        <div class="space-y-1 font-mono">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-rose-800">Ошибка отправки</h3>
+                            <p class="text-xs text-rose-700 leading-relaxed">{{ session('contact_error') }}</p>
+                        </div>
+                    </div>
+                @endif
+
                 <div class="mb-8 border-b border-arch-border pb-6">
                     <span class="text-xs uppercase tracking-widest text-crimson font-mono font-bold block mb-1">
                         ФОРМА ОБРАТНОЙ СВЯЗИ
@@ -173,11 +193,20 @@
                     </p>
                 </div>
 
-                <form action="{{ route('contacts.send') }}" method="POST" class="space-y-6 relative" x-data="{ submitting: false }" @submit="if(submitting){ return false; } submitting = true;">
+                <form action="{{ route('contacts.send') }}" method="POST" class="space-y-6 relative" id="booking-contact-form" x-data="{ submitting: false }" @submit="submitting = true;">
                     @csrf
 
                     {{-- Honeypot anti-spam field --}}
                     <input type="text" name="_hp" value="" style="display:none !important;" tabindex="-1" autocomplete="off">
+                    {{-- Full Form Submitting Overlay --}}
+                    <div x-show="submitting" 
+                         x-cloak 
+                         class="absolute inset-0 bg-white/85 backdrop-blur-[2px] z-40 flex flex-col items-center justify-center p-6 text-center rounded-sm">
+                        <div class="w-12 h-12 rounded-full border-2 border-crimson border-t-transparent animate-spin mb-4"></div>
+                        <h4 class="text-base font-extrabold font-display uppercase tracking-tight text-arch-text">Отправляем вашу заявку</h4>
+                        <p class="text-xs font-mono text-neutral-500 mt-1 max-w-xs">Пожалуйста, не закрывайте страницу, сохраняем данные...</p>
+                    </div>
+
 
                     {{-- Name --}}
                     <div>
@@ -203,59 +232,58 @@
                     @endphp
                     <div x-data="{
                             method: '{{ $oldMethod }}',
-                            methodLabel: '{{ $oldMethod === 'telegram' ? 'Telegram (@username)' : ($oldMethod === 'max' ? 'MAX (Мессенджер)' : ($oldMethod === 'email' ? 'Электронная почта' : 'Телефон (Звонок / SMS)')) }}',
                             methodOpen: false,
                             value: '{{ addslashes($oldValue) }}',
                             methods: [
-                                { id: 'phone', label: 'Телефон (Звонок / SMS)', shortLabel: 'Телефон', placeholder: '+7 (___) ___-__-__', helper: 'Российский или международный номер' },
-                                { id: 'telegram', label: 'Telegram (@username)', shortLabel: 'Telegram', placeholder: '@username', helper: 'Имя пользователя в Telegram' },
-                                { id: 'max', label: 'MAX (Мессенджер)', shortLabel: 'MAX', placeholder: 'ID или номер в MAX', helper: 'Имя профиля или номер телефона в MAX' },
-                                { id: 'email', label: 'Электронная почта', shortLabel: 'Email', placeholder: 'name@example.com', helper: 'Для подробного ответа на почту' }
+                                { id: 'phone', label: 'Телефон (Звонок / SMS)', shortLabel: 'Телефон', placeholder: '+7 (999) 000-00-00', helper: 'Введите номер телефона для звонка или SMS' },
+                                { id: 'telegram', label: 'Telegram (@username)', shortLabel: 'Telegram', placeholder: '@username', helper: 'Укажите никнейм в Telegram' },
+                                { id: 'max', label: 'MAX (Мессенджер)', shortLabel: 'MAX', placeholder: 'ID или номер в MAX', helper: 'Укажите ID или номер в мессенджере MAX' },
+                                { id: 'email', label: 'Электронная почта', shortLabel: 'Email', placeholder: 'name@example.com', helper: 'Для ответа на электронную почту' }
                             ],
                             selectMethod(m) {
                                 this.method = m.id;
-                                this.methodLabel = m.label;
                                 this.methodOpen = false;
-                                if (m.id === 'telegram' && !this.value.startsWith('@') && this.value.length > 0) {
-                                    this.value = '@' + this.value.replace(/^@+/, '');
+                                if (m.id === 'phone' && this.value) {
+                                    this.value = this.formatPhone(this.value);
                                 }
                             },
                             handleInput(e) {
                                 let val = e.target.value;
                                 if (this.method === 'phone') {
                                     this.value = this.formatPhone(val);
-                                } else if (this.method === 'telegram') {
-                                    if (val && !val.startsWith('@')) {
-                                        val = '@' + val;
-                                    }
-                                    this.value = val;
                                 } else {
                                     this.value = val;
                                 }
+                                e.target.value = this.value;
                             },
-                            formatPhone(val) {
-                                let digits = val.replace(/\D/g, '');
-                                if (!digits) return '';
-                                if (digits.startsWith('8')) {
-                                    digits = '7' + digits.slice(1);
-                                } else if (!digits.startsWith('7')) {
-                                    digits = '7' + digits;
+                            formatPhone(input) {
+                                if (!input) return '';
+                                // Keep only digits
+                                let digits = input.replace(/\D/g, '');
+                                if (!digits.length) return '';
+
+                                // If user started typing 8 or 7, normalize to 7
+                                if (digits[0] === '8' || digits[0] === '7') {
+                                    digits = digits.substring(1);
                                 }
-                                digits = digits.slice(0, 11);
-                                let res = '+7';
-                                if (digits.length > 1) {
-                                    res += ' (' + digits.slice(1, 4);
+
+                                // Cap at 10 national digits
+                                digits = digits.substring(0, 10);
+
+                                let result = '+7';
+                                if (digits.length > 0) {
+                                    result += ' (' + digits.substring(0, 3);
                                 }
-                                if (digits.length >= 4) {
-                                    res += ') ' + digits.slice(4, 7);
+                                if (digits.length >= 3) {
+                                    result += ') ' + digits.substring(3, 6);
                                 }
-                                if (digits.length >= 7) {
-                                    res += '-' + digits.slice(7, 9);
+                                if (digits.length >= 6) {
+                                    result += '-' + digits.substring(6, 8);
                                 }
-                                if (digits.length >= 9) {
-                                    res += '-' + digits.slice(9, 11);
+                                if (digits.length >= 8) {
+                                    result += '-' + digits.substring(8, 10);
                                 }
-                                return res;
+                                return result;
                             },
                             get current() {
                                 return this.methods.find(m => m.id === this.method) || this.methods[0];
@@ -507,13 +535,15 @@
 
                     {{-- Message / Details --}}
                     <div>
-                        <label for="message" class="block text-xs uppercase tracking-widest font-mono font-bold text-arch-text mb-2">
-                            Сообщение / пожелания к съёмке <span class="text-crimson">*</span>
-                        </label>
+                        <div class="flex items-center justify-between mb-2">
+                            <label for="message" class="block text-xs uppercase tracking-widest font-mono font-bold text-arch-text">
+                                Сообщение / пожелания к съёмке
+                            </label>
+                            <span class="text-[0.68rem] text-neutral-400 font-mono">Необязательно</span>
+                        </div>
                         <textarea name="message" 
                                   id="message" 
                                   rows="4" 
-                                  required 
                                   placeholder="Расскажите о вашей идее: желаемые даты, локация, количество участников или стиль кадра..."
                                   class="w-full px-4 py-3 bg-arch-bg border border-arch-border text-arch-text text-sm font-mono focus:border-crimson focus:bg-white focus:outline-none transition-colors @error('message') border-crimson @enderror">{{ old('message') }}</textarea>
                         @error('message')

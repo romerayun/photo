@@ -143,7 +143,8 @@ class ContactFormAndDirectCommunicationTest extends TestCase
             'message' => '',
         ]);
 
-        $response->assertSessionHasErrors(['name', 'email', 'message']);
+        $response->assertSessionHasErrors(['name', 'email']);
+        $response->assertSessionDoesntHaveErrors(['message']);
         Mail::assertNothingSent();
     }
 

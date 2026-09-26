@@ -5,6 +5,10 @@
 @tailwind utilities;
 
 @layer base {
+    [x-cloak] {
+        display: none !important;
+    }
+
     html {
         background-color: #09090B;
         color: #FFFFFF;
