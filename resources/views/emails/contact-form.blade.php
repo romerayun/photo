@@ -35,27 +35,25 @@
                                     <td style="padding: 8px 0; font-size: 15px; font-weight: 700; color: #171717;">{{ $data['name'] ?? '—' }}</td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 8px 0; font-size: 13px; color: #737373; text-transform: uppercase; letter-spacing: 1px;">Email:</td>
-                                    <td style="padding: 8px 0; font-size: 15px; color: #171717;">
-                                        <a href="mailto:{{ $data['email'] }}" style="color: #b91c1c; text-decoration: none; font-weight: 600;">{{ $data['email'] }}</a>
+                                    <td width="35%" style="padding: 8px 0; font-size: 13px; color: #737373; text-transform: uppercase; letter-spacing: 1px;">Способ связи:</td>
+                                    <td style="padding: 8px 0; font-size: 15px; font-weight: 700; color: #b91c1c;">
+                                        {{ $data['contact_method_label'] ?? 'Способ связи' }}
                                     </td>
                                 </tr>
-                                @if(!empty($data['phone']))
                                 <tr>
-                                    <td style="padding: 8px 0; font-size: 13px; color: #737373; text-transform: uppercase; letter-spacing: 1px;">Телефон:</td>
-                                    <td style="padding: 8px 0; font-size: 15px; color: #171717;">
-                                        <a href="tel:{{ $data['phone'] }}" style="color: #171717; text-decoration: none; font-weight: 600;">{{ $data['phone'] }}</a>
+                                    <td width="35%" style="padding: 8px 0; font-size: 13px; color: #737373; text-transform: uppercase; letter-spacing: 1px;">Контактные данные:</td>
+                                    <td style="padding: 8px 0; font-size: 16px; font-weight: 700; color: #171717;">
+                                        @if(($data['contact_method'] ?? '') === 'email')
+                                            <a href="mailto:{{ $data['contact_value'] ?? ($data['email'] ?? '') }}" style="color: #b91c1c; text-decoration: none; font-weight: 700;">{{ $data['contact_value'] ?? ($data['email'] ?? '') }}</a>
+                                        @elseif(($data['contact_method'] ?? '') === 'phone')
+                                            <a href="tel:{{ preg_replace('/[^\d+]/', '', $data['contact_value'] ?? ($data['phone'] ?? '')) }}" style="color: #171717; text-decoration: none; font-weight: 700;">{{ $data['contact_value'] ?? ($data['phone'] ?? '') }}</a>
+                                        @elseif(($data['contact_method'] ?? '') === 'telegram')
+                                            <a href="https://t.me/{{ ltrim($data['contact_value'] ?? ($data['telegram'] ?? ''), '@') }}" style="color: #0284c7; text-decoration: none; font-weight: 700;">{{ $data['contact_value'] ?? ($data['telegram'] ?? '') }}</a>
+                                        @else
+                                            <span>{{ $data['contact_value'] ?? '—' }}</span>
+                                        @endif
                                     </td>
                                 </tr>
-                                @endif
-                                @if(!empty($data['telegram']))
-                                <tr>
-                                    <td style="padding: 8px 0; font-size: 13px; color: #737373; text-transform: uppercase; letter-spacing: 1px;">Telegram:</td>
-                                    <td style="padding: 8px 0; font-size: 15px; color: #171717;">
-                                        <strong>{{ $data['telegram'] }}</strong>
-                                    </td>
-                                </tr>
-                                @endif
                                 <tr>
                                     <td style="padding: 8px 0; font-size: 13px; color: #737373; text-transform: uppercase; letter-spacing: 1px;">Дата и время:</td>
                                     <td style="padding: 8px 0; font-size: 13px; color: #525252;">{{ now()->timezone('Asia/Irkutsk')->format('d.m.Y H:i') }} (Иркутск, UTC+8)</td>

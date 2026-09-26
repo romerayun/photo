@@ -6,13 +6,8 @@
 @endif
 
 Имя: {{ $data['name'] ?? '—' }}
-Email: {{ $data['email'] ?? '—' }}
-@if(!empty($data['phone']))
-Телефон: {{ $data['phone'] }}
-@endif
-@if(!empty($data['telegram']))
-Telegram: {{ $data['telegram'] }}
-@endif
+Способ связи: {{ $data['contact_method_label'] ?? 'Способ связи' }}
+Контакт: {{ $data['contact_value'] ?? ($data['email'] ?? ($data['phone'] ?? ($data['telegram'] ?? '—'))) }}
 Дата: {{ now()->timezone('Asia/Irkutsk')->format('d.m.Y H:i') }} (Иркутск, UTC+8)
 
 СООБЩЕНИЕ / ПОЖЕЛАНИЯ:

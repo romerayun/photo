@@ -338,11 +338,20 @@
                                 <h3 class="text-xs font-bold uppercase tracking-tight text-arch-text group-hover:text-crimson font-display line-clamp-2 transition-colors">
                                     {{ $art->title }}
                                 </h3>
-                                <div class="text-[0.65rem] font-mono text-neutral-400 pt-1 flex items-center gap-2">
-                                    <span>👁 {{ $art->views_count }}</span>
-                                    <span>&bull;</span>
-                                    <span>💬 {{ $art->comments_count ?? $art->comments->count() }}</span>
-                                </div>
+                                @php $commCount = $art->comments_count ?? $art->comments->count(); @endphp
+                                @if($art->views_count > 50 || $commCount > 0)
+                                    <div class="text-[0.65rem] font-mono text-neutral-400 pt-1 flex items-center gap-2">
+                                        @if($art->views_count > 50)
+                                            <span>👁 {{ $art->views_count }}</span>
+                                        @endif
+                                        @if($art->views_count > 50 && $commCount > 0)
+                                            <span>&bull;</span>
+                                        @endif
+                                        @if($commCount > 0)
+                                            <span>💬 {{ $commCount }}</span>
+                                        @endif
+                                    </div>
+                                @endif
                             </div>
                         </a>
                     @endforeach

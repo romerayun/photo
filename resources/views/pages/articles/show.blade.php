@@ -52,21 +52,25 @@
                     </svg>
                     <span>{{ $article->estimated_reading_time }} мин чтения</span>
                 </span>
-                <span>&bull;</span>
-                <span class="inline-flex items-center gap-1.5 bg-white/5 border border-white/10 px-2.5 py-1 rounded">
-                    <svg class="w-3.5 h-3.5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                    </svg>
-                    <span>{{ $article->views_count }} {{ trans_choice('просмотр|просмотра|просмотров', $article->views_count, [], 'ru') }}</span>
-                </span>
-                <span>&bull;</span>
-                <a href="#comments" class="inline-flex items-center gap-1.5 bg-white/5 border border-white/10 hover:border-neutral-500 hover:text-white px-2.5 py-1 rounded transition-colors">
-                    <svg class="w-3.5 h-3.5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
-                    </svg>
-                    <span>{{ $article->comments->count() }} {{ trans_choice('комментарий|комментария|комментариев', $article->comments->count(), [], 'ru') }}</span>
-                </a>
+                @if($article->views_count > 50)
+                    <span>&bull;</span>
+                    <span class="inline-flex items-center gap-1.5 bg-white/5 border border-white/10 px-2.5 py-1 rounded">
+                        <svg class="w-3.5 h-3.5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                        <span>{{ $article->views_count }} {{ trans_choice('просмотр|просмотра|просмотров', $article->views_count, [], 'ru') }}</span>
+                    </span>
+                @endif
+                @if($article->comments->count() > 0)
+                    <span>&bull;</span>
+                    <a href="#comments" class="inline-flex items-center gap-1.5 bg-white/5 border border-white/10 hover:border-neutral-500 hover:text-white px-2.5 py-1 rounded transition-colors">
+                        <svg class="w-3.5 h-3.5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                        </svg>
+                        <span>{{ $article->comments->count() }} {{ trans_choice('комментарий|комментария|комментариев', $article->comments->count(), [], 'ru') }}</span>
+                    </a>
+                @endif
             </div>
 
             {{-- Title H1: Balanced, not oversized --}}
@@ -218,7 +222,7 @@
                         ОБСУЖДЕНИЕ
                     </span>
                     <h2 class="text-2xl sm:text-3xl font-extrabold uppercase tracking-tight font-display text-white">
-                        Комментарии ({{ $article->comments->count() }})
+                        Комментарии @if($article->comments->count() > 0)({{ $article->comments->count() }})@endif
                     </h2>
                 </div>
                 <span class="text-xs font-mono text-neutral-500">
@@ -253,7 +257,7 @@
                 <h3 class="text-base font-bold font-display uppercase tracking-wider text-white mb-4">
                     Оставить комментарий
                 </h3>
-                <form action="{{ route('articles.comments.store', $article) }}" method="POST" class="space-y-4">
+                <form action="{{ route('articles.comments.store', $article) }}" method="POST" class="space-y-4" x-data="{ submitting: false }" @submit="if(submitting){ return false; } submitting = true;">
                     @csrf
                     
                     {{-- Honeypot field (hidden from real users, bots will fill it) --}}
@@ -305,9 +309,19 @@
                         <span class="text-[0.7rem] font-mono text-neutral-500">
                             Комментарии модерируются
                         </span>
-                        <button type="submit" class="btn-crimson px-6 py-3 text-xs font-mono font-bold uppercase tracking-wider inline-flex items-center gap-2">
-                            <span>Отправить комментарий</span>
-                            <span>&rarr;</span>
+                        <button type="submit" 
+                                :disabled="submitting"
+                                :class="submitting ? 'opacity-80 cursor-wait' : ''"
+                                class="btn-crimson px-6 py-3 text-xs font-mono font-bold uppercase tracking-wider inline-flex items-center gap-2 transition-all">
+                            <span x-show="!submitting">Отправить комментарий</span>
+                            <span x-show="!submitting">&rarr;</span>
+                            <span x-show="submitting" x-cloak class="inline-flex items-center gap-2">
+                                <svg class="animate-spin h-3.5 w-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <span>Публикация...</span>
+                            </span>
                         </button>
                     </div>
                 </form>
@@ -373,8 +387,12 @@
                                     </h4>
                                 </div>
                                 <div class="text-[0.68rem] font-mono text-neutral-400 pt-2 border-t border-cine-border flex items-center justify-between">
-                                    <span>👁 {{ $rel->views_count }}</span>
-                                    <span>💬 {{ $rel->comments_count }}</span>
+                                    <span>{{ $rel->estimated_reading_time }} мин чтения</span>
+                                    @if($rel->comments_count > 0)
+                                        <span>💬 {{ $rel->comments_count }}</span>
+                                    @elseif($rel->views_count > 50)
+                                        <span>👁 {{ $rel->views_count }}</span>
+                                    @endif
                                 </div>
                             </div>
                         </a>

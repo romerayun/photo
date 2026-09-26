@@ -63,8 +63,10 @@
                                 {{-- Date & Meta --}}
                                 <div class="flex items-center gap-2 text-xs font-mono text-neutral-400">
                                     <span class="text-crimson font-semibold">{{ $article->formatted_date }}</span>
-                                    <span>&bull;</span>
-                                    <span>👁 {{ $article->views_count }}</span>
+                                    @if($article->views_count > 50)
+                                        <span>&bull;</span>
+                                        <span>👁 {{ $article->views_count }}</span>
+                                    @endif
                                     @if($article->comments_count > 0)
                                         <span>&bull;</span>
                                         <span class="flex items-center gap-1 text-neutral-300">

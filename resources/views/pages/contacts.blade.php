@@ -169,11 +169,11 @@
                         Оставить заявку на съёмку
                     </h2>
                     <p class="text-xs text-neutral-600 font-mono mt-2 leading-relaxed">
-                        Заполните форму, и я свяжусь с вами по почте или в Telegram в течение 1–2 часов с подробной информацией.
+                        Заполните форму, и я свяжусь с вами выбранным способом в течение 1–2 часов с подробной информацией.
                     </p>
                 </div>
 
-                <form action="{{ route('contacts.send') }}" method="POST" class="space-y-6">
+                <form action="{{ route('contacts.send') }}" method="POST" class="space-y-6 relative" x-data="{ submitting: false }" @submit="if(submitting){ return false; } submitting = true;">
                     @csrf
 
                     {{-- Honeypot anti-spam field --}}
@@ -196,36 +196,150 @@
                         @enderror
                     </div>
 
-                    {{-- Email & Phone/Telegram row --}}
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div>
-                            <label for="email" class="block text-xs uppercase tracking-widest font-mono font-bold text-arch-text mb-2">
-                                Email для ответа <span class="text-crimson">*</span>
+                    {{-- Preferred Contact Method & Masked Value --}}
+                    @php
+                        $oldMethod = old('contact_method', 'phone');
+                        $oldValue = old('contact_value', '');
+                    @endphp
+                    <div x-data="{
+                            method: '{{ $oldMethod }}',
+                            methodLabel: '{{ $oldMethod === 'telegram' ? 'Telegram (@username)' : ($oldMethod === 'max' ? 'MAX (Мессенджер)' : ($oldMethod === 'email' ? 'Электронная почта' : 'Телефон (Звонок / SMS)')) }}',
+                            methodOpen: false,
+                            value: '{{ addslashes($oldValue) }}',
+                            methods: [
+                                { id: 'phone', label: 'Телефон (Звонок / SMS)', shortLabel: 'Телефон', placeholder: '+7 (___) ___-__-__', helper: 'Российский или международный номер' },
+                                { id: 'telegram', label: 'Telegram (@username)', shortLabel: 'Telegram', placeholder: '@username', helper: 'Имя пользователя в Telegram' },
+                                { id: 'max', label: 'MAX (Мессенджер)', shortLabel: 'MAX', placeholder: 'ID или номер в MAX', helper: 'Имя профиля или номер телефона в MAX' },
+                                { id: 'email', label: 'Электронная почта', shortLabel: 'Email', placeholder: 'name@example.com', helper: 'Для подробного ответа на почту' }
+                            ],
+                            selectMethod(m) {
+                                this.method = m.id;
+                                this.methodLabel = m.label;
+                                this.methodOpen = false;
+                                if (m.id === 'telegram' && !this.value.startsWith('@') && this.value.length > 0) {
+                                    this.value = '@' + this.value.replace(/^@+/, '');
+                                }
+                            },
+                            handleInput(e) {
+                                let val = e.target.value;
+                                if (this.method === 'phone') {
+                                    this.value = this.formatPhone(val);
+                                } else if (this.method === 'telegram') {
+                                    if (val && !val.startsWith('@')) {
+                                        val = '@' + val;
+                                    }
+                                    this.value = val;
+                                } else {
+                                    this.value = val;
+                                }
+                            },
+                            formatPhone(val) {
+                                let digits = val.replace(/\D/g, '');
+                                if (!digits) return '';
+                                if (digits.startsWith('8')) {
+                                    digits = '7' + digits.slice(1);
+                                } else if (!digits.startsWith('7')) {
+                                    digits = '7' + digits;
+                                }
+                                digits = digits.slice(0, 11);
+                                let res = '+7';
+                                if (digits.length > 1) {
+                                    res += ' (' + digits.slice(1, 4);
+                                }
+                                if (digits.length >= 4) {
+                                    res += ') ' + digits.slice(4, 7);
+                                }
+                                if (digits.length >= 7) {
+                                    res += '-' + digits.slice(7, 9);
+                                }
+                                if (digits.length >= 9) {
+                                    res += '-' + digits.slice(9, 11);
+                                }
+                                return res;
+                            },
+                            get current() {
+                                return this.methods.find(m => m.id === this.method) || this.methods[0];
+                            }
+                         }"
+                         class="grid grid-cols-1 sm:grid-cols-12 gap-5 items-start">
+
+                        {{-- Left Column: Styled Contact Method Dropdown (Same Aesthetic as Package Dropdown) --}}
+                        <div class="sm:col-span-5 relative" @click.away="methodOpen = false">
+                            <label class="block text-xs uppercase tracking-widest font-mono font-bold text-arch-text mb-2">
+                                Способ связи <span class="text-crimson">*</span>
                             </label>
-                            <input type="email" 
-                                   name="email" 
-                                   id="email" 
-                                   value="{{ old('email') }}" 
+
+                            <input type="hidden" name="contact_method" :value="method">
+
+                            {{-- Dropdown Trigger Button --}}
+                            <button type="button" 
+                                    @click="methodOpen = !methodOpen" 
+                                    class="w-full px-4 py-3 bg-arch-bg hover:bg-white border text-left flex items-center justify-between transition-all focus:outline-none"
+                                    :class="methodOpen ? 'border-crimson bg-white ring-1 ring-crimson shadow-sm' : 'border-arch-border hover:border-neutral-400'">
+                                <div class="flex items-center gap-2.5 overflow-hidden">
+                                    <span class="w-2.5 h-2.5 rounded-full shrink-0 bg-crimson"></span>
+                                    <span class="truncate font-mono text-sm font-bold text-arch-text uppercase tracking-tight"
+                                          x-text="current.shortLabel">
+                                    </span>
+                                </div>
+                                <svg class="w-4 h-4 text-neutral-500 transition-transform duration-200 shrink-0"
+                                     :class="methodOpen ? 'rotate-180 text-crimson' : ''"
+                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+
+                            {{-- Stylized Dropdown Menu --}}
+                            <div x-show="methodOpen" 
+                                 x-cloak 
+                                 x-transition:enter="transition ease-out duration-150"
+                                 x-transition:enter-start="opacity-0 -translate-y-1 scale-[0.99]"
+                                 x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                                 x-transition:leave="transition ease-in duration-100"
+                                 x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                                 x-transition:leave-end="opacity-0 -translate-y-1 scale-[0.99]"
+                                 class="absolute z-30 left-0 right-0 mt-1.5 bg-white border border-arch-border shadow-card-depth divide-y divide-arch-border">
+                                <template x-for="m in methods" :key="m.id">
+                                    <div @click="selectMethod(m)"
+                                         class="p-3.5 hover:bg-neutral-950 group cursor-pointer transition-colors"
+                                         :class="method === m.id ? 'bg-neutral-900 text-white' : 'bg-white text-arch-text'">
+                                        <div class="flex items-center justify-between">
+                                            <div class="space-y-0.5">
+                                                <div class="text-xs font-bold font-mono uppercase tracking-wider group-hover:text-white"
+                                                     :class="method === m.id ? 'text-white' : 'text-arch-text'"
+                                                     x-text="m.label"></div>
+                                                <div class="text-[0.65rem] font-mono text-neutral-500 group-hover:text-neutral-400"
+                                                     x-text="m.helper"></div>
+                                            </div>
+                                            <span x-show="method === m.id" class="text-crimson font-bold text-sm ml-2">&check;</span>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        {{-- Right Column: Contact Value Input with Adaptive Mask & Placeholder --}}
+                        <div class="sm:col-span-7">
+                            <label for="contact_value_input" class="block text-xs uppercase tracking-widest font-mono font-bold text-arch-text mb-2">
+                                <span x-text="current.shortLabel + ' для связи'">Данные для связи</span> <span class="text-crimson">*</span>
+                            </label>
+                            <input :type="method === 'email' ? 'email' : 'text'" 
+                                   name="contact_value" 
+                                   id="contact_value_input" 
+                                   :value="value"
+                                   @input="handleInput($event)"
                                    required 
-                                   placeholder="example@mail.ru"
-                                   class="w-full px-4 py-3 bg-arch-bg border border-arch-border text-arch-text text-sm font-mono focus:border-crimson focus:bg-white focus:outline-none transition-colors @error('email') border-crimson @enderror">
-                            @error('email')
+                                   :placeholder="current.placeholder"
+                                   class="w-full px-4 py-3 bg-arch-bg border border-arch-border text-arch-text text-sm font-mono focus:border-crimson focus:bg-white focus:outline-none transition-colors @error('contact_value') border-crimson @enderror">
+                            <span class="text-[0.68rem] text-neutral-400 font-mono mt-1 block" x-text="current.helper"></span>
+                            @error('contact_value')
+                                <p class="text-xs text-crimson font-mono mt-1">{{ $message }}</p>
+                            @enderror
+                            @error('contact_method')
                                 <p class="text-xs text-crimson font-mono mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <div>
-                            <label for="telegram_input" class="block text-xs uppercase tracking-widest font-mono font-bold text-arch-text mb-2">
-                                Телефон или Telegram
-                            </label>
-                            <input type="text" 
-                                   name="telegram" 
-                                   id="telegram_input" 
-                                   value="{{ old('telegram') }}" 
-                                   placeholder="@username или +7..."
-                                   class="w-full px-4 py-3 bg-arch-bg border border-arch-border text-arch-text text-sm font-mono focus:border-crimson focus:bg-white focus:outline-none transition-colors">
-                            <span class="text-[0.68rem] text-neutral-400 font-mono mt-1 block">Для более оперативной связи</span>
-                        </div>
                     </div>
 
                     {{-- Package Selection (Custom Stylized Dropdown) --}}
@@ -410,13 +524,29 @@
                     {{-- Submit Button & Response Time note --}}
                     <div class="pt-2 space-y-4">
                         <button type="submit" 
-                                class="btn-crimson w-full py-4 text-xs font-bold uppercase tracking-wider font-mono shadow-crimson-btn">
-                            <span>Отправить заявку</span>
-                            <span>&rarr;</span>
+                                :disabled="submitting"
+                                :class="submitting ? 'opacity-85 cursor-wait' : ''"
+                                class="btn-crimson w-full py-4 text-xs font-bold uppercase tracking-wider font-mono shadow-crimson-btn relative overflow-hidden transition-all">
+                            
+                            {{-- Normal State Content --}}
+                            <span x-show="!submitting" class="inline-flex items-center justify-center gap-2">
+                                <span>Отправить заявку</span>
+                                <span>&rarr;</span>
+                            </span>
+
+                            {{-- Submitting Loading State Content --}}
+                            <span x-show="submitting" x-cloak class="inline-flex items-center justify-center gap-2.5">
+                                <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <span class="animate-pulse">Отправка заявки... Пожалуйста, подождите</span>
+                            </span>
                         </button>
 
                         <div class="flex items-center justify-between text-[0.68rem] text-neutral-500 font-mono">
-                            <span>⏱ Ответ в течение 1–2 часов</span>
+                            <span x-show="!submitting">⏱ Ответ в течение 1–2 часов</span>
+                            <span x-show="submitting" x-cloak class="text-crimson font-bold animate-pulse">Передаём данные на сервер...</span>
                             <span>Конфиденциальность гарантирована</span>
                         </div>
                     </div>

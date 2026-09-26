@@ -52,19 +52,61 @@ class ContactController extends Controller
                 ->with('contact_success', 'Спасибо за обращение! Ваша заявка успешно принята. Отвечу вам в течение 1–2 часов.');
         }
 
+        // Backward compatibility: if legacy email is submitted without contact_method
+        if (!$request->has('contact_method') && $request->filled('email')) {
+            $request->merge([
+                'contact_method' => 'email',
+                'contact_value' => $request->input('email'),
+            ]);
+        }
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:100'],
-            'email' => ['required', 'email', 'max:150'],
-            'phone' => ['nullable', 'string', 'max:50'],
-            'telegram' => ['nullable', 'string', 'max:100'],
+            'contact_method' => ['required', 'string', 'in:phone,telegram,max,email'],
+            'contact_value' => ['required', 'string', 'max:150'],
             'package' => ['nullable', 'string', 'max:150'],
             'message' => ['required', 'string', 'max:3000'],
+            'email' => ['nullable', 'email', 'max:150'],
         ], [
             'name.required' => 'Пожалуйста, укажите ваше имя.',
-            'email.required' => 'Пожалуйста, укажите email для ответа.',
-            'email.email' => 'Пожалуйста, укажите корректный email адрес.',
+            'contact_method.required' => 'Пожалуйста, выберите удобный способ связи.',
+            'contact_value.required' => 'Пожалуйста, укажите контактные данные для выбранного способа связи.',
             'message.required' => 'Пожалуйста, напишите пару слов о желаемой съёмке.',
+            'email.email' => 'Пожалуйста, укажите корректный email адрес.',
         ]);
+
+        // If email was explicitly provided with invalid syntax (legacy or modern)
+        if ($request->filled('email') && !filter_var($request->input('email'), FILTER_VALIDATE_EMAIL)) {
+            return back()->withInput()->withErrors(['email' => 'Пожалуйста, укажите корректный email адрес.']);
+        }
+
+        // Specific format validation for email if chosen as contact_method
+        if ($validated['contact_method'] === 'email' && !filter_var($validated['contact_value'], FILTER_VALIDATE_EMAIL)) {
+            return back()->withInput()->withErrors([
+                'contact_value' => 'Пожалуйста, укажите корректный адрес электронной почты.',
+                'email' => 'Пожалуйста, укажите корректный email адрес.',
+            ]);
+        }
+
+        // Map contact_value back to convenience fields for mail templates and backward compatibility
+        $contactMethod = $validated['contact_method'];
+        $contactValue = trim($validated['contact_value']);
+        $validated[$contactMethod] = $contactValue;
+        if (!empty($request->input('phone'))) {
+            $validated['phone'] = $request->input('phone');
+        }
+        if (!empty($request->input('telegram'))) {
+            $validated['telegram'] = $request->input('telegram');
+        }
+
+        // Friendly label for email
+        $methodLabels = [
+            'phone' => 'Телефон',
+            'telegram' => 'Telegram',
+            'max' => 'MAX (Мессенджер)',
+            'email' => 'Email',
+        ];
+        $validated['contact_method_label'] = $methodLabels[$contactMethod] ?? $contactMethod;
 
         $recipient = Setting::contactEmail();
 

@@ -60,9 +60,9 @@
             })();
         </script>
 
-        {{-- Subtle edge transition gradients only --}}
-        <div class="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-cine-black/60 to-transparent"></div>
-        <div class="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-cine-black/80 to-transparent"></div>
+        {{-- Full Darkening & Contrast Overlay Layer to ensure text pop over video --}}
+        <div class="absolute inset-0 bg-cine-black/45 md:bg-cine-black/55 backdrop-blur-[0.5px]"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-cine-black/75 via-transparent to-cine-black/90"></div>
     </div>
 
     {{-- Center Typographic Impact --}}
@@ -88,25 +88,27 @@
 
         <h1 class="tracking-tight text-white font-display mb-6">
             @if(mb_stripos($heroRole, 'фотограф в иркутске') !== false)
-                <span class="block text-[1.85rem] sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold uppercase leading-[1.08] drop-shadow-[0_4px_18px_rgba(0,0,0,0.95)] drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)]">
+                <span class="block text-[1.85rem] sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold uppercase leading-[1.08] drop-shadow-[0_4px_24px_rgba(0,0,0,1)] drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
                     <span class="inline-block">Фотограф</span> <span class="inline-block whitespace-nowrap">в&nbsp;Иркутске</span>
                 </span>
             @else
-                <span class="block text-[1.85rem] sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold uppercase leading-[1.08] drop-shadow-[0_4px_18px_rgba(0,0,0,0.95)] drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)]">
+                <span class="block text-[1.85rem] sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold uppercase leading-[1.08] drop-shadow-[0_4px_24px_rgba(0,0,0,1)] drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
                     {!! $formattedHeroRole !!}
                 </span>
             @endif
 
             @if(!empty($heroAuthor))
-                <span class="block text-base sm:text-xl md:text-2xl lg:text-3xl font-bold uppercase tracking-widest text-neutral-200 mt-3 sm:mt-4 font-display opacity-95 drop-shadow-[0_3px_12px_rgba(0,0,0,0.95)]">
+                <span class="block text-base sm:text-xl md:text-2xl lg:text-3xl font-bold uppercase tracking-widest text-white/90 mt-3 sm:mt-4 font-display drop-shadow-[0_3px_14px_rgba(0,0,0,1)]">
                     {{ $heroAuthor }}
                 </span>
             @endif
         </h1>
 
-        <p class="text-xs sm:text-sm md:text-base text-neutral-200 font-normal max-w-2xl mx-auto uppercase tracking-wide font-mono mb-10 opacity-95 drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]">
-            {{ \App\Models\Setting::get("hero_sub_{$locale}", __('site.hero_description')) }}
-        </p>
+        <div class="mb-10 max-w-2xl mx-auto">
+            <p class="inline-block text-xs sm:text-sm md:text-[0.95rem] text-white font-medium uppercase tracking-wider font-mono px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-black/60 backdrop-blur-md border border-white/15 shadow-[0_4px_20px_rgba(0,0,0,0.6)] leading-relaxed">
+                {{ \App\Models\Setting::get("hero_sub_{$locale}", __('site.hero_description')) }}
+            </p>
+        </div>
 
         {{-- Bold Crimson CTA Button with Arrow (As in Reference) --}}
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -385,7 +387,7 @@
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 sm:mb-16">
             <div>
                 <span class="text-xs uppercase tracking-widest text-crimson font-mono font-bold block mb-2">
-                    03 / ИЗБРАННЫЕ РАБОТЫ
+                    04 / ИЗБРАННЫЕ РАБОТЫ
                 </span>
                 <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight uppercase font-display text-arch-text">
                     ПОРТРЕТНЫЕ ИСТОРИИ
@@ -499,7 +501,7 @@
             <div>
                 <div class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-crimson font-bold mb-3">
                     <span class="w-2 h-2 rounded-full bg-crimson animate-pulse"></span>
-                    <span>04 / ПРОЦЕСС</span>
+                    <span>05 / ПРОЦЕСС</span>
                 </div>
                 <h2 class="text-3xl sm:text-5xl font-extrabold uppercase font-display tracking-tight text-white leading-tight">
                     КАК ПРОХОДИТ СЪЁМКА
@@ -744,7 +746,7 @@
             <div class="lg:col-span-4 p-6 sm:p-8 lg:p-10 flex flex-col justify-between space-y-6">
                 <div>
                     <span class="text-[0.68rem] uppercase tracking-widest text-crimson font-mono font-bold block mb-3">
-                        05 / СТОИМОСТЬ СЪЁМКИ
+                        06 / СТОИМОСТЬ СЪЁМКИ
                     </span>
                     <h2 class="text-2xl sm:text-3xl lg:text-3xl xl:text-4xl font-extrabold uppercase tracking-tight font-display text-arch-text mb-4 leading-tight break-words">
                         ВЫБЕРИТЕ СВОЙ ФОРМАТ
@@ -843,7 +845,7 @@
             <div class="lg:col-span-8 space-y-6 lg:pl-6">
                 <div>
                     <span class="text-xs uppercase tracking-widest text-crimson font-mono font-bold block mb-3">
-                        06 / О фотографе
+                        07 / О фотографе
                     </span>
                     <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold uppercase tracking-tight text-arch-text font-display leading-tight">
                         Привет, я Роман

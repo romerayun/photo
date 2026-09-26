@@ -146,4 +146,29 @@ class ContactFormAndDirectCommunicationTest extends TestCase
         $response->assertSessionHasErrors(['name', 'email', 'message']);
         Mail::assertNothingSent();
     }
+
+    public function test_contact_form_supports_custom_contact_method_and_mask(): void
+    {
+        Mail::fake();
+
+        $payload = [
+            'name' => 'Елена Фото',
+            'contact_method' => 'telegram',
+            'contact_value' => '@elena_photo',
+            'package' => 'Индивидуальный портрет',
+            'message' => 'Добрый день, хочу забронировать фотосессию.',
+        ];
+
+        $response = $this->post('/contacts', $payload);
+
+        $response->assertRedirect('/contacts?package=' . rawurlencode('Индивидуальный портрет'));
+        $response->assertSessionHas('contact_success');
+
+        Mail::assertSent(ContactFormSubmitted::class, function ($mail) use ($payload) {
+            return $mail->hasTo('romerayun@gmail.com') &&
+                   $mail->data['name'] === $payload['name'] &&
+                   $mail->data['contact_method'] === 'telegram' &&
+                   $mail->data['contact_value'] === '@elena_photo';
+        });
+    }
 }
