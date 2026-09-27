@@ -31,19 +31,35 @@
     <form method="POST" action="{{ route('admin.max_bot.update') }}" class="space-y-8">
         @csrf
 
-        {{-- 1. Welcome Message --}}
-        <div class="bg-white p-6 sm:p-8 border border-slate-200 rounded-xl shadow-sm space-y-4">
+        {{-- 1. Welcome Messages --}}
+        <div class="bg-white p-6 sm:p-8 border border-slate-200 rounded-xl shadow-sm space-y-6">
             <div class="border-b border-slate-100 pb-3">
-                <h2 class="text-base font-bold text-slate-900">1. Приветственное сообщение при подключении</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Это сообщение клиент получает сразу после перехода в бот по кнопке «Подключить напоминания». Доступны теги подстановки: <code class="text-crimson font-mono">{client_name}</code>, <code class="text-crimson font-mono">{date}</code>, <code class="text-crimson font-mono">{time}</code>, <code class="text-crimson font-mono">{location}</code>.</p>
+                <h2 class="text-base font-bold text-slate-900">1. Приветственные сообщения при подключении бота</h2>
+                <p class="text-xs text-slate-500 mt-0.5">При первом входе и подключении съёмки бот отправляет <b>два последовательных сообщения</b>. Доступны теги: <code class="text-crimson font-mono">{client_name}</code>, <code class="text-crimson font-mono">{date}</code>, <code class="text-crimson font-mono">{time}</code>, <code class="text-crimson font-mono">{location}</code>.</p>
             </div>
 
-            <div>
-                <label for="welcome_text" class="block text-xs uppercase tracking-wider font-bold text-slate-700 mb-1.5">
-                    Текст приветствия *
-                </label>
-                <textarea name="welcome_text" id="welcome_text" rows="6" required
-                          class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 font-sans leading-relaxed">{{ old('welcome_text', $settings['welcome_text']) }}</textarea>
+            <div class="space-y-5">
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label for="welcome_text" class="block text-xs uppercase tracking-wider font-bold text-slate-700">
+                            Первое сообщение (отправляется без кнопок) *
+                        </label>
+                        <span class="text-[0.7rem] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-semibold border border-slate-200">Без кнопок</span>
+                    </div>
+                    <textarea name="welcome_text" id="welcome_text" rows="5" required
+                              class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 font-sans leading-relaxed">{{ old('welcome_text', $settings['welcome_text']) }}</textarea>
+                </div>
+
+                <div class="pt-4 border-t border-slate-100">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label for="welcome_second_text" class="block text-xs uppercase tracking-wider font-bold text-slate-700">
+                            Второе сообщение (следует сразу за первым, к нему прикрепляются кнопки меню) *
+                        </label>
+                        <span class="text-[0.7rem] px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200">С кнопками меню</span>
+                    </div>
+                    <textarea name="welcome_second_text" id="welcome_second_text" rows="3" required
+                              class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 font-sans leading-relaxed">{{ old('welcome_second_text', $settings['welcome_second_text']) }}</textarea>
+                </div>
             </div>
         </div>
 

@@ -223,7 +223,9 @@ class MaxMessengerService
     }
 
     /**
-     * Send confirmation message when client links their shoot.
+     * Send confirmation messages when client links their shoot:
+     * 1. Welcome message (without buttons).
+     * 2. Follow-up action message (with buttons).
      */
     public function sendConfirmation(Shoot $shoot): bool
     {
@@ -234,26 +236,44 @@ class MaxMessengerService
         $dateFormatted = $shoot->shoot_date ? $shoot->shoot_date->format('d.m.Y') : '';
         $time = substr($shoot->start_time, 0, 5);
 
-        $template = \App\Models\Setting::get('max_bot_welcome_text', 
+        // 1. First Welcome Message (No buttons)
+        $firstTemplate = \App\Models\Setting::get('max_bot_welcome_text', 
             "Здравствуйте, {client_name}! 👋\n\n"
             . "Напоминания о вашей фотосессии успешно подключены в MAX.\n\n"
             . "📅 Дата: {date}\n"
             . "⏰ Время: {time}\n"
             . "{location}\n"
-            . "Вы можете воспользоваться кнопками ниже для быстрой информации:"
+            . "Мы пришлем вам уведомление перед съёмкой, чтобы всё прошло идеально!"
         );
 
         $locationText = $shoot->location ? "📍 Локация: {$shoot->location}\n" : "";
 
-        $text = str_replace(
+        $firstText = str_replace(
             ['{client_name}', '{date}', '{time}', '{location}'],
             [$shoot->client_name, $dateFormatted, $time, $locationText],
-            $template
+            $firstTemplate
+        );
+
+        // Send first message without buttons
+        $this->sendMessage($shoot->max_chat_id, $shoot->max_user_id, $firstText, []);
+
+        // Small delay to ensure sequential arrival in client's messenger
+        usleep(300000); // 300ms
+
+        // 2. Second Message (With interactive menu buttons)
+        $secondTemplate = \App\Models\Setting::get('max_bot_welcome_second_text', 
+            "Чтобы вам было удобно, вы можете прямо сейчас посмотреть детали съёмки, памятку по подготовке или перейти в карточку съёмки кнопками ниже:"
+        );
+
+        $secondText = str_replace(
+            ['{client_name}', '{date}', '{time}', '{location}'],
+            [$shoot->client_name, $dateFormatted, $time, $locationText],
+            $secondTemplate
         );
 
         $buttons = $this->getMenuButtons($shoot);
 
-        return $this->sendMessage($shoot->max_chat_id, $shoot->max_user_id, $text, $buttons);
+        return $this->sendMessage($shoot->max_chat_id, $shoot->max_user_id, $secondText, $buttons);
     }
 
     /**

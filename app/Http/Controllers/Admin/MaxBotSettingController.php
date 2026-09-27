@@ -50,7 +50,11 @@ class MaxBotSettingController extends Controller
                 . "📅 Дата: {date}\n"
                 . "⏰ Время: {time}\n"
                 . "{location}\n"
-                . "Вы можете воспользоваться кнопками ниже для быстрой информации:"
+                . "Мы пришлем вам уведомление перед съёмкой, чтобы всё прошло идеально!"
+            ),
+
+            'welcome_second_text' => Setting::get('max_bot_welcome_second_text', 
+                "Чтобы вам было удобно, вы можете прямо сейчас посмотреть детали съёмки, памятку по подготовке или перейти в карточку съёмки кнопками ниже:"
             ),
 
             'custom_buttons' => json_decode(Setting::get('max_bot_custom_buttons', '[]'), true) ?: [],
@@ -72,6 +76,7 @@ class MaxBotSettingController extends Controller
             'btn_contacts_text' => ['required', 'string', 'max:50'],
             'contacts_response' => ['required', 'string', 'max:2000'],
             'welcome_text' => ['required', 'string', 'max:1000'],
+            'welcome_second_text' => ['required', 'string', 'max:1000'],
             'custom_buttons' => ['nullable', 'array'],
             'custom_buttons.*.title' => ['required_with:custom_buttons', 'string', 'max:50'],
             'custom_buttons.*.type' => ['required_with:custom_buttons', 'in:link,text'],
@@ -94,6 +99,7 @@ class MaxBotSettingController extends Controller
         Setting::set('max_bot_contacts_response', $validated['contacts_response']);
 
         Setting::set('max_bot_welcome_text', $validated['welcome_text']);
+        Setting::set('max_bot_welcome_second_text', $validated['welcome_second_text']);
 
         // Filter and sanitize custom buttons
         $customButtons = [];
