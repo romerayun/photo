@@ -85,10 +85,19 @@
                     </div>
 
                     {{-- Add to calendar & MAX reminders --}}
+                    {{-- Add to calendar & MAX reminders --}}
                     <div class="pt-2 flex flex-wrap gap-2 items-center" x-data="{
                         maxLoading: false,
+                        maxModalOpen: false,
+                        copied: false,
                         maxConnected: {{ $shoot->max_connected_at ? 'true' : 'false' }},
-                        async connectMax() {
+                        maxData: {
+                            deep_link: '',
+                            app_link: '',
+                            start_command: '',
+                            bot_username: 'se14454241_bot'
+                        },
+                        async initMaxConnect() {
                             if (this.maxLoading) return;
                             this.maxLoading = true;
                             try {
@@ -100,16 +109,23 @@
                                     }
                                 });
                                 const data = await response.json();
-                                if (data.success && data.deep_link) {
-                                    window.open(data.deep_link, '_blank');
+                                if (data.success) {
+                                    this.maxData = data;
+                                    this.maxModalOpen = true;
                                 } else {
-                                    alert('Не удалось сформировать ссылку для MAX. Попробуйте еще раз.');
+                                    alert('Не удалось сформировать данные для MAX. Попробуйте еще раз.');
                                 }
                             } catch (e) {
-                                alert('Произошла ошибка при подключении к MAX');
+                                alert('Произошла ошибка при формировании ссылки MAX');
                             } finally {
                                 this.maxLoading = false;
                             }
+                        },
+                        copyCommand() {
+                            if (!this.maxData.start_command) return;
+                            navigator.clipboard.writeText(this.maxData.start_command);
+                            this.copied = true;
+                            setTimeout(() => { this.copied = false; }, 2500);
                         }
                     }">
                         <a href="{{ route('shoots.share.ics', ['token' => $shoot->share_token]) }}" 
@@ -127,13 +143,98 @@
 
                         <template x-if="!maxConnected">
                             <button type="button"
-                                    @click="connectMax()"
+                                    @click="initMaxConnect()"
                                     :disabled="maxLoading"
                                     class="px-3.5 py-2 rounded-xl bg-neutral-900 hover:bg-black text-white text-xs font-mono uppercase tracking-wider font-bold transition-all inline-flex items-center gap-1.5 border border-neutral-800 shadow-sm disabled:opacity-50 cursor-pointer">
                                 <svg class="w-3.5 h-3.5 text-amber-400 animate-pulse" fill="currentColor" viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/></svg>
-                                <span x-text="maxLoading ? 'Генерация ссылки...' : 'Получать напоминания в MAX'"></span>
+                                <span x-text="maxLoading ? 'Генерация...' : 'Получать напоминания в MAX'"></span>
                             </button>
                         </template>
+
+                        {{-- Modal: Choice for with app / without app --}}
+                        <div x-show="maxModalOpen" 
+                             x-cloak 
+                             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
+                             @keydown.escape.window="maxModalOpen = false">
+                            <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-neutral-200 relative text-left"
+                                 @click.away="maxModalOpen = false">
+                                
+                                {{-- Close cross --}}
+                                <button type="button" @click="maxModalOpen = false" class="absolute top-5 right-5 text-neutral-400 hover:text-neutral-700 p-1">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
+
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 font-bold">
+                                        MAX
+                                    </div>
+                                    <div>
+                                        <h3 class="text-base sm:text-lg font-bold font-display uppercase tracking-tight text-neutral-900">
+                                            Подключение напоминаний
+                                        </h3>
+                                        <p class="text-xs text-neutral-500 font-mono">Выберите удобный способ запуска бота</p>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-3.5 mt-5">
+                                    {{-- Option 1: Mobile / Desktop App installed --}}
+                                    <a :href="maxData.app_link" 
+                                       class="group block p-4 rounded-2xl border-2 border-neutral-900 bg-neutral-900 hover:bg-black text-white transition-all shadow-sm">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center gap-2.5">
+                                                <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 24 24"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
+                                                <span class="font-bold text-sm">У меня установлено приложение MAX</span>
+                                            </div>
+                                            <svg class="w-4 h-4 text-neutral-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                        </div>
+                                        <p class="text-xs text-neutral-300 font-mono mt-1.5 pl-7.5">Откроет приложение напрямую в чате бота</p>
+                                    </a>
+
+                                    {{-- Option 2: Web Browser Link --}}
+                                    <a :href="maxData.deep_link" 
+                                       target="_blank"
+                                       class="group block p-4 rounded-2xl border border-neutral-300 bg-neutral-50 hover:bg-neutral-100 text-neutral-900 transition-all">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center gap-2.5">
+                                                <svg class="w-5 h-5 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+                                                <span class="font-bold text-sm">Открыть через веб-сайт (max.ru)</span>
+                                            </div>
+                                            <svg class="w-4 h-4 text-neutral-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                        </div>
+                                        <p class="text-xs text-neutral-500 font-mono mt-1.5 pl-7.5">Переход через сайт платформы</p>
+                                    </a>
+
+                                    {{-- Option 3: Manual Command Copy --}}
+                                    <div class="p-4 rounded-2xl border border-neutral-200 bg-white">
+                                        <div class="text-xs font-mono font-bold text-neutral-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                                            <span>Или скопируйте команду:</span>
+                                            <span class="text-[0.65rem] text-neutral-400 font-normal">Срок действия: 15 минут</span>
+                                        </div>
+                                        <p class="text-xs text-neutral-600 mb-2.5">
+                                            Откройте бота <strong class="text-neutral-900">@<span x-text="maxData.bot_username"></span></strong> в MAX и отправьте:
+                                        </p>
+                                        <div class="flex items-center gap-2">
+                                            <code class="px-3 py-2 bg-neutral-100 rounded-xl text-xs font-mono text-neutral-800 break-all select-all flex-1 border border-neutral-200" x-text="maxData.start_command"></code>
+                                            <button type="button" 
+                                                    @click="copyCommand()" 
+                                                    class="px-3 py-2 rounded-xl bg-neutral-900 text-white hover:bg-black text-xs font-mono font-bold shrink-0 transition-all flex items-center gap-1">
+                                                <svg x-show="!copied" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                                                <svg x-show="copied" class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                                <span x-text="copied ? 'Скопировано!' : 'Копировать'"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-5 pt-4 border-t border-neutral-100 flex justify-end">
+                                    <button type="button" 
+                                            @click="maxModalOpen = false" 
+                                            class="px-4 py-2 rounded-xl text-xs font-mono text-neutral-600 hover:text-neutral-900 font-bold uppercase tracking-wider">
+                                        Закрыть
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
