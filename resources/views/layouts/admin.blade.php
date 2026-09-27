@@ -31,6 +31,10 @@
                        class="px-3.5 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.shoots.*') ? 'bg-white/15 text-white shadow-sm' : 'hover:bg-white/5 hover:text-white' }}">
                         Календарь
                     </a>
+                    <a href="{{ route('admin.clients.index') }}" 
+                       class="px-3.5 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.clients.*') ? 'bg-white/15 text-white shadow-sm' : 'hover:bg-white/5 hover:text-white' }}">
+                        Клиенты
+                    </a>
                     <a href="{{ route('admin.series.index') }}" 
                        class="px-3.5 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.series.*') ? 'bg-white/15 text-white shadow-sm' : 'hover:bg-white/5 hover:text-white' }}">
                         Серии
@@ -88,6 +92,7 @@
         <div class="md:hidden border-t border-white/10 px-4 py-2.5 flex items-center justify-between overflow-x-auto text-[0.72rem] uppercase tracking-wider text-zinc-300 gap-1">
             <a href="{{ route('admin.dashboard') }}" class="px-2.5 py-1 rounded {{ request()->routeIs('admin.dashboard') ? 'bg-white/15 text-white' : '' }}">Обзор</a>
             <a href="{{ route('admin.shoots.index') }}" class="px-2.5 py-1 rounded {{ request()->routeIs('admin.shoots.*') ? 'bg-white/15 text-white' : '' }}">Календарь</a>
+            <a href="{{ route('admin.clients.index') }}" class="px-2.5 py-1 rounded {{ request()->routeIs('admin.clients.*') ? 'bg-white/15 text-white' : '' }}">Клиенты</a>
             <a href="{{ route('admin.series.index') }}" class="px-2.5 py-1 rounded {{ request()->routeIs('admin.series.*') ? 'bg-white/15 text-white' : '' }}">Серии</a>
             <a href="{{ route('admin.articles.index') }}" class="px-2.5 py-1 rounded {{ request()->routeIs('admin.articles.*') ? 'bg-white/15 text-white' : '' }}">Статьи</a>
             <a href="{{ route('admin.categories.index') }}" class="px-2.5 py-1 rounded {{ request()->routeIs('admin.categories.*') ? 'bg-white/15 text-white' : '' }}">Категории</a>

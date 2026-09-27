@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
 use App\Models\Shoot;
 use App\Services\MaxMessengerService;
 use Illuminate\Http\JsonResponse;
@@ -76,7 +77,7 @@ class MaxWebhookController extends Controller
 
         $codeHash = hash('sha256', trim($payload));
 
-        // 3. Atomically find shoot, check expiration, redeem code, and link MAX user
+        // 3. Atomically find shoot, check expiration, redeem code, and link MAX user & client
         $shoot = DB::transaction(function () use ($codeHash, $userId, $chatId) {
             $shootRecord = Shoot::where('max_link_code_hash', $codeHash)
                 ->where('max_link_code_expires_at', '>=', now())
@@ -87,7 +88,7 @@ class MaxWebhookController extends Controller
                 return null;
             }
 
-            // Atomically invalidate code and save MAX identifiers
+            // Atomically invalidate code and save MAX identifiers on shoot
             $shootRecord->update([
                 'max_link_code_hash' => null,
                 'max_link_code_expires_at' => null,
@@ -95,6 +96,46 @@ class MaxWebhookController extends Controller
                 'max_chat_id' => $chatId ? (string)$chatId : null,
                 'max_connected_at' => now(),
             ]);
+
+            // Sync with Client entity
+            $client = null;
+            if ($shootRecord->client_id) {
+                $client = Client::find($shootRecord->client_id);
+            }
+            if (!$client) {
+                // Find or create client by phone or name
+                if ($shootRecord->phone) {
+                    $client = Client::where('phone', $shootRecord->phone)->first();
+                }
+                if (!$client && $shootRecord->client_name) {
+                    $client = Client::where('name', $shootRecord->client_name)->first();
+                }
+                if (!$client) {
+                    $client = Client::create([
+                        'name' => $shootRecord->client_name,
+                        'phone' => $shootRecord->phone,
+                        'social_link' => $shootRecord->social_link,
+                    ]);
+                }
+                $shootRecord->update(['client_id' => $client->id]);
+            }
+
+            if ($client) {
+                $client->update([
+                    'max_user_id' => $userId ? (string)$userId : $client->max_user_id,
+                    'max_chat_id' => $chatId ? (string)$chatId : $client->max_chat_id,
+                    'max_connected_at' => now(),
+                ]);
+
+                // Also make sure other shoots of this client have MAX ids updated if empty
+                Shoot::where('client_id', $client->id)
+                    ->whereNull('max_connected_at')
+                    ->update([
+                        'max_user_id' => $userId ? (string)$userId : null,
+                        'max_chat_id' => $chatId ? (string)$chatId : null,
+                        'max_connected_at' => now(),
+                    ]);
+            }
 
             return $shootRecord;
         });
@@ -151,48 +192,98 @@ class MaxWebhookController extends Controller
                 ?? $request->input('user_id'));
         }
 
-        // Find linked shoot for this user or chat
-        $shoot = Shoot::where(function ($query) use ($chatId, $userId) {
+        // Find all linked shoots for this user or chat
+        $shootsQuery = Shoot::where(function ($query) use ($chatId, $userId) {
                 if ($chatId) {
                     $query->where('max_chat_id', $chatId);
                 }
                 if ($userId) {
                     $query->orWhere('max_user_id', $userId);
                 }
-            })
-            ->latest('shoot_date')
-            ->first();
+            });
+
+        // Also check if linked via Client record
+        $client = Client::where(function ($q) use ($chatId, $userId) {
+            if ($chatId) {
+                $q->where('max_chat_id', $chatId);
+            }
+            if ($userId) {
+                $q->orWhere('max_user_id', $userId);
+            }
+        })->first();
+
+        if ($client) {
+            $shootsQuery->orWhere('client_id', $client->id);
+        }
+
+        $allShoots = $shootsQuery
+            ->orderBy('shoot_date', 'desc')
+            ->orderBy('start_time', 'desc')
+            ->get();
+
+        $shoot = $allShoots->first();
 
         // 1. Details button
         if ($callbackPayload === 'shoot_details') {
-            if (!$shoot) {
+            if ($allShoots->isEmpty()) {
                 $maxService->sendMessage($chatId, $userId, "У вас пока нет активной фотосессии, привязанной к этому чату.", $maxService->getMenuButtons());
                 return response()->json(['status' => 'ok']);
             }
 
-            $dateFormatted = $shoot->shoot_date ? $shoot->shoot_date->format('d.m.Y') : 'Дата не указана';
-            $time = substr($shoot->start_time, 0, 5) ?: 'Время не указано';
-            $duration = $shoot->duration_minutes ? "{$shoot->duration_minutes} мин." : '';
-            $statusLabels = [
-                'planned' => 'Запланирована',
-                'in_progress' => 'В процессе',
-                'completed' => 'Завершена',
-                'cancelled' => 'Отменена',
-            ];
-            $status = $statusLabels[$shoot->status] ?? $shoot->status;
+            // If user has MULTIPLE shoots, prompt them to choose which one
+            if ($allShoots->count() > 1) {
+                $text = "📅 *У вас запланировано несколько съёмок*:\n\nПожалуйста, выберите фотосессию, по которой хотите посмотреть подробную информацию:";
+                
+                $selectButtons = [];
+                foreach ($allShoots as $s) {
+                    $dateStr = $s->shoot_date ? $s->shoot_date->format('d.m.Y') : 'Без даты';
+                    $locStr = $s->location ? " ({$s->location})" : '';
+                    $btnTitle = "📅 {$dateStr}{$locStr}";
+                    // Limit button text length for MAX API
+                    if (mb_strlen($btnTitle) > 36) {
+                        $btnTitle = mb_substr($btnTitle, 0, 35) . '…';
+                    }
+                    $selectButtons[] = [
+                        [
+                            'type' => 'callback',
+                            'text' => $btnTitle,
+                            'payload' => "shoot_select_{$s->id}",
+                        ]
+                    ];
+                }
 
-            $text = "📋 *Детали вашей фотосессии*:\n\n"
-                . "👤 Клиент: {$shoot->client_name}\n"
-                . "📅 Дата: {$dateFormatted}\n"
-                . "⏰ Время: {$time} " . ($duration ? "({$duration})" : '') . "\n"
-                . "📍 Локация: " . ($shoot->location ?: 'уточняется') . "\n"
-                . "💰 Стоимость: " . ($shoot->price ? number_format($shoot->price, 0, '', ' ') . ' ₽' : '—') . "\n"
-                . ($shoot->prepayment ? "💵 Предоплата: " . number_format($shoot->prepayment, 0, '', ' ') . " ₽ (Внесена)\n" : '')
-                . "📌 Статус: {$status}";
+                // Add back / cancel button
+                $selectButtons[] = [
+                    [
+                        'type' => 'callback',
+                        'text' => '🔙 В главное меню',
+                        'payload' => 'main_menu',
+                    ]
+                ];
 
+                $maxService->sendMessage($chatId, $userId, $text, $selectButtons);
+                return response()->json(['status' => 'ok']);
+            }
+
+            // Exactly 1 shoot
+            return $this->sendShootDetailsResponse($maxService, $shoot, $chatId, $userId);
+        }
+
+        // Specific shoot selected by client from list
+        if (preg_match('/^shoot_select_(\d+)$/', $callbackPayload, $matches)) {
+            $selectedId = (int)$matches[1];
+            $targetShoot = $allShoots->firstWhere('id', $selectedId) ?? Shoot::find($selectedId);
+
+            if ($targetShoot) {
+                return $this->sendShootDetailsResponse($maxService, $targetShoot, $chatId, $userId);
+            }
+        }
+
+        // Main menu button
+        if ($callbackPayload === 'main_menu') {
+            $reply = "Главное меню бота. Выберите действие кнопками ниже:";
             $buttons = $maxService->getMenuButtons($shoot);
-
-            $maxService->sendMessage($chatId, $userId, $text, $buttons);
+            $maxService->sendMessage($chatId, $userId, $reply, $buttons);
             return response()->json(['status' => 'ok']);
         }
 
@@ -262,4 +353,36 @@ class MaxWebhookController extends Controller
 
         return response()->json(['status' => 'ok']);
     }
+
+    /**
+     * Send formatted shoot details with back/menu buttons.
+     */
+    protected function sendShootDetailsResponse(MaxMessengerService $maxService, Shoot $shoot, string $chatId, string $userId): JsonResponse
+    {
+        $dateFormatted = $shoot->shoot_date ? $shoot->shoot_date->format('d.m.Y') : 'Дата не указана';
+        $time = substr($shoot->start_time, 0, 5) ?: 'Время не указано';
+        $duration = $shoot->duration_minutes ? "{$shoot->duration_minutes} мин." : '';
+        $statusLabels = [
+            'planned' => 'Запланирована',
+            'in_progress' => 'В процессе',
+            'completed' => 'Завершена',
+            'cancelled' => 'Отменена',
+        ];
+        $status = $statusLabels[$shoot->status] ?? $shoot->status;
+
+        $text = "📋 *Детали съёмки*:\n\n"
+            . "👤 Клиент: {$shoot->client_name}\n"
+            . "📅 Дата: {$dateFormatted}\n"
+            . "⏰ Время: {$time} " . ($duration ? "({$duration})" : '') . "\n"
+            . "📍 Локация: " . ($shoot->location ?: 'уточняется') . "\n"
+            . "💰 Стоимость: " . ($shoot->price ? number_format($shoot->price, 0, '', ' ') . ' ₽' : '—') . "\n"
+            . ($shoot->prepayment ? "💵 Предоплата: " . number_format($shoot->prepayment, 0, '', ' ') . " ₽ (Внесена)\n" : '')
+            . "📌 Статус: {$status}";
+
+        $buttons = $maxService->getMenuButtons($shoot);
+
+        $maxService->sendMessage($chatId, $userId, $text, $buttons);
+        return response()->json(['status' => 'ok']);
+    }
 }
+

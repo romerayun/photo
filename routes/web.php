@@ -124,6 +124,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/max-bot/clients', [\App\Http\Controllers\Admin\MaxBotSettingController::class, 'clients'])->name('max_bot.clients');
         Route::post('/max-bot/broadcast', [\App\Http\Controllers\Admin\MaxBotSettingController::class, 'sendBroadcast'])->name('max_bot.broadcast');
 
+        // Clients (CRM)
+        Route::get('/clients/search', [\App\Http\Controllers\Admin\ClientController::class, 'search'])->name('clients.search');
+        Route::resource('clients', \App\Http\Controllers\Admin\ClientController::class);
+
         // Shoots & Calendar
         Route::get('/shoots', [AdminShootController::class, 'index'])->name('shoots.index');
         Route::post('/shoots', [AdminShootController::class, 'store'])->name('shoots.store');

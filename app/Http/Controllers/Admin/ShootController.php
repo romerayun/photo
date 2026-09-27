@@ -67,6 +67,11 @@ class ShootController extends Controller
             'this_month' => Shoot::whereYear('shoot_date', $year)->whereMonth('shoot_date', $month)->count(),
         ];
 
+        $prefillClient = null;
+        if ($request->has('client_id')) {
+            $prefillClient = \App\Models\Client::find($request->input('client_id'));
+        }
+
         return view('admin.shoots.index', [
             'currentDate' => $currentMonthDate,
             'year' => $year,
@@ -76,6 +81,12 @@ class ShootController extends Controller
             'allShoots' => $allShoots,
             'stats' => $stats,
             'statusFilter' => $statusFilter,
+            'prefillClient' => $prefillClient ? [
+                'id' => $prefillClient->id,
+                'name' => $prefillClient->name,
+                'phone' => $prefillClient->phone,
+                'social_link' => $prefillClient->social_link,
+            ] : null,
         ]);
     }
 
@@ -85,6 +96,7 @@ class ShootController extends Controller
     public function store(Request $request): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
+            'client_id' => ['nullable', 'integer', 'exists:clients,id'],
             'client_name' => ['required', 'string', 'max:255'],
             'social_link' => ['nullable', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:50'],
@@ -104,6 +116,35 @@ class ShootController extends Controller
 
         $validated['status'] = $validated['status'] ?? 'planned';
         $validated['start_time'] = substr($validated['start_time'], 0, 5);
+
+        // Find or create Client
+        $client = null;
+        if (!empty($validated['client_id'])) {
+            $client = \App\Models\Client::find($validated['client_id']);
+        }
+        if (!$client && !empty($validated['phone'])) {
+            $client = \App\Models\Client::where('phone', $validated['phone'])->first();
+        }
+        if (!$client && !empty($validated['client_name'])) {
+            $client = \App\Models\Client::where('name', $validated['client_name'])->first();
+        }
+        if (!$client && !empty($validated['client_name'])) {
+            $client = \App\Models\Client::create([
+                'name' => $validated['client_name'],
+                'phone' => $validated['phone'] ?? null,
+                'social_link' => $validated['social_link'] ?? null,
+            ]);
+        }
+
+        if ($client) {
+            $validated['client_id'] = $client->id;
+            // Inherit client MAX credentials if present
+            if ($client->max_connected_at) {
+                $validated['max_user_id'] = $client->max_user_id;
+                $validated['max_chat_id'] = $client->max_chat_id;
+                $validated['max_connected_at'] = $client->max_connected_at;
+            }
+        }
 
         $shoot = Shoot::create($validated);
 
@@ -131,6 +172,7 @@ class ShootController extends Controller
     public function update(Request $request, Shoot $shoot): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
+            'client_id' => ['nullable', 'integer', 'exists:clients,id'],
             'client_name' => ['required', 'string', 'max:255'],
             'social_link' => ['nullable', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:50'],
@@ -150,6 +192,26 @@ class ShootController extends Controller
 
         $validated['status'] = $validated['status'] ?? 'planned';
         $validated['start_time'] = substr($validated['start_time'], 0, 5);
+
+        // Client association
+        $client = null;
+        if (!empty($validated['client_id'])) {
+            $client = \App\Models\Client::find($validated['client_id']);
+        }
+        if (!$client && !empty($validated['phone'])) {
+            $client = \App\Models\Client::where('phone', $validated['phone'])->first();
+        }
+        if (!$client && !empty($validated['client_name'])) {
+            $client = \App\Models\Client::where('name', $validated['client_name'])->first();
+        }
+        if ($client) {
+            $validated['client_id'] = $client->id;
+            if ($client->max_connected_at && !$shoot->max_connected_at) {
+                $validated['max_user_id'] = $client->max_user_id;
+                $validated['max_chat_id'] = $client->max_chat_id;
+                $validated['max_connected_at'] = $client->max_connected_at;
+            }
+        }
 
         $shoot->update($validated);
 
@@ -312,6 +374,7 @@ class ShootController extends Controller
     {
         return [
             'id' => $shoot->id,
+            'client_id' => $shoot->client_id,
             'client_name' => $shoot->client_name,
             'social_link' => $shoot->social_link,
             'social_url' => $shoot->social_url,

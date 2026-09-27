@@ -87,4 +87,80 @@ class MaxReminderTest extends TestCase
         $secondResponse = $this->postJson(route('webhook.max'), $webhookPayload);
         $secondResponse->assertStatus(400);
     }
+
+    public function test_client_with_multiple_shoots_receives_selection_menu_in_bot(): void
+    {
+        $sentRequests = [];
+        Http::fake(function ($request) use (&$sentRequests) {
+            $sentRequests[] = $request->data();
+            return Http::response(['ok' => true], 200);
+        });
+
+        $client = \App\Models\Client::create([
+            'name' => 'Елена Попова',
+            'phone' => '+7 999 111-22-33',
+            'max_user_id' => 'user_multiple_123',
+            'max_chat_id' => 'chat_multiple_123',
+            'max_connected_at' => now(),
+        ]);
+
+        $shoot1 = Shoot::create([
+            'client_id' => $client->id,
+            'client_name' => $client->name,
+            'shoot_date' => now()->addDays(5)->format('Y-m-d'),
+            'start_time' => '10:00',
+            'duration_minutes' => 60,
+            'status' => 'planned',
+            'location' => 'Студия Фотолофт',
+            'max_user_id' => 'user_multiple_123',
+            'max_chat_id' => 'chat_multiple_123',
+            'share_token' => 'token-multiple-1',
+        ]);
+
+        $shoot2 = Shoot::create([
+            'client_id' => $client->id,
+            'client_name' => $client->name,
+            'shoot_date' => now()->addDays(20)->format('Y-m-d'),
+            'start_time' => '17:00',
+            'duration_minutes' => 90,
+            'status' => 'planned',
+            'location' => 'Набережная',
+            'max_user_id' => 'user_multiple_123',
+            'max_chat_id' => 'chat_multiple_123',
+            'share_token' => 'token-multiple-2',
+        ]);
+
+        // When client clicks "shoot_details" callback
+        $response = $this->postJson(route('webhook.max'), [
+            'event' => 'message_callback',
+            'callback' => [
+                'callback_id' => 'cb_multiple_test',
+                'payload' => 'shoot_details',
+                'user' => ['user_id' => 'user_multiple_123'],
+            ],
+            'chat_id' => 'chat_multiple_123',
+        ]);
+
+        $response->assertStatus(200);
+
+        // Verify sent message contains prompt for multiple shoots and options
+        $lastRequest = end($sentRequests);
+        $this->assertNotEmpty($lastRequest);
+        $this->assertStringContainsString('несколько съёмок', $lastRequest['text'] ?? '');
+
+        // Verify callback shoot_select_{id} provides specific details
+        $selectResponse = $this->postJson(route('webhook.max'), [
+            'event' => 'message_callback',
+            'callback' => [
+                'callback_id' => 'cb_select_1',
+                'payload' => "shoot_select_{$shoot1->id}",
+                'user' => ['user_id' => 'user_multiple_123'],
+            ],
+            'chat_id' => 'chat_multiple_123',
+        ]);
+
+        $selectResponse->assertStatus(200);
+        $detailRequest = end($sentRequests);
+        $this->assertStringContainsString('Студия Фотолофт', $detailRequest['text'] ?? '');
+    }
 }

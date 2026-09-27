@@ -6,6 +6,7 @@
 <div x-data="shootCalendar({
     initialShoots: {{ Js::from($shootsInMonth->map(fn($s) => [
         'id' => $s->id,
+        'client_id' => $s->client_id,
         'client_name' => $s->client_name,
         'social_link' => $s->social_link,
         'social_url' => $s->social_url,
@@ -44,7 +45,9 @@
     month: {{ $month }},
     csrfToken: '{{ csrf_token() }}',
     storeUrl: '{{ route('admin.shoots.store') }}',
-    indexUrl: '{{ route('admin.shoots.index') }}'
+    indexUrl: '{{ route('admin.shoots.index') }}',
+    clientSearchUrl: '{{ route('admin.clients.search') }}',
+    prefillClient: {{ Js::from($prefillClient) }}
 })" class="space-y-6">
 
     {{-- Top Header --}}
@@ -372,17 +375,51 @@
             {{-- Form Body --}}
             <form @submit.prevent="submitShootForm()" class="p-6 md:p-8 space-y-5 max-h-[85vh] overflow-y-auto custom-scrollbar">
                 
-                {{-- Client Information: Name, Phone, Social Link in 3 cols --}}
+                {{-- Client Information: Name with Autocomplete, Phone, Social Link in 3 cols --}}
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                            Имя клиента <span class="text-rose-500">*</span>
-                        </label>
+                    <div class="relative" @click.away="clientSuggestions = []">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                                Клиент <span class="text-rose-500">*</span>
+                            </label>
+                            <template x-if="formData.client_id">
+                                <span class="text-[0.65rem] text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                                    ✓ Из базы
+                                </span>
+                            </template>
+                        </div>
                         <input type="text" 
                                x-model="formData.client_name" 
+                               @input.debounce.250ms="searchClients($event.target.value)"
+                               @focus="searchClients(formData.client_name)"
                                required 
-                               placeholder="Например: Анастасия Белова" 
+                               placeholder="Имя клиента (поиск в базе)..." 
                                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-colors">
+
+                        {{-- Autocomplete Dropdown --}}
+                        <div x-show="clientSuggestions.length > 0" 
+                             x-cloak
+                             class="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 max-h-56 overflow-y-auto divide-y divide-slate-100">
+                            <div class="p-2 text-[0.65rem] uppercase font-bold text-slate-400 bg-slate-50">
+                                Найдено в базе клиентов:
+                            </div>
+                            <template x-for="c in clientSuggestions" :key="c.id">
+                                <button type="button" 
+                                        @click="selectClientSuggestion(c)"
+                                        class="w-full text-left px-3.5 py-2 hover:bg-slate-50 transition-colors flex items-center justify-between cursor-pointer">
+                                    <div>
+                                        <div class="font-bold text-xs text-slate-900" x-text="c.name"></div>
+                                        <div class="text-[0.68rem] text-slate-500 font-mono" x-text="c.phone || c.social_link || 'Без контактов'"></div>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-[0.65rem] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono" x-text="c.shoots_count + ' съёмок'"></span>
+                                        <template x-if="c.max_user_id || c.max_chat_id">
+                                            <span class="block text-[0.62rem] text-emerald-600 font-semibold mt-0.5">MAX подключен</span>
+                                        </template>
+                                    </div>
+                                </button>
+                            </template>
+                        </div>
                     </div>
 
                     <div>
@@ -711,7 +748,16 @@
                                       }"
                                       x-text="selectedShoot.status_label">
                                 </span>
-                                <h3 class="text-2xl md:text-3xl font-serif font-bold text-white leading-tight" x-text="selectedShoot.client_name"></h3>
+                                <div class="flex items-center gap-3">
+                                    <h3 class="text-2xl md:text-3xl font-serif font-bold text-white leading-tight" x-text="selectedShoot.client_name"></h3>
+                                    <template x-if="selectedShoot.client_id">
+                                        <a :href="'/admin/clients/' + selectedShoot.client_id" 
+                                           class="px-2.5 py-1 rounded-md bg-white/15 hover:bg-white/25 text-white text-[0.68rem] font-bold uppercase tracking-wider transition-colors inline-flex items-center gap-1 border border-white/20">
+                                            <span>Профиль клиента</span>
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                        </a>
+                                    </template>
+                                </div>
                             </div>
                             <button type="button" @click="closeViewModal()" class="text-white/60 hover:text-white p-1.5 rounded-lg transition-colors cursor-pointer">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -1183,6 +1229,7 @@ document.addEventListener('alpine:init', () => {
         // Form state
         formData: {
             id: null,
+            client_id: null,
             client_name: '',
             social_link: '',
             phone: '',
@@ -1194,6 +1241,27 @@ document.addEventListener('alpine:init', () => {
             location: '',
             price: '',
             gallery_link: ''
+        },
+
+        // Client autocomplete search state
+        clientSuggestions: [],
+
+        async searchClients(query) {
+            try {
+                const response = await fetch(`${config.clientSearchUrl}?q=${encodeURIComponent(query || '')}`);
+                const data = await response.json();
+                this.clientSuggestions = data.clients || [];
+            } catch (e) {
+                console.error('Error fetching clients:', e);
+            }
+        },
+
+        selectClientSuggestion(client) {
+            this.formData.client_id = client.id;
+            this.formData.client_name = client.name;
+            if (client.phone) this.formData.phone = client.phone;
+            if (client.social_link) this.formData.social_link = client.social_link;
+            this.clientSuggestions = [];
         },
 
         // Files handling in form
@@ -1212,7 +1280,11 @@ document.addEventListener('alpine:init', () => {
         isConfirmingBooking: false,
 
         init() {
-            // Initial setup
+            // Check if prefill client is given from URL
+            if (config.prefillClient) {
+                this.openCreateModal();
+                this.selectClientSuggestion(config.prefillClient);
+            }
         },
 
         // Helper: Russian month name
@@ -1445,9 +1517,11 @@ document.addEventListener('alpine:init', () => {
             this.isEditMode = false;
             this.clearNewSelectedFiles();
             this.currentShootFiles = [];
+            this.clientSuggestions = [];
             const defaultDate = prefillDate || new Date().toISOString().split('T')[0];
             this.formData = {
                 id: null,
+                client_id: null,
                 client_name: '',
                 social_link: '',
                 phone: '',
@@ -1472,9 +1546,11 @@ document.addEventListener('alpine:init', () => {
             this.isViewModalOpen = false;
             this.isEditMode = true;
             this.clearNewSelectedFiles();
+            this.clientSuggestions = [];
             this.currentShootFiles = targetShoot.files ? [...targetShoot.files] : [];
             this.formData = {
                 id: targetShoot.id,
+                client_id: targetShoot.client_id || null,
                 client_name: targetShoot.client_name,
                 social_link: targetShoot.social_link || '',
                 phone: targetShoot.phone || '',
@@ -1495,6 +1571,7 @@ document.addEventListener('alpine:init', () => {
             this.isFormModalOpen = false;
             this.clearNewSelectedFiles();
             this.currentShootFiles = [];
+            this.clientSuggestions = [];
         },
 
         // Open view details modal
@@ -1633,6 +1710,9 @@ document.addEventListener('alpine:init', () => {
                 : config.storeUrl;
 
             const formPayload = new FormData();
+            if (this.formData.client_id) {
+                formPayload.append('client_id', this.formData.client_id);
+            }
             formPayload.append('client_name', this.formData.client_name);
             formPayload.append('social_link', this.formData.social_link || '');
             formPayload.append('phone', this.formData.phone || '');

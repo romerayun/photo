@@ -14,6 +14,7 @@ class Shoot extends Model
     use HasFactory;
 
     protected $fillable = [
+        'client_id',
         'client_name',
         'social_link',
         'phone',
@@ -38,6 +39,11 @@ class Shoot extends Model
         'max_chat_id',
         'max_connected_at',
     ];
+
+    public function client(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Client::class);
+    }
 
     public function files(): HasMany
     {
