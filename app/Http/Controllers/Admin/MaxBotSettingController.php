@@ -108,6 +108,7 @@ class MaxBotSettingController extends Controller
                     'type' => $btn['type'] ?? 'link',
                     'url' => trim($btn['url'] ?? ''),
                     'reply' => trim($btn['reply'] ?? ''),
+                    'in_menu' => !empty($btn['in_menu']),
                 ];
             }
         }

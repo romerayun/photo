@@ -203,6 +203,15 @@
                                       placeholder="Текст, который бот пришлет клиенту..."
                                       class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:border-neutral-900 leading-relaxed">{{ $cBtn['reply'] ?? '' }}</textarea>
                         </div>
+
+                        <div class="pt-2 border-t border-slate-200/80">
+                            <label class="flex items-center cursor-pointer select-none">
+                                <input type="checkbox" name="custom_buttons[{{ $index }}][in_menu]" value="1" {{ (!isset($cBtn['in_menu']) || !empty($cBtn['in_menu'])) ? 'checked' : '' }}
+                                       class="w-4 h-4 rounded border-slate-300 text-neutral-900 focus:ring-neutral-900 mr-2">
+                                <span class="text-xs font-semibold text-slate-700">Показывать в основном постоянном меню бота (приветствие, ответы на сообщения)</span>
+                            </label>
+                            <span class="text-[0.7rem] text-slate-400 block pl-6 mt-0.5">Если выключить — кнопка не будет захламлять обычный диалог бота, но будет доступна для выбора в разовых рассылках.</span>
+                        </div>
                     </div>
                 @empty
                     <div id="no-custom-buttons-msg" class="text-xs text-slate-400 py-3 text-center border border-dashed border-slate-200 rounded-lg">
@@ -256,6 +265,15 @@
             <textarea data-name="reply" rows="3"
                       placeholder="Текст, который бот пришлет клиенту..."
                       class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:border-neutral-900 leading-relaxed"></textarea>
+        </div>
+
+        <div class="pt-2 border-t border-slate-200/80">
+            <label class="flex items-center cursor-pointer select-none">
+                <input type="checkbox" data-name="in_menu" value="1" checked
+                       class="w-4 h-4 rounded border-slate-300 text-neutral-900 focus:ring-neutral-900 mr-2">
+                <span class="text-xs font-semibold text-slate-700">Показывать в основном постоянном меню бота (приветствие, ответы на сообщения)</span>
+            </label>
+            <span class="text-[0.7rem] text-slate-400 block pl-6 mt-0.5">Если выключить — кнопка не будет захламлять обычный диалог бота, но будет доступна для выбора в разовых рассылках.</span>
         </div>
     </div>
 </template>

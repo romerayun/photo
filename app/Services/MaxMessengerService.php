@@ -185,12 +185,19 @@ class MaxMessengerService
         foreach ($customButtons as $index => $cBtn) {
             $title = $cBtn['title'] ?? '';
             $type = $cBtn['type'] ?? 'link';
+            $inMenu = !isset($cBtn['in_menu']) || (bool)$cBtn['in_menu'];
             if (empty($title)) {
                 continue;
             }
 
-            if ($filter && !in_array("custom_{$index}", $allowedButtons, true)) {
-                continue;
+            if ($filter) {
+                if (!in_array("custom_{$index}", $allowedButtons, true)) {
+                    continue;
+                }
+            } else {
+                if (!$inMenu) {
+                    continue;
+                }
             }
 
             if ($type === 'link' && !empty($cBtn['url'])) {
