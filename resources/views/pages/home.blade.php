@@ -289,7 +289,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
             
             {{-- Left Column: Huge Headline with Camera Crosshair --}}
-            <div class="lg:col-span-5 space-y-6 sticky top-28">
+            <div class="lg:col-span-5 space-y-6 lg:sticky lg:top-28">
                 <div class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-crimson font-bold">
                     <span class="w-2 h-2 rounded-full bg-crimson animate-pulse"></span>
                     <span>{{ __('site.directions_title') }}</span>
