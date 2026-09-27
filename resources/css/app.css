@@ -288,6 +288,80 @@
     100% { opacity: 0; }
 }
 
+/* ========================================================
+   Skeleton Shimmer & Lazy Image Reveal Effects
+   ======================================================== */
+.lazy-skeleton-wrapper {
+    position: relative;
+    background-color: #141416;
+    overflow: hidden;
+}
+
+/* Light background context support (e.g. portfolio cards on arch-bg / white cards) */
+.bg-white .lazy-skeleton-wrapper,
+.bg-arch-bg .lazy-skeleton-wrapper,
+.lazy-skeleton-wrapper.skeleton-light {
+    background-color: #f1f2f4;
+}
+
+/* Shimmer overlay animation */
+.lazy-skeleton-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    transform: translateX(-100%);
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.06) 35%,
+        rgba(255, 255, 255, 0.15) 50%,
+        rgba(255, 255, 255, 0.06) 65%,
+        transparent 100%
+    );
+    animation: lazySkeletonShimmer 1.8s infinite cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+}
+
+.bg-white .lazy-skeleton-wrapper::before,
+.bg-arch-bg .lazy-skeleton-wrapper::before,
+.lazy-skeleton-wrapper.skeleton-light::before {
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0) 20%,
+        rgba(255, 255, 255, 0.7) 50%,
+        rgba(255, 255, 255, 0) 80%,
+        transparent 100%
+    );
+}
+
+@keyframes lazySkeletonShimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Image reveal transitions */
+.lazy-img-fade {
+    opacity: 0;
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.lazy-img-fade.is-loaded {
+    opacity: 1;
+}
+
+/* Hide skeleton shimmer once image is fully loaded */
+.lazy-skeleton-wrapper.is-loaded::before {
+    display: none !important;
+    animation: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
     *, ::before, ::after {
         animation-duration: 0.01ms !important;
@@ -296,3 +370,4 @@
         scroll-behavior: auto !important;
     }
 }
+

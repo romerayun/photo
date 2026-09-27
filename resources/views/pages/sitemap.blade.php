@@ -207,12 +207,12 @@
                            class="group bg-white border border-arch-border p-4 hover:border-arch-text hover:shadow-card-depth transition-all duration-300 flex items-start gap-4">
                             
                             {{-- Thumbnail --}}
-                            <div class="w-20 h-24 shrink-0 bg-neutral-900 border border-arch-border overflow-hidden">
+                            <div class="w-20 h-24 shrink-0 bg-neutral-900 border border-arch-border overflow-hidden lazy-skeleton-wrapper skeleton-light">
                                 @if($series->cover_photo_url)
                                     <img src="{{ $series->cover_photo_url }}" 
                                          alt="{{ $series->title }}" 
                                          loading="lazy"
-                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 lazy-img-fade">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center text-[0.65rem] font-mono text-neutral-500 uppercase">
                                         Фото
@@ -327,8 +327,8 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     @foreach($articles as $art)
                         <a href="{{ route('articles.show', $art->slug) }}" class="group bg-white border border-arch-border p-5 flex gap-4 items-start shadow-sm hover:shadow-card-depth hover:border-arch-text transition-all duration-300">
-                            <div class="w-16 h-16 shrink-0 bg-neutral-900 border border-arch-border overflow-hidden">
-                                <img src="{{ $art->cover_url }}" alt="{{ $art->title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="w-16 h-16 shrink-0 bg-neutral-900 border border-arch-border overflow-hidden lazy-skeleton-wrapper skeleton-light">
+                                <img src="{{ $art->cover_url }}" alt="{{ $art->title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 lazy-img-fade">
                             </div>
                             <div class="min-w-0 flex-1 space-y-1">
                                 <div class="flex items-center justify-between gap-1 text-[0.68rem] font-mono text-crimson font-bold uppercase">

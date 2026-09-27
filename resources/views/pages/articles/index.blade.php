@@ -33,7 +33,7 @@
                 @foreach($articles as $article)
                     <article class="group flex flex-col bg-cine-surface border border-cine-border hover:border-neutral-500 transition-all duration-300 rounded-xl overflow-hidden shadow-sm hover:shadow-card-depth">
                         {{-- Cover Image Link --}}
-                        <a href="{{ route('articles.show', $article->slug) }}" class="relative aspect-[16/10] overflow-hidden bg-neutral-900 block">
+                        <a href="{{ route('articles.show', $article->slug) }}" class="relative aspect-[16/10] overflow-hidden bg-neutral-900 block lazy-skeleton-wrapper">
                             <picture>
                                 <source type="image/avif" 
                                         srcset="{{ $article->getCoverSrcsetAttribute('avif') }}" 
@@ -47,7 +47,7 @@
                                      alt="{{ $article->title }}" 
                                      loading="lazy" 
                                      decoding="async"
-                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out lazy-img-fade">
                             </picture>
                             <div class="absolute inset-0 bg-gradient-to-t from-cine-black/70 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
                             

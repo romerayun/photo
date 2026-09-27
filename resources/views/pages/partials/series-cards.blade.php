@@ -6,7 +6,7 @@
         <a href="{{ route('series.show', ['slug' => $series->slug]) }}" class="block">
             
             {{-- Cover Image in 3:4 aspect ratio --}}
-            <div class="overflow-hidden aspect-[3/4] relative bg-neutral-900">
+            <div class="overflow-hidden aspect-[3/4] relative bg-neutral-900 lazy-skeleton-wrapper skeleton-light">
                 <picture>
                     <source type="image/avif" 
                             srcset="{{ $series->getCoverSrcsetAttribute('avif') }}" 
@@ -20,7 +20,7 @@
                          alt="{{ $series->localizedTitle($locale) }}" 
                          loading="lazy"
                          decoding="async"
-                         class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105">
+                         class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 lazy-img-fade">
                 </picture>
                 
                 <div class="absolute top-3.5 left-3.5 bg-black/80 text-white text-[0.65rem] uppercase tracking-wider font-mono font-bold px-2.5 py-1 backdrop-blur-sm">

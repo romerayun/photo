@@ -82,7 +82,7 @@
                         @keydown.space.prevent="open({{ $index }})"
                         aria-label="Открыть фото в увеличенном размере">
                     
-                    <div class="relative overflow-hidden bg-white">
+                    <div class="relative overflow-hidden bg-white lazy-skeleton-wrapper skeleton-light">
                         <picture>
                             <source type="image/avif" 
                                     srcset="{{ $photo->getSrcsetAttribute('avif') }}" 
@@ -98,7 +98,7 @@
                                  decoding="async"
                                  width="{{ $photo->width ?: 1200 }}"
                                  height="{{ $photo->height ?: 800 }}"
-                                 class="w-full h-auto block object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]">
+                                 class="w-full h-auto block object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02] lazy-img-fade">
                         </picture>
                         
                         <div class="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-all duration-300 flex items-center justify-center p-3 opacity-0 group-hover:opacity-100">

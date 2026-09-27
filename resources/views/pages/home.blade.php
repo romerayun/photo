@@ -175,7 +175,7 @@
 
                         {{-- Prominent Large Photo (Clean, without distracting badges) --}}
                         <a href="{{ route('series.show', ['slug' => $spotlightSeries->slug]) }}" 
-                           class="block relative overflow-hidden bg-neutral-900 border border-arch-border shadow-card-depth aspect-[4/5] group mb-4">
+                           class="block relative overflow-hidden bg-neutral-900 border border-arch-border shadow-card-depth aspect-[4/5] group mb-4 lazy-skeleton-wrapper skeleton-light">
                             <picture>
                                 <source type="image/avif" 
                                         srcset="{{ $spotlightSeries->getCoverSrcsetAttribute('avif') }}" 
@@ -189,7 +189,7 @@
                                      alt="{{ $spotlightSeries->localizedTitle($locale) }}" 
                                      loading="lazy" 
                                      decoding="async"
-                                     class="w-full h-full object-cover filter contrast-105 group-hover:scale-105 transition-transform duration-700 ease-out">
+                                     class="w-full h-full object-cover filter contrast-105 group-hover:scale-105 transition-transform duration-700 ease-out lazy-img-fade">
                             </picture>
                         </a>
 
@@ -252,7 +252,7 @@
 
                     {{-- Highlight Portfolio Photo (Clean, No overlay text) --}}
                     <a href="{{ route('portfolio.index') }}" 
-                       class="block relative overflow-hidden bg-neutral-900 border border-arch-border shadow-card-depth aspect-[4/5] group mb-4">
+                       class="block relative overflow-hidden bg-neutral-900 border border-arch-border shadow-card-depth aspect-[4/5] group mb-4 lazy-skeleton-wrapper skeleton-light">
                         <picture>
                             <source srcset="{{ asset('images/photo-portfolio.avif') }}" type="image/avif">
                             <source srcset="{{ asset('images/photo-portfolio.webp') }}" type="image/webp">
@@ -260,7 +260,7 @@
                                  alt="Посмотрите, как я снимаю" 
                                  loading="lazy" 
                                  decoding="async"
-                                 class="w-full h-full object-cover filter contrast-105 group-hover:scale-105 transition-transform duration-700 ease-out">
+                                 class="w-full h-full object-cover filter contrast-105 group-hover:scale-105 transition-transform duration-700 ease-out lazy-img-fade">
                         </picture>
                     </a>
                 </div>
@@ -330,7 +330,7 @@
 
                         {{-- Inset Preview Thumbnail & Arrow --}}
                         <div class="flex items-center gap-4 shrink-0">
-                            <div class="w-32 sm:w-40 h-20 sm:h-24 overflow-hidden bg-neutral-800 rounded-sm border border-white/10">
+                            <div class="w-32 sm:w-40 h-20 sm:h-24 overflow-hidden bg-neutral-800 rounded-sm border border-white/10 lazy-skeleton-wrapper">
                                 <picture>
                                     <source srcset="{{ $cat->getVariantImageUrl('thumb', 'avif') }}" type="image/avif">
                                     <source srcset="{{ $cat->getVariantImageUrl('thumb', 'webp') }}" type="image/webp">
@@ -338,7 +338,7 @@
                                          alt="{{ $cat->localizedName($locale) }}" 
                                          loading="lazy"
                                          decoding="async"
-                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 lazy-img-fade">
                                 </picture>
                             </div>
                             <span class="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-white group-hover:bg-crimson group-hover:border-crimson transition-all text-xs font-bold">
@@ -411,7 +411,7 @@
                 <article class="bg-white border border-arch-border shadow-card-depth overflow-hidden group flex flex-col justify-between hover:border-black/40 transition-all duration-300">
                     {{-- 3:4 Aspect Ratio Photo --}}
                     <a href="{{ route('series.show', ['slug' => $series->slug]) }}" 
-                       class="block relative aspect-[3/4] overflow-hidden bg-neutral-900">
+                       class="block relative aspect-[3/4] overflow-hidden bg-neutral-900 lazy-skeleton-wrapper skeleton-light">
                         <picture>
                             <source type="image/avif" 
                                     srcset="{{ $series->getCoverSrcsetAttribute('avif') }}" 
@@ -425,7 +425,7 @@
                                  alt="{{ $series->localizedTitle($locale) }}" 
                                  loading="lazy" 
                                  decoding="async"
-                                 class="w-full h-full object-cover filter contrast-[1.02] group-hover:scale-105 transition-transform duration-700 ease-out">
+                                 class="w-full h-full object-cover filter contrast-[1.02] group-hover:scale-105 transition-transform duration-700 ease-out lazy-img-fade">
                         </picture>
                         
                         @if($series->category)

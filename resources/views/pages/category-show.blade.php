@@ -97,7 +97,7 @@
 
                 {{-- Right Visual Banner --}}
                 <div class="lg:col-span-5">
-                    <div class="relative aspect-[4/3] sm:aspect-[16/10] overflow-hidden bg-neutral-900 border border-arch-border shadow-card-depth group">
+                    <div class="relative aspect-[4/3] sm:aspect-[16/10] overflow-hidden bg-neutral-900 border border-arch-border shadow-card-depth group lazy-skeleton-wrapper">
                         <picture>
                             <source type="image/avif" 
                                     srcset="{{ $category->getImageSrcsetAttribute('avif') }}" 
@@ -111,7 +111,7 @@
                                  alt="{{ $category->localizedName($locale) }}" 
                                  loading="eager" 
                                  decoding="async"
-                                 class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105">
+                                 class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 lazy-img-fade">
                         </picture>
                         
                         <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
