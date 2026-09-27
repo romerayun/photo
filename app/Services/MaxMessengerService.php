@@ -132,16 +132,19 @@ class MaxMessengerService
     }
 
     /**
-     * Build the active menu buttons based on admin settings.
+     * Build active buttons based on admin settings or specific allowed button keys.
+     * @param Shoot|null $shoot
+     * @param array|null $allowedButtons If specified, only include these keys (e.g. ['card', 'details', 'tips', 'contacts', 'custom_0'])
      */
-    public function getMenuButtons(?Shoot $shoot = null): array
+    public function getMenuButtons(?Shoot $shoot = null, ?array $allowedButtons = null): array
     {
         $buttons = [];
+        $filter = $allowedButtons !== null;
 
         // 1. Link button to web card
         $cardEnabled = \App\Models\Setting::get('max_bot_btn_card_enabled', '1') === '1';
         $cardText = \App\Models\Setting::get('max_bot_btn_card_text', '📱 Открыть карточку съёмки');
-        if ($cardEnabled && $shoot && $shoot->share_token) {
+        if (($filter ? in_array('card', $allowedButtons, true) : $cardEnabled) && $shoot && $shoot->share_token) {
             $buttons[] = [
                 [
                     'type' => 'link',
@@ -155,13 +158,13 @@ class MaxMessengerService
         $actionRow = [];
         $detailsEnabled = \App\Models\Setting::get('max_bot_btn_details_enabled', '1') === '1';
         $detailsText = \App\Models\Setting::get('max_bot_btn_details_text', 'ℹ️ Детали съёмки');
-        if ($detailsEnabled) {
+        if ($filter ? in_array('details', $allowedButtons, true) : $detailsEnabled) {
             $actionRow[] = ['type' => 'callback', 'text' => $detailsText, 'payload' => 'shoot_details'];
         }
 
         $tipsEnabled = \App\Models\Setting::get('max_bot_btn_tips_enabled', '1') === '1';
         $tipsText = \App\Models\Setting::get('max_bot_btn_tips_text', '👗 Подготовка');
-        if ($tipsEnabled) {
+        if ($filter ? in_array('tips', $allowedButtons, true) : $tipsEnabled) {
             $actionRow[] = ['type' => 'callback', 'text' => $tipsText, 'payload' => 'shoot_tips'];
         }
         if (!empty($actionRow)) {
@@ -171,7 +174,7 @@ class MaxMessengerService
         // 3. Contacts button
         $contactsEnabled = \App\Models\Setting::get('max_bot_btn_contacts_enabled', '1') === '1';
         $contactsText = \App\Models\Setting::get('max_bot_btn_contacts_text', '📞 Контакты фотографа');
-        if ($contactsEnabled) {
+        if ($filter ? in_array('contacts', $allowedButtons, true) : $contactsEnabled) {
             $buttons[] = [
                 ['type' => 'callback', 'text' => $contactsText, 'payload' => 'photographer_contacts'],
             ];
@@ -183,6 +186,10 @@ class MaxMessengerService
             $title = $cBtn['title'] ?? '';
             $type = $cBtn['type'] ?? 'link';
             if (empty($title)) {
+                continue;
+            }
+
+            if ($filter && !in_array("custom_{$index}", $allowedButtons, true)) {
                 continue;
             }
 

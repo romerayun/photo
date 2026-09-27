@@ -101,19 +101,42 @@
                           placeholder="Здравствуйте, {client_name}! Хочу сообщить о сезонной акции..."
                           class="w-full px-4 py-3 border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 leading-relaxed font-sans">{{ old('message') }}</textarea>
                 
-                <div class="flex flex-wrap items-center justify-between gap-3 mt-2 text-xs text-slate-500">
-                    <div class="flex items-center gap-2">
-                        <span>Подстановка имени:</span>
-                        <code class="px-2 py-0.5 rounded bg-slate-100 text-crimson font-mono cursor-pointer select-all" title="Кликните, чтобы выделить">{client_name}</code>
-                        <span class="text-slate-400">|</span>
-                        <span>Форматирование: <b>**жирный**</b>, <i>*курсив*</i></span>
+                <div class="mt-3 p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                        <div class="flex items-center gap-2 text-slate-500">
+                            <span>Подстановка имени:</span>
+                            <code class="px-2 py-0.5 rounded bg-white border border-slate-200 text-crimson font-mono cursor-pointer select-all" title="Кликните, чтобы выделить">{client_name}</code>
+                            <span class="text-slate-400">|</span>
+                            <span>Форматирование: <b>**жирный**</b>, <i>*курсив*</i></span>
+                        </div>
+
+                        <div class="flex items-center gap-3 font-semibold text-slate-700">
+                            <span class="text-slate-500 uppercase tracking-wider text-[0.7rem]">Кнопки:</span>
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="radio" name="attach_buttons" value="none" class="text-neutral-900 focus:ring-neutral-900">
+                                <span class="ml-1 text-slate-600">Без кнопок</span>
+                            </label>
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="radio" name="attach_buttons" value="all" class="text-neutral-900 focus:ring-neutral-900">
+                                <span class="ml-1 text-slate-600">Все кнопки меню</span>
+                            </label>
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="radio" name="attach_buttons" value="custom" checked class="text-neutral-900 focus:ring-neutral-900">
+                                <span class="ml-1 text-slate-900 font-bold">Выбрать нужные</span>
+                            </label>
+                        </div>
                     </div>
 
-                    <label class="flex items-center cursor-pointer select-none">
-                        <input type="checkbox" name="include_menu" value="1" checked
-                               class="w-4 h-4 rounded border-slate-300 text-neutral-900 focus:ring-neutral-900 mr-2">
-                        <span class="font-semibold text-slate-700">Прикрепить кнопки меню к рассылке</span>
-                    </label>
+                    {{-- Button Checkboxes --}}
+                    <div id="buttons-selector" class="pt-3 border-t border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                        @foreach($availableButtons as $bKey => $bTitle)
+                            <label class="flex items-center p-2.5 rounded-lg bg-white border border-slate-200 hover:border-slate-300 transition-colors cursor-pointer select-none">
+                                <input type="checkbox" name="selected_buttons[]" value="{{ $bKey }}" checked
+                                       class="w-4 h-4 rounded border-slate-300 text-neutral-900 focus:ring-neutral-900 mr-2.5">
+                                <span class="text-xs font-medium text-slate-800 truncate">{{ $bTitle }}</span>
+                            </label>
+                        @endforeach
+                    </div>
                 </div>
             </div>
 
@@ -235,6 +258,17 @@ document.addEventListener('DOMContentLoaded', function () {
         cb.addEventListener('change', function () {
             if (targetSelectedRadio && cb.checked) {
                 targetSelectedRadio.checked = true;
+            }
+        });
+    });
+
+    const attachRadios = document.querySelectorAll('input[name="attach_buttons"]');
+    const buttonsSelector = document.getElementById('buttons-selector');
+
+    attachRadios.forEach(radio => {
+        radio.addEventListener('change', function () {
+            if (buttonsSelector) {
+                buttonsSelector.style.display = this.value === 'custom' ? 'grid' : 'none';
             }
         });
     });

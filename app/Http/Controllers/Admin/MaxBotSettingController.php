@@ -135,7 +135,22 @@ class MaxBotSettingController extends Controller
             return $item->max_chat_id ?: $item->max_user_id;
         })->count();
 
-        return view('admin.max_bot.clients', compact('shoots', 'uniqueSubscribersCount'));
+        // Get configured buttons available for attachment
+        $availableButtons = [
+            'card' => Setting::get('max_bot_btn_card_text', '📱 Открыть карточку съёмки'),
+            'details' => Setting::get('max_bot_btn_details_text', 'ℹ️ Детали съёмки'),
+            'tips' => Setting::get('max_bot_btn_tips_text', '👗 Подготовка'),
+            'contacts' => Setting::get('max_bot_btn_contacts_text', '📞 Контакты фотографа'),
+        ];
+
+        $customButtons = json_decode(Setting::get('max_bot_custom_buttons', '[]'), true) ?: [];
+        foreach ($customButtons as $index => $cBtn) {
+            if (!empty($cBtn['title'])) {
+                $availableButtons["custom_{$index}"] = $cBtn['title'];
+            }
+        }
+
+        return view('admin.max_bot.clients', compact('shoots', 'uniqueSubscribersCount', 'availableButtons'));
     }
 
     /**
@@ -148,7 +163,9 @@ class MaxBotSettingController extends Controller
             'target' => ['required', 'in:all,selected'],
             'shoot_ids' => ['nullable', 'array'],
             'shoot_ids.*' => ['exists:shoots,id'],
-            'include_menu' => ['nullable'],
+            'attach_buttons' => ['nullable', 'in:none,all,custom'],
+            'selected_buttons' => ['nullable', 'array'],
+            'selected_buttons.*' => ['string'],
         ]);
 
         $query = \App\Models\Shoot::whereNotNull('max_connected_at')
@@ -170,6 +187,9 @@ class MaxBotSettingController extends Controller
             return back()->withErrors(['message' => 'Нет активных получателей в MAX для отправки.']);
         }
 
+        $attachMode = $validated['attach_buttons'] ?? 'none';
+        $selectedButtons = $validated['selected_buttons'] ?? [];
+
         $sentCount = 0;
         $failedCount = 0;
         $processedRecipients = [];
@@ -183,9 +203,12 @@ class MaxBotSettingController extends Controller
 
             $text = str_replace('{client_name}', $recipient->client_name, $validated['message']);
             
-            $buttons = !empty($validated['include_menu']) 
-                ? $maxService->getMenuButtons($recipient) 
-                : [];
+            $buttons = [];
+            if ($attachMode === 'all') {
+                $buttons = $maxService->getMenuButtons($recipient);
+            } elseif ($attachMode === 'custom' && !empty($selectedButtons)) {
+                $buttons = $maxService->getMenuButtons($recipient, $selectedButtons);
+            }
 
             $success = $maxService->sendMessage($recipient->max_chat_id, $recipient->max_user_id, $text, $buttons);
 
