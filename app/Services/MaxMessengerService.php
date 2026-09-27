@@ -46,12 +46,12 @@ class MaxMessengerService
     }
 
     /**
-     * Send a text message to a user or chat in MAX.
+     * Send a text message to a user or chat in MAX with optional buttons.
      * Official API: POST https://platform-api2.max.ru/messages?chat_id=... or ?user_id=...
      * Header: Authorization: <token>
-     * Body: { "text": "..." }
+     * Body: { "text": "...", "attachments": [...] }
      */
-    public function sendMessage(?string $chatId, ?string $userId, string $text): bool
+    public function sendMessage(?string $chatId, ?string $userId, string $text, array $buttons = []): bool
     {
         if (empty($this->token)) {
             Log::warning('MaxMessengerService: bot_token is not configured.');
@@ -71,15 +71,25 @@ class MaxMessengerService
 
             $url = "{$this->apiUrl}/messages?" . http_build_query($queryParams);
 
+            $payload = ['text' => $text];
+            if (!empty($buttons)) {
+                $payload['attachments'] = [
+                    [
+                        'type' => 'inline_keyboard',
+                        'payload' => [
+                            'buttons' => $buttons,
+                        ],
+                    ],
+                ];
+            }
+
             $response = Http::withHeaders([
                 'Authorization' => $this->token,
                 'Content-Type' => 'application/json',
             ])
             ->withoutVerifying() // Supports Russian CA certificates
             ->timeout(5)
-            ->post($url, [
-                'text' => $text,
-            ]);
+            ->post($url, $payload);
 
             if ($response->successful()) {
                 Log::info("MAX message sent successfully to chat_id={$chatId} user_id={$userId}");
@@ -95,9 +105,7 @@ class MaxMessengerService
                 ])
                 ->withoutVerifying()
                 ->timeout(5)
-                ->post($fallbackUrl, [
-                    'text' => $text,
-                ]);
+                ->post($fallbackUrl, $payload);
 
                 if ($fallbackRes->successful()) {
                     Log::info("MAX fallback message sent successfully to user_id={$userId}");
@@ -137,9 +145,31 @@ class MaxMessengerService
             . "📅 Дата: {$dateFormatted}\n"
             . "⏰ Время: {$time}\n"
             . ($shoot->location ? "📍 Локация: {$shoot->location}\n\n" : "\n")
-            . "Мы пришлем вам уведомление перед съемкой, чтобы вы ничего не забыли!";
+            . "Вы можете воспользоваться кнопками ниже для быстрой информации:";
 
-        return $this->sendMessage($shoot->max_chat_id, $shoot->max_user_id, $text);
+        $buttons = [];
+
+        // Link button to web card
+        if ($shoot->share_token) {
+            $buttons[] = [
+                [
+                    'type' => 'link',
+                    'text' => '📱 Открыть карточку съёмки',
+                    'url' => url("/shoot/{$shoot->share_token}"),
+                ],
+            ];
+        }
+
+        // Action buttons
+        $buttons[] = [
+            ['type' => 'callback', 'text' => 'ℹ️ Детали съёмки', 'payload' => 'shoot_details'],
+            ['type' => 'callback', 'text' => '👗 Подготовка', 'payload' => 'shoot_tips'],
+        ];
+        $buttons[] = [
+            ['type' => 'callback', 'text' => '📞 Контакты фотографа', 'payload' => 'photographer_contacts'],
+        ];
+
+        return $this->sendMessage($shoot->max_chat_id, $shoot->max_user_id, $text, $buttons);
     }
 }
 

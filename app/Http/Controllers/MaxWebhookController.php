@@ -56,10 +56,21 @@ class MaxWebhookController extends Controller
             ?? $request->input('chat.id')
             ?? $userId;
 
+        // Handle interactive callback button clicks (update_type: message_callback)
+        if ($event === 'message_callback' || $request->has('callback')) {
+            return $this->handleCallback($request, $maxService, (string)$chatId, (string)$userId);
+        }
+
         if (!$payload) {
+            // Check if user just texted the bot (e.g. "инфо", "меню", "помощь")
+            $text = trim($request->input('message.text') ?? $request->input('text') ?? '');
+            if (!empty($text)) {
+                return $this->handleTextMessage($text, $maxService, (string)$chatId, (string)$userId);
+            }
+
             return response()->json([
                 'status' => 'ignored',
-                'message' => 'No start payload found in event',
+                'message' => 'No start payload or recognized action found in event',
             ], 200);
         }
 
@@ -96,7 +107,7 @@ class MaxWebhookController extends Controller
             ], 400);
         }
 
-        // 4. Send confirmation message
+        // 4. Send confirmation message with interactive buttons
         $maxService->sendConfirmation($shoot);
 
         Log::info("MAX linked successfully to shoot ID #{$shoot->id} for user {$userId}");
@@ -106,5 +117,135 @@ class MaxWebhookController extends Controller
             'shoot_id' => $shoot->id,
             'message' => 'Shoot successfully linked to MAX and confirmation sent',
         ]);
+    }
+
+    /**
+     * Handle button clicks (message_callback event).
+     */
+    protected function handleCallback(Request $request, MaxMessengerService $maxService, string $chatId, string $userId): JsonResponse
+    {
+        $callbackPayload = $request->input('callback.payload') 
+            ?? $request->input('payload') 
+            ?? $request->input('data.payload');
+
+        // Find linked shoot for this user or chat
+        $shoot = Shoot::where('max_chat_id', $chatId)
+            ->orWhere('max_user_id', $userId)
+            ->latest('shoot_date')
+            ->first();
+
+        if ($callbackPayload === 'shoot_details') {
+            if (!$shoot) {
+                $maxService->sendMessage($chatId, $userId, "У вас пока нет активной фотосессии, привязанной к этому чату.");
+                return response()->json(['status' => 'ok']);
+            }
+
+            $dateFormatted = $shoot->shoot_date ? $shoot->shoot_date->format('d.m.Y') : 'Дата не указана';
+            $time = substr($shoot->start_time, 0, 5) ?: 'Время не указано';
+            $duration = $shoot->duration_minutes ? "{$shoot->duration_minutes} мин." : '';
+            $statusLabels = [
+                'planned' => 'Запланирована',
+                'in_progress' => 'В процессе',
+                'completed' => 'Завершена',
+                'cancelled' => 'Отменена',
+            ];
+            $status = $statusLabels[$shoot->status] ?? $shoot->status;
+
+            $text = "📋 *Детали вашей фотосессии*:\n\n"
+                . "👤 Клиент: {$shoot->client_name}\n"
+                . "📅 Дата: {$dateFormatted}\n"
+                . "⏰ Время: {$time} " . ($duration ? "({$duration})" : '') . "\n"
+                . "📍 Локация: " . ($shoot->location ?: 'уточняется') . "\n"
+                . "💰 Стоимость: " . ($shoot->price ? number_format($shoot->price, 0, '', ' ') . ' ₽' : '—') . "\n"
+                . ($shoot->prepayment ? "💵 Предоплата: " . number_format($shoot->prepayment, 0, '', ' ') . " ₽ (Внесена)\n" : '')
+                . "📌 Статус: {$status}";
+
+            $buttons = [];
+            if ($shoot->share_token) {
+                $buttons[] = [
+                    ['type' => 'link', 'text' => '📱 Открыть веб-карточку', 'url' => url("/shoot/{$shoot->share_token}")],
+                ];
+            }
+            $buttons[] = [
+                ['type' => 'callback', 'text' => '👗 Подготовка', 'payload' => 'shoot_tips'],
+                ['type' => 'callback', 'text' => '📞 Контакты', 'payload' => 'photographer_contacts'],
+            ];
+
+            $maxService->sendMessage($chatId, $userId, $text, $buttons);
+            return response()->json(['status' => 'ok']);
+        }
+
+        if ($callbackPayload === 'shoot_tips') {
+            $text = "💡 *Памятка подготовки к съёмке*:\n\n"
+                . "1. 🕒 *Время*: Пожалуйста, приезжайте за 10–15 минут до начала, чтобы без спешки переодеться и подготовиться.\n"
+                . "2. 👗 *Одежда*: Возьмите чистую сменную обувь (для студии) и заранее отпарьте вещи.\n"
+                . "3. 💄 *Макияж и прическа*: Если делаете образ у стилиста, заложите достаточно времени на сборы.\n"
+                . "4. 😴 *Отдых*: Постарайтесь хорошо выспаться и не пить много воды на ночь.\n\n"
+                . "Если у вас есть вопросы по референсам или идеям — пишите фотографу!";
+
+            $buttons = [
+                [
+                    ['type' => 'callback', 'text' => 'ℹ️ Детали съёмки', 'payload' => 'shoot_details'],
+                    ['type' => 'callback', 'text' => '📞 Контакты', 'payload' => 'photographer_contacts'],
+                ],
+            ];
+
+            $maxService->sendMessage($chatId, $userId, $text, $buttons);
+            return response()->json(['status' => 'ok']);
+        }
+
+        if ($callbackPayload === 'photographer_contacts') {
+            $text = "📸 *Контакты фотографа (Роман Юн)*:\n\n"
+                . "📞 Телефон: +7 (900) 000-00-00\n"
+                . "🌐 Сайт: " . url('/') . "\n"
+                . "📷 Портфолио: " . url('/series') . "\n\n"
+                . "Всегда на связи и готов ответить на любые вопросы!";
+
+            $buttons = [
+                [
+                    ['type' => 'link', 'text' => '🌐 Перейти на сайт', 'url' => url('/')],
+                ],
+                [
+                    ['type' => 'callback', 'text' => 'ℹ️ Детали съёмки', 'payload' => 'shoot_details'],
+                ],
+            ];
+
+            $maxService->sendMessage($chatId, $userId, $text, $buttons);
+            return response()->json(['status' => 'ok']);
+        }
+
+        return response()->json(['status' => 'ignored']);
+    }
+
+    /**
+     * Handle incoming text messages (e.g. client sends "привет", "инфо", "меню").
+     */
+    protected function handleTextMessage(string $text, MaxMessengerService $maxService, string $chatId, string $userId): JsonResponse
+    {
+        $shoot = Shoot::where('max_chat_id', $chatId)
+            ->orWhere('max_user_id', $userId)
+            ->latest('shoot_date')
+            ->first();
+
+        $reply = "Здравствуйте! Чем могу помочь? Выберите действие кнопками ниже:";
+
+        $buttons = [];
+        if ($shoot && $shoot->share_token) {
+            $buttons[] = [
+                ['type' => 'link', 'text' => '📱 Моя карточка съёмки', 'url' => url("/shoot/{$shoot->share_token}")],
+            ];
+        }
+
+        $buttons[] = [
+            ['type' => 'callback', 'text' => 'ℹ️ Детали съёмки', 'payload' => 'shoot_details'],
+            ['type' => 'callback', 'text' => '👗 Подготовка к съёмке', 'payload' => 'shoot_tips'],
+        ];
+        $buttons[] = [
+            ['type' => 'callback', 'text' => '📞 Контакты фотографа', 'payload' => 'photographer_contacts'],
+        ];
+
+        $maxService->sendMessage($chatId, $userId, $reply, $buttons);
+
+        return response()->json(['status' => 'ok']);
     }
 }
