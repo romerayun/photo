@@ -163,9 +163,10 @@ class MaxWebhookController extends Controller
             ->latest('shoot_date')
             ->first();
 
+        // 1. Details button
         if ($callbackPayload === 'shoot_details') {
             if (!$shoot) {
-                $maxService->sendMessage($chatId, $userId, "У вас пока нет активной фотосессии, привязанной к этому чату.");
+                $maxService->sendMessage($chatId, $userId, "У вас пока нет активной фотосессии, привязанной к этому чату.", $maxService->getMenuButtons());
                 return response()->json(['status' => 'ok']);
             }
 
@@ -189,58 +190,56 @@ class MaxWebhookController extends Controller
                 . ($shoot->prepayment ? "💵 Предоплата: " . number_format($shoot->prepayment, 0, '', ' ') . " ₽ (Внесена)\n" : '')
                 . "📌 Статус: {$status}";
 
-            $buttons = [];
-            if ($shoot->share_token) {
-                $buttons[] = [
-                    ['type' => 'link', 'text' => '📱 Открыть веб-карточку', 'url' => url("/shoot/{$shoot->share_token}")],
-                ];
-            }
-            $buttons[] = [
-                ['type' => 'callback', 'text' => '👗 Подготовка', 'payload' => 'shoot_tips'],
-                ['type' => 'callback', 'text' => '📞 Контакты', 'payload' => 'photographer_contacts'],
-            ];
+            $buttons = $maxService->getMenuButtons($shoot);
 
             $maxService->sendMessage($chatId, $userId, $text, $buttons);
             return response()->json(['status' => 'ok']);
         }
 
+        // 2. Tips button
         if ($callbackPayload === 'shoot_tips') {
-            $text = "💡 *Памятка подготовки к съёмке*:\n\n"
+            $text = \App\Models\Setting::get('max_bot_tips_response', 
+                "💡 *Памятка подготовки к съёмке*:\n\n"
                 . "1. 🕒 *Время*: Пожалуйста, приезжайте за 10–15 минут до начала, чтобы без спешки переодеться и подготовиться.\n"
                 . "2. 👗 *Одежда*: Возьмите чистую сменную обувь (для студии) и заранее отпарьте вещи.\n"
                 . "3. 💄 *Макияж и прическа*: Если делаете образ у стилиста, заложите достаточно времени на сборы.\n"
                 . "4. 😴 *Отдых*: Постарайтесь хорошо выспаться и не пить много воды на ночь.\n\n"
-                . "Если у вас есть вопросы по референсам или идеям — пишите фотографу!";
+                . "Если у вас есть вопросы по референсам или идеям — пишите фотографу!"
+            );
 
-            $buttons = [
-                [
-                    ['type' => 'callback', 'text' => 'ℹ️ Детали съёмки', 'payload' => 'shoot_details'],
-                    ['type' => 'callback', 'text' => '📞 Контакты', 'payload' => 'photographer_contacts'],
-                ],
-            ];
+            $buttons = $maxService->getMenuButtons($shoot);
 
             $maxService->sendMessage($chatId, $userId, $text, $buttons);
             return response()->json(['status' => 'ok']);
         }
 
+        // 3. Contacts button
         if ($callbackPayload === 'photographer_contacts') {
-            $text = "📸 *Контакты фотографа (Роман Юн)*:\n\n"
-                . "📞 Телефон: +7 (900) 000-00-00\n"
+            $defaultContacts = "📸 *Контакты фотографа (Роман Юн)*:\n\n"
+                . "📞 Телефон: " . (\App\Models\Setting::get('phone') ?: '+7 (900) 000-00-00') . "\n"
                 . "🌐 Сайт: " . url('/') . "\n"
-                . "📷 Портфолио: " . url('/series') . "\n\n"
+                . "📷 Портфолио: " . url('/portfolio') . "\n\n"
                 . "Всегда на связи и готов ответить на любые вопросы!";
 
-            $buttons = [
-                [
-                    ['type' => 'link', 'text' => '🌐 Перейти на сайт', 'url' => url('/')],
-                ],
-                [
-                    ['type' => 'callback', 'text' => 'ℹ️ Детали съёмки', 'payload' => 'shoot_details'],
-                ],
-            ];
+            $text = \App\Models\Setting::get('max_bot_contacts_response', $defaultContacts);
+
+            $buttons = $maxService->getMenuButtons($shoot);
 
             $maxService->sendMessage($chatId, $userId, $text, $buttons);
             return response()->json(['status' => 'ok']);
+        }
+
+        // 4. Custom button callbacks (custom_btn_0, custom_btn_1, etc.)
+        if (preg_match('/^custom_btn_(\d+)$/', $callbackPayload, $matches)) {
+            $index = (int)$matches[1];
+            $customButtons = json_decode(\App\Models\Setting::get('max_bot_custom_buttons', '[]'), true) ?: [];
+            if (isset($customButtons[$index])) {
+                $btn = $customButtons[$index];
+                $reply = !empty($btn['reply']) ? $btn['reply'] : 'Информация по данному запросу пока не заполнена.';
+                $buttons = $maxService->getMenuButtons($shoot);
+                $maxService->sendMessage($chatId, $userId, $reply, $buttons);
+                return response()->json(['status' => 'ok']);
+            }
         }
 
         return response()->json(['status' => 'ignored']);
@@ -256,22 +255,8 @@ class MaxWebhookController extends Controller
             ->latest('shoot_date')
             ->first();
 
-        $reply = "Здравствуйте! Чем могу помочь? Выберите действие кнопками ниже:";
-
-        $buttons = [];
-        if ($shoot && $shoot->share_token) {
-            $buttons[] = [
-                ['type' => 'link', 'text' => '📱 Моя карточка съёмки', 'url' => url("/shoot/{$shoot->share_token}")],
-            ];
-        }
-
-        $buttons[] = [
-            ['type' => 'callback', 'text' => 'ℹ️ Детали съёмки', 'payload' => 'shoot_details'],
-            ['type' => 'callback', 'text' => '👗 Подготовка к съёмке', 'payload' => 'shoot_tips'],
-        ];
-        $buttons[] = [
-            ['type' => 'callback', 'text' => '📞 Контакты фотографа', 'payload' => 'photographer_contacts'],
-        ];
+        $reply = "Здравствуйте! Чем могу помочь? Выберите действие кнопками меню ниже:";
+        $buttons = $maxService->getMenuButtons($shoot);
 
         $maxService->sendMessage($chatId, $userId, $reply, $buttons);
 

@@ -129,6 +129,83 @@ class MaxMessengerService
     }
 
     /**
+     * Build the active menu buttons based on admin settings.
+     */
+    public function getMenuButtons(?Shoot $shoot = null): array
+    {
+        $buttons = [];
+
+        // 1. Link button to web card
+        $cardEnabled = \App\Models\Setting::get('max_bot_btn_card_enabled', '1') === '1';
+        $cardText = \App\Models\Setting::get('max_bot_btn_card_text', '📱 Открыть карточку съёмки');
+        if ($cardEnabled && $shoot && $shoot->share_token) {
+            $buttons[] = [
+                [
+                    'type' => 'link',
+                    'text' => $cardText,
+                    'url' => url("/shoot/{$shoot->share_token}"),
+                ],
+            ];
+        }
+
+        // 2. Action buttons row (Details & Tips)
+        $actionRow = [];
+        $detailsEnabled = \App\Models\Setting::get('max_bot_btn_details_enabled', '1') === '1';
+        $detailsText = \App\Models\Setting::get('max_bot_btn_details_text', 'ℹ️ Детали съёмки');
+        if ($detailsEnabled) {
+            $actionRow[] = ['type' => 'callback', 'text' => $detailsText, 'payload' => 'shoot_details'];
+        }
+
+        $tipsEnabled = \App\Models\Setting::get('max_bot_btn_tips_enabled', '1') === '1';
+        $tipsText = \App\Models\Setting::get('max_bot_btn_tips_text', '👗 Подготовка');
+        if ($tipsEnabled) {
+            $actionRow[] = ['type' => 'callback', 'text' => $tipsText, 'payload' => 'shoot_tips'];
+        }
+        if (!empty($actionRow)) {
+            $buttons[] = $actionRow;
+        }
+
+        // 3. Contacts button
+        $contactsEnabled = \App\Models\Setting::get('max_bot_btn_contacts_enabled', '1') === '1';
+        $contactsText = \App\Models\Setting::get('max_bot_btn_contacts_text', '📞 Контакты фотографа');
+        if ($contactsEnabled) {
+            $buttons[] = [
+                ['type' => 'callback', 'text' => $contactsText, 'payload' => 'photographer_contacts'],
+            ];
+        }
+
+        // 4. Custom user buttons from admin
+        $customButtons = json_decode(\App\Models\Setting::get('max_bot_custom_buttons', '[]'), true) ?: [];
+        foreach ($customButtons as $index => $cBtn) {
+            $title = $cBtn['title'] ?? '';
+            $type = $cBtn['type'] ?? 'link';
+            if (empty($title)) {
+                continue;
+            }
+
+            if ($type === 'link' && !empty($cBtn['url'])) {
+                $buttons[] = [
+                    [
+                        'type' => 'link',
+                        'text' => $title,
+                        'url' => $cBtn['url'],
+                    ],
+                ];
+            } elseif ($type === 'text') {
+                $buttons[] = [
+                    [
+                        'type' => 'callback',
+                        'text' => $title,
+                        'payload' => "custom_btn_{$index}",
+                    ],
+                ];
+            }
+        }
+
+        return $buttons;
+    }
+
+    /**
      * Send confirmation message when client links their shoot.
      */
     public function sendConfirmation(Shoot $shoot): bool
@@ -140,34 +217,24 @@ class MaxMessengerService
         $dateFormatted = $shoot->shoot_date ? $shoot->shoot_date->format('d.m.Y') : '';
         $time = substr($shoot->start_time, 0, 5);
 
-        $text = "Здравствуйте, {$shoot->client_name}! 👋\n\n"
+        $template = \App\Models\Setting::get('max_bot_welcome_text', 
+            "Здравствуйте, {client_name}! 👋\n\n"
             . "Напоминания о вашей фотосессии успешно подключены в MAX.\n\n"
-            . "📅 Дата: {$dateFormatted}\n"
-            . "⏰ Время: {$time}\n"
-            . ($shoot->location ? "📍 Локация: {$shoot->location}\n\n" : "\n")
-            . "Вы можете воспользоваться кнопками ниже для быстрой информации:";
+            . "📅 Дата: {date}\n"
+            . "⏰ Время: {time}\n"
+            . "{location}\n"
+            . "Вы можете воспользоваться кнопками ниже для быстрой информации:"
+        );
 
-        $buttons = [];
+        $locationText = $shoot->location ? "📍 Локация: {$shoot->location}\n" : "";
 
-        // Link button to web card
-        if ($shoot->share_token) {
-            $buttons[] = [
-                [
-                    'type' => 'link',
-                    'text' => '📱 Открыть карточку съёмки',
-                    'url' => url("/shoot/{$shoot->share_token}"),
-                ],
-            ];
-        }
+        $text = str_replace(
+            ['{client_name}', '{date}', '{time}', '{location}'],
+            [$shoot->client_name, $dateFormatted, $time, $locationText],
+            $template
+        );
 
-        // Action buttons
-        $buttons[] = [
-            ['type' => 'callback', 'text' => 'ℹ️ Детали съёмки', 'payload' => 'shoot_details'],
-            ['type' => 'callback', 'text' => '👗 Подготовка', 'payload' => 'shoot_tips'],
-        ];
-        $buttons[] = [
-            ['type' => 'callback', 'text' => '📞 Контакты фотографа', 'payload' => 'photographer_contacts'],
-        ];
+        $buttons = $this->getMenuButtons($shoot);
 
         return $this->sendMessage($shoot->max_chat_id, $shoot->max_user_id, $text, $buttons);
     }

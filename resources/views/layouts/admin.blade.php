@@ -55,6 +55,10 @@
                        class="px-3.5 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.seo.*') ? 'bg-white/15 text-white shadow-sm' : 'hover:bg-white/5 hover:text-white' }}">
                         SEO
                     </a>
+                    <a href="{{ route('admin.max_bot.index') }}" 
+                       class="px-3.5 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.max_bot.*') ? 'bg-white/15 text-white shadow-sm' : 'hover:bg-white/5 hover:text-white' }}">
+                        Бот MAX
+                    </a>
                     <a href="{{ route('admin.settings.index') }}" 
                        class="px-3.5 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.settings.*') ? 'bg-white/15 text-white shadow-sm' : 'hover:bg-white/5 hover:text-white' }}">
                         Настройки
@@ -90,6 +94,7 @@
             <a href="{{ route('admin.packages.index') }}" class="px-2.5 py-1 rounded {{ request()->routeIs('admin.packages.*') ? 'bg-white/15 text-white' : '' }}">Пакеты</a>
             <a href="{{ route('admin.faqs.index') }}" class="px-2.5 py-1 rounded {{ request()->routeIs('admin.faqs.*') ? 'bg-white/15 text-white' : '' }}">FAQ</a>
             <a href="{{ route('admin.seo.index') }}" class="px-2.5 py-1 rounded {{ request()->routeIs('admin.seo.*') ? 'bg-white/15 text-white' : '' }}">SEO</a>
+            <a href="{{ route('admin.max_bot.index') }}" class="px-2.5 py-1 rounded {{ request()->routeIs('admin.max_bot.*') ? 'bg-white/15 text-white' : '' }}">Бот MAX</a>
             <a href="{{ route('admin.settings.index') }}" class="px-2.5 py-1 rounded {{ request()->routeIs('admin.settings.*') ? 'bg-white/15 text-white' : '' }}">Настройки</a>
         </div>
     </header>
