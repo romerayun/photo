@@ -210,5 +210,56 @@ class MaxReminderTest extends TestCase
         $this->assertEquals('📞 Контакты фотографа', $buttons[1][0]['text']);
         $this->assertEquals('callback', $buttons[1][0]['type']);
     }
+
+    public function test_past_shoots_are_ignored_and_not_shown_in_bot(): void
+    {
+        $sentRequests = [];
+        Http::fake(function ($request) use (&$sentRequests) {
+            $sentRequests[] = $request->data();
+            return Http::response(['ok' => true], 200);
+        });
+
+        $client = \App\Models\Client::create([
+            'name' => 'Михаил Бывший',
+            'phone' => '+7 999 555-44-33',
+            'max_user_id' => 'user_past_999',
+            'max_chat_id' => 'chat_past_999',
+            'max_connected_at' => now(),
+        ]);
+
+        // Create shoot in the past (e.g. yesterday)
+        Shoot::create([
+            'client_id' => $client->id,
+            'client_name' => $client->name,
+            'shoot_date' => now('Asia/Irkutsk')->subDays(2)->format('Y-m-d'),
+            'start_time' => '12:00',
+            'duration_minutes' => 60,
+            'status' => 'completed',
+            'location' => 'Прошлая студия',
+            'max_user_id' => 'user_past_999',
+            'max_chat_id' => 'chat_past_999',
+            'share_token' => 'token-past-shoot',
+        ]);
+
+        // When client writes to the bot
+        $response = $this->postJson(route('webhook.max'), [
+            'update_type' => 'message_created',
+            'chat_id' => 'chat_past_999',
+            'user' => ['user_id' => 'user_past_999'],
+            'message' => [
+                'text' => 'Здравствуйте',
+            ],
+        ]);
+
+        $response->assertStatus(200);
+        $lastRequest = end($sentRequests);
+        $this->assertNotEmpty($lastRequest);
+        // Past shoot should not be shown; bot should say no shoots are planned
+        $this->assertStringContainsString('нет запланированных съёмок', $lastRequest['text'] ?? '');
+        $buttons = $lastRequest['attachments'][0]['payload']['buttons'] ?? [];
+        $this->assertCount(2, $buttons);
+        $this->assertEquals('📅 Записаться на съёмку', $buttons[0][0]['text']);
+    }
 }
+
 

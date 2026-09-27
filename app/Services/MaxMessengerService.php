@@ -308,14 +308,26 @@ class MaxMessengerService
         );
 
         $shootsCount = 1;
+        $irkutskToday = now('Asia/Irkutsk')->toDateString();
         if ($shoot->client_id) {
-            $shootsCount = Shoot::where('client_id', $shoot->client_id)->count();
+            $shootsCount = Shoot::where('client_id', $shoot->client_id)
+                ->where('shoot_date', '>=', $irkutskToday)
+                ->where('status', '!=', 'cancelled')
+                ->get()
+                ->reject(fn($s) => $s->is_past)
+                ->count();
         } elseif ($shoot->max_chat_id || $shoot->max_user_id) {
             $shootsCount = Shoot::where(function ($q) use ($shoot) {
                 if ($shoot->max_chat_id) $q->where('max_chat_id', $shoot->max_chat_id);
                 if ($shoot->max_user_id) $q->orWhere('max_user_id', $shoot->max_user_id);
-            })->count();
+            })
+            ->where('shoot_date', '>=', $irkutskToday)
+            ->where('status', '!=', 'cancelled')
+            ->get()
+            ->reject(fn($s) => $s->is_past)
+            ->count();
         }
+        $shootsCount = max(1, $shootsCount);
 
         $buttons = $this->getMenuButtons($shoot, null, $shootsCount);
 

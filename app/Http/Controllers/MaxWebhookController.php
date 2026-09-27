@@ -216,10 +216,15 @@ class MaxWebhookController extends Controller
             $shootsQuery->orWhere('client_id', $client->id);
         }
 
+        $irkutskToday = now('Asia/Irkutsk')->toDateString();
         $allShoots = $shootsQuery
-            ->orderBy('shoot_date', 'desc')
-            ->orderBy('start_time', 'desc')
-            ->get();
+            ->where('shoot_date', '>=', $irkutskToday)
+            ->where('status', '!=', 'cancelled')
+            ->orderBy('shoot_date', 'asc')
+            ->orderBy('start_time', 'asc')
+            ->get()
+            ->reject(fn($s) => $s->is_past)
+            ->values();
 
         $shoot = $allShoots->first();
 
@@ -409,7 +414,16 @@ class MaxWebhookController extends Controller
             $shootsQuery->orWhere('client_id', $client->id);
         }
 
-        $allShoots = $shootsQuery->orderBy('shoot_date', 'desc')->get();
+        $irkutskToday = now('Asia/Irkutsk')->toDateString();
+        $allShoots = $shootsQuery
+            ->where('shoot_date', '>=', $irkutskToday)
+            ->where('status', '!=', 'cancelled')
+            ->orderBy('shoot_date', 'asc')
+            ->orderBy('start_time', 'asc')
+            ->get()
+            ->reject(fn($s) => $s->is_past)
+            ->values();
+
         $shoot = $allShoots->first();
 
         if ($allShoots->isEmpty()) {

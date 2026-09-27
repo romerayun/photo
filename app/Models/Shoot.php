@@ -267,6 +267,29 @@ class Shoot extends Model
     }
 
     /**
+     * Check if shoot has already ended based on date and time.
+     */
+    public function getIsPastAttribute(): bool
+    {
+        if (!$this->shoot_date) {
+            return false;
+        }
+
+        $irkutskTz = 'Asia/Irkutsk';
+        $now = now($irkutskTz);
+        $dateStr = $this->shoot_date->format('Y-m-d');
+        $timeStr = !empty($this->start_time) ? substr($this->start_time, 0, 5) : '23:59';
+
+        try {
+            $shootEnd = Carbon::createFromFormat('Y-m-d H:i', "{$dateStr} {$timeStr}", $irkutskTz)
+                ->addMinutes($this->duration_minutes ?? 60);
+            return $shootEnd->lessThan($now);
+        } catch (\Throwable $e) {
+            return $this->shoot_date->lessThan($now->startOfDay());
+        }
+    }
+
+    /**
      * Scope for a specific month.
      */
     public function scopeForMonth(Builder $query, int $year, int $month): Builder
