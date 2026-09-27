@@ -20,13 +20,16 @@ class MaxWebhookController extends Controller
         Log::info('MAX Webhook received payload:', $request->all());
 
         // Extract event data according to MAX Bot API formats
-        $event = $request->input('event') ?? $request->input('type');
+        $event = $request->input('update_type') ?? $request->input('event') ?? $request->input('type');
         
         // 1. Extract payload code
-        // Various possible structures in bot platforms:
-        // - $request->input('payload')
-        // - $request->input('data.payload')
-        // - $request->input('message.text') (e.g. "/start <code>")
+        // MAX format:
+        // {
+        //   "update_type": "bot_started",
+        //   "chat_id": 1234567890,
+        //   "user": { "user_id": 1234567890, ... },
+        //   "payload": "code"
+        // }
         $payload = $request->input('payload') 
             ?? $request->input('data.payload')
             ?? $request->input('data.start_payload')

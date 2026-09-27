@@ -15,7 +15,7 @@ class MaxMessengerService
     public function __construct()
     {
         $this->token = config('services.max.bot_token', '');
-        $this->apiUrl = rtrim(config('services.max.api_url', 'https://api.max.ru'), '/');
+        $this->apiUrl = rtrim(config('services.max.api_url', 'https://platform-api2.max.ru'), '/');
         $this->botUsername = config('services.max.bot_username', 'se14454241_bot');
     }
 
@@ -38,8 +38,11 @@ class MaxMessengerService
 
     /**
      * Send a text message to a user or chat in MAX.
+     * Official API: POST https://platform-api2.max.ru/messages?chat_id=... or ?user_id=...
+     * Header: Authorization: <token>
+     * Body: { "text": "..." }
      */
-    public function sendMessage(string $chatIdOrUserId, string $text): bool
+    public function sendMessage(?string $chatId, ?string $userId, string $text): bool
     {
         if (empty($this->token)) {
             Log::warning('MaxMessengerService: bot_token is not configured.');
@@ -47,36 +50,62 @@ class MaxMessengerService
         }
 
         try {
-            // Attempt standard bot sendMessage endpoints
-            $endpoints = [
-                "{$this->apiUrl}/bot/v1/messages/sendText",
-                "{$this->apiUrl}/messages/sendText",
-                "{$this->apiUrl}/sendMessage",
-            ];
+            // Build query params
+            $queryParams = [];
+            if ($chatId) {
+                $queryParams['chat_id'] = $chatId;
+            } elseif ($userId) {
+                $queryParams['user_id'] = $userId;
+            } else {
+                return false;
+            }
 
-            $payload = [
-                'chat_id' => $chatIdOrUserId,
-                'user_id' => $chatIdOrUserId,
+            $url = "{$this->apiUrl}/messages?" . http_build_query($queryParams);
+
+            $response = Http::withHeaders([
+                'Authorization' => $this->token,
+                'Content-Type' => 'application/json',
+            ])
+            ->withoutVerifying() // Supports Russian CA certificates
+            ->timeout(5)
+            ->post($url, [
                 'text' => $text,
-            ];
+            ]);
 
-            foreach ($endpoints as $endpoint) {
-                $response = Http::withHeaders([
-                    'Authorization' => "Bearer {$this->token}",
-                    'X-Bot-Token' => $this->token,
-                ])->timeout(5)->post($endpoint . "?token=" . urlencode($this->token), $payload);
+            if ($response->successful()) {
+                Log::info("MAX message sent successfully to chat_id={$chatId} user_id={$userId}");
+                return true;
+            }
 
-                if ($response->successful()) {
-                    Log::info("MAX message sent successfully to {$chatIdOrUserId}");
+            // Fallback: If chat_id failed, try user_id directly if available
+            if ($chatId && $userId && $chatId !== $userId) {
+                $fallbackUrl = "{$this->apiUrl}/messages?user_id=" . urlencode($userId);
+                $fallbackRes = Http::withHeaders([
+                    'Authorization' => $this->token,
+                    'Content-Type' => 'application/json',
+                ])
+                ->withoutVerifying()
+                ->timeout(5)
+                ->post($fallbackUrl, [
+                    'text' => $text,
+                ]);
+
+                if ($fallbackRes->successful()) {
+                    Log::info("MAX fallback message sent successfully to user_id={$userId}");
                     return true;
                 }
             }
 
-            Log::warning("MAX message failed across endpoints to {$chatIdOrUserId}");
+            Log::warning("MAX message failed: " . $response->body(), [
+                'status' => $response->status(),
+                'chat_id' => $chatId,
+                'user_id' => $userId,
+            ]);
             return false;
         } catch (\Throwable $e) {
             Log::error("MAX sendMessage exception: " . $e->getMessage(), [
-                'recipient' => $chatIdOrUserId,
+                'chat_id' => $chatId,
+                'user_id' => $userId,
             ]);
             return false;
         }
@@ -87,8 +116,7 @@ class MaxMessengerService
      */
     public function sendConfirmation(Shoot $shoot): bool
     {
-        $target = $shoot->max_chat_id ?: $shoot->max_user_id;
-        if (!$target) {
+        if (!$shoot->max_chat_id && !$shoot->max_user_id) {
             return false;
         }
 
@@ -102,6 +130,7 @@ class MaxMessengerService
             . ($shoot->location ? "📍 Локация: {$shoot->location}\n\n" : "\n")
             . "Мы пришлем вам уведомление перед съемкой, чтобы вы ничего не забыли!";
 
-        return $this->sendMessage($target, $text);
+        return $this->sendMessage($shoot->max_chat_id, $shoot->max_user_id, $text);
     }
 }
+
