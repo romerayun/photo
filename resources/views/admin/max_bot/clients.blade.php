@@ -131,7 +131,7 @@
                     <div id="buttons-selector" class="pt-3 border-t border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
                         @foreach($availableButtons as $bKey => $bTitle)
                             <label class="flex items-center p-2.5 rounded-lg bg-white border border-slate-200 hover:border-slate-300 transition-colors cursor-pointer select-none">
-                                <input type="checkbox" name="selected_buttons[]" value="{{ $bKey }}" checked
+                                <input type="checkbox" name="selected_buttons[]" value="{{ $bKey }}"
                                        class="w-4 h-4 rounded border-slate-300 text-neutral-900 focus:ring-neutral-900 mr-2.5">
                                 <span class="text-xs font-medium text-slate-800 truncate">{{ $bTitle }}</span>
                             </label>
