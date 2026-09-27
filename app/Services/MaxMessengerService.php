@@ -136,22 +136,34 @@ class MaxMessengerService
      * @param Shoot|null $shoot
      * @param array|null $allowedButtons If specified, only include these keys (e.g. ['card', 'details', 'tips', 'contacts', 'custom_0'])
      */
-    public function getMenuButtons(?Shoot $shoot = null, ?array $allowedButtons = null): array
+    public function getMenuButtons(?Shoot $shoot = null, ?array $allowedButtons = null, int $shootsCount = 1): array
     {
         $buttons = [];
         $filter = $allowedButtons !== null;
 
-        // 1. Link button to web card
+        // 1. Button to web card
         $cardEnabled = \App\Models\Setting::get('max_bot_btn_card_enabled', '1') === '1';
         $cardText = \App\Models\Setting::get('max_bot_btn_card_text', '📱 Открыть карточку съёмки');
-        if (($filter ? in_array('card', $allowedButtons, true) : $cardEnabled) && $shoot && $shoot->share_token) {
-            $buttons[] = [
-                [
-                    'type' => 'link',
-                    'text' => $cardText,
-                    'url' => url("/shoot/{$shoot->share_token}"),
-                ],
-            ];
+        if ($filter ? in_array('card', $allowedButtons, true) : $cardEnabled) {
+            if ($shootsCount > 1) {
+                // If client has multiple shoots, show selection prompt
+                $buttons[] = [
+                    [
+                        'type' => 'callback',
+                        'text' => $cardText,
+                        'payload' => 'shoot_card_menu',
+                    ],
+                ];
+            } elseif ($shoot && $shoot->share_token) {
+                // Exactly 1 shoot: direct link to web card
+                $buttons[] = [
+                    [
+                        'type' => 'link',
+                        'text' => $cardText,
+                        'url' => url("/shoot/{$shoot->share_token}"),
+                    ],
+                ];
+            }
         }
 
         // 2. Action buttons row (Details & Tips)
@@ -271,7 +283,17 @@ class MaxMessengerService
             $secondTemplate
         );
 
-        $buttons = $this->getMenuButtons($shoot);
+        $shootsCount = 1;
+        if ($shoot->client_id) {
+            $shootsCount = Shoot::where('client_id', $shoot->client_id)->count();
+        } elseif ($shoot->max_chat_id || $shoot->max_user_id) {
+            $shootsCount = Shoot::where(function ($q) use ($shoot) {
+                if ($shoot->max_chat_id) $q->where('max_chat_id', $shoot->max_chat_id);
+                if ($shoot->max_user_id) $q->orWhere('max_user_id', $shoot->max_user_id);
+            })->count();
+        }
+
+        $buttons = $this->getMenuButtons($shoot, null, $shootsCount);
 
         return $this->sendMessage($shoot->max_chat_id, $shoot->max_user_id, $secondText, $buttons);
     }

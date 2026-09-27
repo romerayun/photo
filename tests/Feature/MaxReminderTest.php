@@ -162,5 +162,20 @@ class MaxReminderTest extends TestCase
         $selectResponse->assertStatus(200);
         $detailRequest = end($sentRequests);
         $this->assertStringContainsString('Студия Фотолофт', $detailRequest['text'] ?? '');
+
+        // Verify "shoot_card_menu" callback also asks user to choose which card to open
+        $cardResponse = $this->postJson(route('webhook.max'), [
+            'event' => 'message_callback',
+            'callback' => [
+                'callback_id' => 'cb_card_multiple',
+                'payload' => 'shoot_card_menu',
+                'user' => ['user_id' => 'user_multiple_123'],
+            ],
+            'chat_id' => 'chat_multiple_123',
+        ]);
+
+        $cardResponse->assertStatus(200);
+        $cardRequest = end($sentRequests);
+        $this->assertStringContainsString('Выберите карточку съёмки', $cardRequest['text'] ?? '');
     }
 }

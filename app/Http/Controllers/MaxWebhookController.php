@@ -266,7 +266,7 @@ class MaxWebhookController extends Controller
             }
 
             // Exactly 1 shoot
-            return $this->sendShootDetailsResponse($maxService, $shoot, $chatId, $userId);
+            return $this->sendShootDetailsResponse($maxService, $shoot, $chatId, $userId, $allShoots->count());
         }
 
         // Specific shoot selected by client from list
@@ -275,14 +275,52 @@ class MaxWebhookController extends Controller
             $targetShoot = $allShoots->firstWhere('id', $selectedId) ?? Shoot::find($selectedId);
 
             if ($targetShoot) {
-                return $this->sendShootDetailsResponse($maxService, $targetShoot, $chatId, $userId);
+                return $this->sendShootDetailsResponse($maxService, $targetShoot, $chatId, $userId, $allShoots->count());
             }
+        }
+
+        // Card button clicked when client has MULTIPLE shoots
+        if ($callbackPayload === 'shoot_card_menu') {
+            if ($allShoots->isEmpty()) {
+                $maxService->sendMessage($chatId, $userId, "У вас пока нет активной фотосессии, привязанной к этому чату.", $maxService->getMenuButtons());
+                return response()->json(['status' => 'ok']);
+            }
+
+            $text = "📱 *Выберите карточку съёмки*:\n\nУ вас несколько фотосессий. Выберите, какую карточку вы хотите открыть:";
+            $cardButtons = [];
+            foreach ($allShoots as $s) {
+                $dateStr = $s->shoot_date ? $s->shoot_date->format('d.m.Y') : 'Без даты';
+                $locStr = $s->location ? " ({$s->location})" : '';
+                $btnTitle = "📱 {$dateStr}{$locStr}";
+                if (mb_strlen($btnTitle) > 36) {
+                    $btnTitle = mb_substr($btnTitle, 0, 35) . '…';
+                }
+                $cardButtons[] = [
+                    [
+                        'type' => 'link',
+                        'text' => $btnTitle,
+                        'url' => url("/shoot/{$s->share_token}"),
+                    ]
+                ];
+            }
+
+            // Back button
+            $cardButtons[] = [
+                [
+                    'type' => 'callback',
+                    'text' => '🔙 В главное меню',
+                    'payload' => 'main_menu',
+                ]
+            ];
+
+            $maxService->sendMessage($chatId, $userId, $text, $cardButtons);
+            return response()->json(['status' => 'ok']);
         }
 
         // Main menu button
         if ($callbackPayload === 'main_menu') {
             $reply = "Главное меню бота. Выберите действие кнопками ниже:";
-            $buttons = $maxService->getMenuButtons($shoot);
+            $buttons = $maxService->getMenuButtons($shoot, null, $allShoots->count());
             $maxService->sendMessage($chatId, $userId, $reply, $buttons);
             return response()->json(['status' => 'ok']);
         }
@@ -341,13 +379,25 @@ class MaxWebhookController extends Controller
      */
     protected function handleTextMessage(string $text, MaxMessengerService $maxService, string $chatId, string $userId): JsonResponse
     {
-        $shoot = Shoot::where('max_chat_id', $chatId)
-            ->orWhere('max_user_id', $userId)
-            ->latest('shoot_date')
-            ->first();
+        $shootsQuery = Shoot::where(function ($query) use ($chatId, $userId) {
+            if ($chatId) $query->where('max_chat_id', $chatId);
+            if ($userId) $query->orWhere('max_user_id', $userId);
+        });
+
+        $client = Client::where(function ($q) use ($chatId, $userId) {
+            if ($chatId) $q->where('max_chat_id', $chatId);
+            if ($userId) $q->orWhere('max_user_id', $userId);
+        })->first();
+
+        if ($client) {
+            $shootsQuery->orWhere('client_id', $client->id);
+        }
+
+        $allShoots = $shootsQuery->orderBy('shoot_date', 'desc')->get();
+        $shoot = $allShoots->first();
 
         $reply = "Здравствуйте! Чем могу помочь? Выберите действие кнопками меню ниже:";
-        $buttons = $maxService->getMenuButtons($shoot);
+        $buttons = $maxService->getMenuButtons($shoot, null, $allShoots->count());
 
         $maxService->sendMessage($chatId, $userId, $reply, $buttons);
 
@@ -357,7 +407,7 @@ class MaxWebhookController extends Controller
     /**
      * Send formatted shoot details with back/menu buttons.
      */
-    protected function sendShootDetailsResponse(MaxMessengerService $maxService, Shoot $shoot, string $chatId, string $userId): JsonResponse
+    protected function sendShootDetailsResponse(MaxMessengerService $maxService, Shoot $shoot, string $chatId, string $userId, int $shootsCount = 1): JsonResponse
     {
         $dateFormatted = $shoot->shoot_date ? $shoot->shoot_date->format('d.m.Y') : 'Дата не указана';
         $time = substr($shoot->start_time, 0, 5) ?: 'Время не указано';
@@ -379,7 +429,7 @@ class MaxWebhookController extends Controller
             . ($shoot->prepayment ? "💵 Предоплата: " . number_format($shoot->prepayment, 0, '', ' ') . " ₽ (Внесена)\n" : '')
             . "📌 Статус: {$status}";
 
-        $buttons = $maxService->getMenuButtons($shoot);
+        $buttons = $maxService->getMenuButtons($shoot, null, $shootsCount);
 
         $maxService->sendMessage($chatId, $userId, $text, $buttons);
         return response()->json(['status' => 'ok']);

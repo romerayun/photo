@@ -210,11 +210,21 @@ class MaxBotSettingController extends Controller
 
             $text = str_replace('{client_name}', $recipient->client_name, $validated['message']);
             
+            $shootsCount = 1;
+            if ($recipient->client_id) {
+                $shootsCount = Shoot::where('client_id', $recipient->client_id)->count();
+            } elseif ($recipient->max_chat_id || $recipient->max_user_id) {
+                $shootsCount = Shoot::where(function ($q) use ($recipient) {
+                    if ($recipient->max_chat_id) $q->where('max_chat_id', $recipient->max_chat_id);
+                    if ($recipient->max_user_id) $q->orWhere('max_user_id', $recipient->max_user_id);
+                })->count();
+            }
+
             $buttons = [];
             if ($attachMode === 'all') {
-                $buttons = $maxService->getMenuButtons($recipient);
+                $buttons = $maxService->getMenuButtons($recipient, null, $shootsCount);
             } elseif ($attachMode === 'custom' && !empty($selectedButtons)) {
-                $buttons = $maxService->getMenuButtons($recipient, $selectedButtons);
+                $buttons = $maxService->getMenuButtons($recipient, $selectedButtons, $shootsCount);
             }
 
             $success = $maxService->sendMessage($recipient->max_chat_id, $recipient->max_user_id, $text, $buttons);
