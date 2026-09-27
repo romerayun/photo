@@ -71,7 +71,10 @@ class MaxMessengerService
 
             $url = "{$this->apiUrl}/messages?" . http_build_query($queryParams);
 
-            $payload = ['text' => $text];
+            $payload = [
+                'text' => $text,
+                'format' => 'markdown',
+            ];
             if (!empty($buttons)) {
                 $payload['attachments'] = [
                     [
