@@ -153,10 +153,14 @@ class PublicShootController extends Controller
     /**
      * Disconnect / remove MAX messenger connection for this shoot.
      */
-    public function disconnectMax(string $token): \Illuminate\Http\JsonResponse
+    public function disconnectMax(string $token, \App\Services\MaxMessengerService $maxService): \Illuminate\Http\JsonResponse
     {
         $shoot = Shoot::where('share_token', $token)->firstOrFail();
 
+        $chatId = $shoot->max_chat_id;
+        $userId = $shoot->max_user_id;
+
+        // Reset MAX fields on shoot
         $shoot->update([
             'max_user_id' => null,
             'max_chat_id' => null,
@@ -164,6 +168,32 @@ class PublicShootController extends Controller
             'max_link_code_hash' => null,
             'max_link_code_expires_at' => null,
         ]);
+
+        // If client has an associated record, check if they have any other shoots connected
+        if ($shoot->client_id) {
+            $otherConnectedShootsCount = Shoot::where('client_id', $shoot->client_id)
+                ->where('id', '!=', $shoot->id)
+                ->whereNotNull('max_connected_at')
+                ->count();
+
+            if ($otherConnectedShootsCount === 0) {
+                \App\Models\Client::where('id', $shoot->client_id)->update([
+                    'max_user_id' => null,
+                    'max_chat_id' => null,
+                    'max_connected_at' => null,
+                ]);
+            }
+        }
+
+        // Optionally send a courtesy message in MAX confirming unlinking
+        if ($chatId || $userId) {
+            try {
+                $disconnectText = "🔔 Напоминания о съёмке отключены.\n\nВы всегда можете снова подключить их на странице вашей съёмки.";
+                $maxService->sendMessage($chatId, $userId, $disconnectText, $maxService->getMenuButtons(null, null, 0));
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning("Could not send MAX disconnect notice: " . $e->getMessage());
+            }
+        }
 
         return response()->json([
             'success' => true,

@@ -228,14 +228,28 @@ class MaxBotSettingController extends Controller
             $text = str_replace('{client_name}', $recipient->client_name, $validated['message']);
             
             $shootsCount = 1;
+            $irkutskToday = now('Asia/Irkutsk')->toDateString();
             if ($recipient->client_id) {
-                $shootsCount = Shoot::where('client_id', $recipient->client_id)->count();
+                $shootsCount = Shoot::where('client_id', $recipient->client_id)
+                    ->whereNotNull('max_connected_at')
+                    ->where('shoot_date', '>=', $irkutskToday)
+                    ->where('status', '!=', 'cancelled')
+                    ->get()
+                    ->reject(fn($s) => $s->is_past)
+                    ->count();
             } elseif ($recipient->max_chat_id || $recipient->max_user_id) {
-                $shootsCount = Shoot::where(function ($q) use ($recipient) {
-                    if ($recipient->max_chat_id) $q->where('max_chat_id', $recipient->max_chat_id);
-                    if ($recipient->max_user_id) $q->orWhere('max_user_id', $recipient->max_user_id);
-                })->count();
+                $shootsCount = Shoot::whereNotNull('max_connected_at')
+                    ->where(function ($q) use ($recipient) {
+                        if ($recipient->max_chat_id) $q->where('max_chat_id', $recipient->max_chat_id);
+                        if ($recipient->max_user_id) $q->orWhere('max_user_id', $recipient->max_user_id);
+                    })
+                    ->where('shoot_date', '>=', $irkutskToday)
+                    ->where('status', '!=', 'cancelled')
+                    ->get()
+                    ->reject(fn($s) => $s->is_past)
+                    ->count();
             }
+            $shootsCount = max(1, $shootsCount);
 
             $buttons = [];
             if ($attachMode === 'all') {

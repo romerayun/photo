@@ -314,13 +314,15 @@ class MaxMessengerService
         $irkutskToday = now('Asia/Irkutsk')->toDateString();
         if ($shoot->client_id) {
             $shootsCount = Shoot::where('client_id', $shoot->client_id)
+                ->whereNotNull('max_connected_at')
                 ->where('shoot_date', '>=', $irkutskToday)
                 ->where('status', '!=', 'cancelled')
                 ->get()
                 ->reject(fn($s) => $s->is_past)
                 ->count();
         } elseif ($shoot->max_chat_id || $shoot->max_user_id) {
-            $shootsCount = Shoot::where(function ($q) use ($shoot) {
+            $shootsCount = Shoot::whereNotNull('max_connected_at')
+            ->where(function ($q) use ($shoot) {
                 if ($shoot->max_chat_id) $q->where('max_chat_id', $shoot->max_chat_id);
                 if ($shoot->max_user_id) $q->orWhere('max_user_id', $shoot->max_user_id);
             })

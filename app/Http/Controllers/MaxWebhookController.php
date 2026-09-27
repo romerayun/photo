@@ -192,8 +192,9 @@ class MaxWebhookController extends Controller
                 ?? $request->input('user_id'));
         }
 
-        // Find all linked shoots for this user or chat
-        $shootsQuery = Shoot::where(function ($query) use ($chatId, $userId) {
+        // Find all actively connected shoots for this user or chat
+        $shootsQuery = Shoot::whereNotNull('max_connected_at')
+            ->where(function ($query) use ($chatId, $userId) {
                 if ($chatId) {
                     $query->where('max_chat_id', $chatId);
                 }
@@ -213,7 +214,10 @@ class MaxWebhookController extends Controller
         })->first();
 
         if ($client) {
-            $shootsQuery->orWhere('client_id', $client->id);
+            $shootsQuery->orWhere(function ($q) use ($client) {
+                $q->where('client_id', $client->id)
+                  ->whereNotNull('max_connected_at');
+            });
         }
 
         $irkutskToday = now('Asia/Irkutsk')->toDateString();
@@ -400,10 +404,11 @@ class MaxWebhookController extends Controller
      */
     protected function handleTextMessage(string $text, MaxMessengerService $maxService, string $chatId, string $userId): JsonResponse
     {
-        $shootsQuery = Shoot::where(function ($query) use ($chatId, $userId) {
-            if ($chatId) $query->where('max_chat_id', $chatId);
-            if ($userId) $query->orWhere('max_user_id', $userId);
-        });
+        $shootsQuery = Shoot::whereNotNull('max_connected_at')
+            ->where(function ($query) use ($chatId, $userId) {
+                if ($chatId) $query->where('max_chat_id', $chatId);
+                if ($userId) $query->orWhere('max_user_id', $userId);
+            });
 
         $client = Client::where(function ($q) use ($chatId, $userId) {
             if ($chatId) $q->where('max_chat_id', $chatId);
@@ -411,7 +416,10 @@ class MaxWebhookController extends Controller
         })->first();
 
         if ($client) {
-            $shootsQuery->orWhere('client_id', $client->id);
+            $shootsQuery->orWhere(function ($q) use ($client) {
+                $q->where('client_id', $client->id)
+                  ->whereNotNull('max_connected_at');
+            });
         }
 
         $irkutskToday = now('Asia/Irkutsk')->toDateString();

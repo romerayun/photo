@@ -114,6 +114,7 @@ class MaxReminderTest extends TestCase
             'location' => 'Студия Фотолофт',
             'max_user_id' => 'user_multiple_123',
             'max_chat_id' => 'chat_multiple_123',
+            'max_connected_at' => now(),
             'share_token' => 'token-multiple-1',
         ]);
 
@@ -127,6 +128,7 @@ class MaxReminderTest extends TestCase
             'location' => 'Набережная',
             'max_user_id' => 'user_multiple_123',
             'max_chat_id' => 'chat_multiple_123',
+            'max_connected_at' => now(),
             'share_token' => 'token-multiple-2',
         ]);
 
@@ -280,6 +282,62 @@ class MaxReminderTest extends TestCase
         $buttons = $lastRequest['attachments'][0]['payload']['buttons'] ?? [];
         $this->assertCount(2, $buttons);
         $this->assertEquals('📅 Записаться на съёмку', $buttons[0][0]['text']);
+    }
+
+    public function test_client_can_disconnect_max_reminders(): void
+    {
+        $sentRequests = [];
+        Http::fake(function (\Illuminate\Http\Client\Request $request) use (&$sentRequests) {
+            $sentRequests[] = [
+                'url' => $request->url(),
+                'text' => $request['text'] ?? '',
+            ];
+            return Http::response(['ok' => true], 200);
+        });
+
+        $client = \App\Models\Client::create([
+            'name' => 'Анна Смирнова',
+            'phone' => '+7 999 888-77-66',
+            'max_user_id' => 'user_disc_111',
+            'max_chat_id' => 'chat_disc_111',
+            'max_connected_at' => now(),
+        ]);
+
+        $shoot = Shoot::create([
+            'client_id' => $client->id,
+            'client_name' => $client->name,
+            'shoot_date' => now()->addDays(5)->format('Y-m-d'),
+            'start_time' => '14:00',
+            'duration_minutes' => 60,
+            'status' => 'planned',
+            'location' => 'Студия',
+            'max_user_id' => 'user_disc_111',
+            'max_chat_id' => 'chat_disc_111',
+            'max_connected_at' => now(),
+            'share_token' => 'token-disconnect-test',
+        ]);
+
+        // Disconnect via public endpoint
+        $response = $this->postJson(route('shoots.share.max_disconnect', ['token' => $shoot->share_token]));
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        // Shoot should have MAX data cleared
+        $shoot->refresh();
+        $this->assertNull($shoot->max_user_id);
+        $this->assertNull($shoot->max_chat_id);
+        $this->assertNull($shoot->max_connected_at);
+
+        // Client record should also be cleared since no other shoots connected
+        $client->refresh();
+        $this->assertNull($client->max_user_id);
+        $this->assertNull($client->max_chat_id);
+        $this->assertNull($client->max_connected_at);
+
+        // Disconnect message should have been sent to user
+        $lastRequest = end($sentRequests);
+        $this->assertNotEmpty($lastRequest);
+        $this->assertStringContainsString('отключены', $lastRequest['text'] ?? '');
     }
 }
 
