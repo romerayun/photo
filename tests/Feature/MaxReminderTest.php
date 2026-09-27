@@ -177,6 +177,27 @@ class MaxReminderTest extends TestCase
         $cardResponse->assertStatus(200);
         $cardRequest = end($sentRequests);
         $this->assertStringContainsString('Выберите карточку съёмки', $cardRequest['text'] ?? '');
+
+        // Verify that menu sent to client with multiple shoots has "ℹ️ Детали съёмок" in plural
+        $menuResponse = $this->postJson(route('webhook.max'), [
+            'update_type' => 'message_created',
+            'chat_id' => 'chat_multiple_123',
+            'user' => ['user_id' => 'user_multiple_123'],
+            'message' => ['text' => 'меню'],
+        ]);
+        $menuResponse->assertStatus(200);
+        $menuRequest = end($sentRequests);
+        $menuButtons = $menuRequest['attachments'][0]['payload']['buttons'] ?? [];
+        $hasPluralDetails = false;
+        foreach ($menuButtons as $row) {
+            foreach ($row as $btn) {
+                if (($btn['payload'] ?? '') === 'shoot_details') {
+                    $this->assertEquals('ℹ️ Детали съёмок', $btn['text']);
+                    $hasPluralDetails = true;
+                }
+            }
+        }
+        $this->assertTrue($hasPluralDetails, 'Expected details button to be in plural form for multiple shoots');
     }
 
     public function test_user_without_shoots_receives_no_shoots_message_and_booking_buttons(): void

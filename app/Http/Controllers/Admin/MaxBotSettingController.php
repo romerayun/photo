@@ -22,6 +22,7 @@ class MaxBotSettingController extends Controller
 
             'btn_details_enabled' => Setting::get('max_bot_btn_details_enabled', '1') === '1',
             'btn_details_text' => Setting::get('max_bot_btn_details_text', 'ℹ️ Детали съёмки'),
+            'btn_details_plural_text' => Setting::get('max_bot_btn_details_plural_text', 'ℹ️ Детали съёмок'),
 
             'btn_tips_enabled' => Setting::get('max_bot_btn_tips_enabled', '1') === '1',
             'btn_tips_text' => Setting::get('max_bot_btn_tips_text', '👗 Подготовка'),
@@ -79,6 +80,7 @@ class MaxBotSettingController extends Controller
         $validated = $request->validate([
             'btn_card_text' => ['required', 'string', 'max:50'],
             'btn_details_text' => ['required', 'string', 'max:50'],
+            'btn_details_plural_text' => ['required', 'string', 'max:50'],
             'btn_tips_text' => ['required', 'string', 'max:50'],
             'tips_response' => ['required', 'string', 'max:2000'],
             'btn_contacts_text' => ['required', 'string', 'max:50'],
@@ -100,6 +102,7 @@ class MaxBotSettingController extends Controller
 
         Setting::set('max_bot_btn_details_enabled', $request->has('btn_details_enabled') ? '1' : '0');
         Setting::set('max_bot_btn_details_text', $validated['btn_details_text']);
+        Setting::set('max_bot_btn_details_plural_text', $validated['btn_details_plural_text']);
 
         Setting::set('max_bot_btn_tips_enabled', $request->has('btn_tips_enabled') ? '1' : '0');
         Setting::set('max_bot_btn_tips_text', $validated['btn_tips_text']);

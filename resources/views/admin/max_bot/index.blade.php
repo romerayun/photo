@@ -139,14 +139,23 @@
                         </label>
                         <span class="text-[0.7rem] px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200">Автоматически из базы</span>
                     </div>
-                    <div class="pl-6.5 max-w-md">
-                        <label for="btn_details_text" class="block text-[0.7rem] uppercase tracking-wider font-bold text-slate-500 mb-1">
-                            Текст на кнопке
-                        </label>
-                        <input type="text" name="btn_details_text" id="btn_details_text" value="{{ old('btn_details_text', $settings['btn_details_text']) }}" required
-                               class="w-full px-3.5 py-2 border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-neutral-900">
-                        <span class="text-[0.7rem] text-slate-400 mt-1 block">Ответ формируется автоматически из карточки: дата, время, локация, стоимость, статус оплаты.</span>
+                    <div class="pl-6.5 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="btn_details_text" class="block text-[0.7rem] uppercase tracking-wider font-bold text-slate-500 mb-1">
+                                Текст при одной съёмке (ед. число)
+                            </label>
+                            <input type="text" name="btn_details_text" id="btn_details_text" value="{{ old('btn_details_text', $settings['btn_details_text']) }}" required
+                                   class="w-full px-3.5 py-2 border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-neutral-900">
+                        </div>
+                        <div>
+                            <label for="btn_details_plural_text" class="block text-[0.7rem] uppercase tracking-wider font-bold text-slate-500 mb-1">
+                                Текст при нескольких съёмках (мн. число)
+                            </label>
+                            <input type="text" name="btn_details_plural_text" id="btn_details_plural_text" value="{{ old('btn_details_plural_text', $settings['btn_details_plural_text']) }}" required
+                                   class="w-full px-3.5 py-2 border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-neutral-900">
+                        </div>
                     </div>
+                    <span class="text-[0.7rem] text-slate-400 pl-6.5 block">Если у клиента 1 съёмка, выводится ед. число. Если 2 и более — множественное число, и бот предложит выбрать нужную.</span>
                 </div>
 
                 {{-- Button 3: Shoot Tips --}}

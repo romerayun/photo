@@ -193,7 +193,10 @@ class MaxMessengerService
         // 2. Action buttons row (Details & Tips)
         $actionRow = [];
         $detailsEnabled = \App\Models\Setting::get('max_bot_btn_details_enabled', '1') === '1';
-        $detailsText = \App\Models\Setting::get('max_bot_btn_details_text', 'ℹ️ Детали съёмки');
+        $detailsSingleText = \App\Models\Setting::get('max_bot_btn_details_text', 'ℹ️ Детали съёмки');
+        $detailsPluralText = \App\Models\Setting::get('max_bot_btn_details_plural_text', 'ℹ️ Детали съёмок');
+        $detailsText = ($shootsCount > 1) ? $detailsPluralText : $detailsSingleText;
+
         if ($filter ? in_array('details', $allowedButtons, true) : $detailsEnabled) {
             $actionRow[] = ['type' => 'callback', 'text' => $detailsText, 'payload' => 'shoot_details'];
         }
