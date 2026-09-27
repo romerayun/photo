@@ -124,13 +124,42 @@ class MaxWebhookController extends Controller
      */
     protected function handleCallback(Request $request, MaxMessengerService $maxService, string $chatId, string $userId): JsonResponse
     {
+        $callbackId = $request->input('callback.callback_id')
+            ?? $request->input('callback_id')
+            ?? $request->input('data.callback_id');
+
+        if ($callbackId) {
+            $maxService->answerCallback($callbackId);
+        }
+
         $callbackPayload = $request->input('callback.payload') 
+            ?? $request->input('callback.data')
             ?? $request->input('payload') 
             ?? $request->input('data.payload');
 
+        // Check user/chat in nested structures if empty
+        if (empty($chatId) || $chatId === '0') {
+            $chatId = (string)($request->input('message.chat_id') 
+                ?? $request->input('message.chat.id') 
+                ?? $request->input('chat_id') 
+                ?? $userId);
+        }
+
+        if (empty($userId) || $userId === '0') {
+            $userId = (string)($request->input('user.user_id') 
+                ?? $request->input('callback.user.user_id') 
+                ?? $request->input('user_id'));
+        }
+
         // Find linked shoot for this user or chat
-        $shoot = Shoot::where('max_chat_id', $chatId)
-            ->orWhere('max_user_id', $userId)
+        $shoot = Shoot::where(function ($query) use ($chatId, $userId) {
+                if ($chatId) {
+                    $query->where('max_chat_id', $chatId);
+                }
+                if ($userId) {
+                    $query->orWhere('max_user_id', $userId);
+                }
+            })
             ->latest('shoot_date')
             ->first();
 

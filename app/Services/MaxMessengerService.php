@@ -171,5 +171,37 @@ class MaxMessengerService
 
         return $this->sendMessage($shoot->max_chat_id, $shoot->max_user_id, $text, $buttons);
     }
+
+    /**
+     * Answer a callback query from button click.
+     * API: POST https://platform-api2.max.ru/answers?callback_id=...
+     */
+    public function answerCallback(string $callbackId, ?string $notificationText = null): bool
+    {
+        if (empty($this->token) || empty($callbackId)) {
+            return false;
+        }
+
+        try {
+            $url = "{$this->apiUrl}/answers?callback_id=" . urlencode($callbackId);
+            $payload = [];
+            if ($notificationText) {
+                $payload['notification'] = $notificationText;
+            }
+
+            $response = Http::withHeaders([
+                'Authorization' => $this->token,
+                'Content-Type' => 'application/json',
+            ])
+            ->withoutVerifying()
+            ->timeout(5)
+            ->post($url, empty($payload) ? (object)[] : $payload);
+
+            return $response->successful();
+        } catch (\Throwable $e) {
+            Log::error("MAX answerCallback exception: " . $e->getMessage());
+            return false;
+        }
+    }
 }
 
