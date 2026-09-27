@@ -187,13 +187,16 @@
                                  @click.away="maxModalOpen = false">
                                 
                                 {{-- Close cross --}}
-                                <button type="button" @click="maxModalOpen = false" class="absolute top-5 right-5 text-neutral-400 hover:text-neutral-700 p-1.5 rounded-full hover:bg-neutral-100 transition-colors cursor-pointer">
+                                <button type="button" 
+                                        @click="maxModalOpen = false" 
+                                        aria-label="Закрыть"
+                                        class="absolute top-5 right-5 text-neutral-400 hover:text-neutral-700 p-2 rounded-full hover:bg-neutral-100 transition-colors cursor-pointer">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                                 </button>
 
-                                <div class="flex items-center gap-3.5 mb-5 pr-8">
-                                    <div class="w-11 h-11 rounded-2xl bg-neutral-900 text-white flex items-center justify-center font-bold text-sm shadow-sm shrink-0">
-                                        MAX
+                                <div class="flex items-center gap-3.5 mb-5 pr-10">
+                                    <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-sm shrink-0 border border-neutral-100 bg-black flex items-center justify-center">
+                                        <img src="{{ asset('images/max-logo.png') }}" alt="MAX" class="w-full h-full object-cover">
                                     </div>
                                     <div>
                                         <h3 class="text-base font-bold uppercase tracking-tight text-neutral-900 font-sans">
