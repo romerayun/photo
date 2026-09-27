@@ -135,11 +135,13 @@ class PublicShootController extends Controller
         ]);
 
         $deepLink = $maxService->getStartLink($plainCode);
+        $webLink = $maxService->getWebLink($plainCode);
         $appLink = "max://max.ru/{$maxService->getBotUsername()}?start={$plainCode}";
 
         return response()->json([
             'success' => true,
             'deep_link' => $deepLink,
+            'web_link' => $webLink,
             'app_link' => $appLink,
             'start_command' => "/start {$plainCode}",
             'plain_code' => $plainCode,

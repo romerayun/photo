@@ -190,18 +190,18 @@
                                         <p class="text-xs text-neutral-300 font-mono mt-1.5 pl-7.5">Откроет приложение напрямую в чате бота</p>
                                     </a>
 
-                                    {{-- Option 2: Web Browser Link --}}
-                                    <a :href="maxData.deep_link" 
+                                    {{-- Option 2: Web Browser Link (web.max.ru) --}}
+                                    <a :href="maxData.web_link || maxData.deep_link" 
                                        target="_blank"
                                        class="group block p-4 rounded-2xl border border-neutral-300 bg-neutral-50 hover:bg-neutral-100 text-neutral-900 transition-all">
                                         <div class="flex items-center justify-between">
                                             <div class="flex items-center gap-2.5">
-                                                <svg class="w-5 h-5 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
-                                                <span class="font-bold text-sm">Открыть через веб-сайт (max.ru)</span>
+                                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+                                                <span class="font-bold text-sm">Открыть в веб-версии (web.max.ru)</span>
                                             </div>
                                             <svg class="w-4 h-4 text-neutral-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                         </div>
-                                        <p class="text-xs text-neutral-500 font-mono mt-1.5 pl-7.5">Переход через сайт платформы</p>
+                                        <p class="text-xs text-neutral-500 font-mono mt-1.5 pl-7.5">Откроет диалог сразу в браузере без ошибки приложения</p>
                                     </a>
 
                                     {{-- Option 3: Manual Command Copy --}}

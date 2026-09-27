@@ -37,6 +37,15 @@ class MaxMessengerService
     }
 
     /**
+     * Generate link directly to Web MAX client.
+     * https://web.max.ru/<bot_username>?start=<code>
+     */
+    public function getWebLink(string $plainCode): string
+    {
+        return "https://web.max.ru/{$this->botUsername}?start={$plainCode}";
+    }
+
+    /**
      * Send a text message to a user or chat in MAX.
      * Official API: POST https://platform-api2.max.ru/messages?chat_id=... or ?user_id=...
      * Header: Authorization: <token>
