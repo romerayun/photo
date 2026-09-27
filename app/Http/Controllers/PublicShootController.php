@@ -149,5 +149,26 @@ class PublicShootController extends Controller
             'bot_username' => $maxService->getBotUsername(),
         ]);
     }
+
+    /**
+     * Disconnect / remove MAX messenger connection for this shoot.
+     */
+    public function disconnectMax(string $token): \Illuminate\Http\JsonResponse
+    {
+        $shoot = Shoot::where('share_token', $token)->firstOrFail();
+
+        $shoot->update([
+            'max_user_id' => null,
+            'max_chat_id' => null,
+            'max_connected_at' => null,
+            'max_link_code_hash' => null,
+            'max_link_code_expires_at' => null,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Связь с MAX успешно отключена',
+        ]);
+    }
 }
 

@@ -126,6 +126,24 @@
                             navigator.clipboard.writeText(this.maxData.start_command);
                             this.copied = true;
                             setTimeout(() => { this.copied = false; }, 2500);
+                        },
+                        async disconnectMax() {
+                            if (!confirm('Отключить напоминания в MAX для этой съёмки?')) return;
+                            try {
+                                const response = await fetch('{{ route('shoots.share.max_disconnect', ['token' => $shoot->share_token]) }}', {
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                        'Accept': 'application/json'
+                                    }
+                                });
+                                const data = await response.json();
+                                if (data.success) {
+                                    this.maxConnected = false;
+                                }
+                            } catch (e) {
+                                alert('Не удалось отключить напоминания');
+                            }
                         }
                     }">
                         <a href="{{ route('shoots.share.ics', ['token' => $shoot->share_token]) }}" 
@@ -135,10 +153,19 @@
                         </a>
 
                         <template x-if="maxConnected">
-                            <span class="px-3.5 py-2 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-mono uppercase tracking-wider font-bold inline-flex items-center gap-1.5 border border-emerald-200 shadow-2xs">
-                                <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                <span>Напоминания в MAX подключены</span>
-                            </span>
+                            <div class="inline-flex items-center gap-2">
+                                <span class="px-3.5 py-2 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-mono uppercase tracking-wider font-bold inline-flex items-center gap-1.5 border border-emerald-200 shadow-2xs">
+                                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    <span>Напоминания в MAX подключены</span>
+                                </span>
+                                <button type="button"
+                                        @click="disconnectMax()"
+                                        title="Отвязать напоминания"
+                                        class="px-2.5 py-2 rounded-xl bg-neutral-100 hover:bg-rose-50 text-neutral-400 hover:text-rose-600 text-xs font-mono transition-colors border border-neutral-200 hover:border-rose-200">
+                                    <span class="sr-only">Отключить</span>
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                </button>
+                            </div>
                         </template>
 
                         <template x-if="!maxConnected">

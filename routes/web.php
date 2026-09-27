@@ -47,6 +47,7 @@ Route::get('/shoots/share/{token}', [PublicShootController::class, 'show'])->nam
 Route::get('/shoots/share/{token}/ics', [PublicShootController::class, 'ics'])->name('shoots.share.ics');
 Route::post('/shoots/share/{token}/receipt', [PublicShootController::class, 'uploadReceipt'])->name('shoots.share.receipt');
 Route::post('/shoots/share/{token}/max-link', [PublicShootController::class, 'generateMaxLink'])->name('shoots.share.max_link');
+Route::post('/shoots/share/{token}/max-disconnect', [PublicShootController::class, 'disconnectMax'])->name('shoots.share.max_disconnect');
 
 // MAX Messenger Webhook endpoint
 Route::post('/webhook/max', [\App\Http\Controllers\MaxWebhookController::class, 'handle'])->name('webhook.max');
