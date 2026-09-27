@@ -6,6 +6,8 @@ Alpine.data('lightbox', (photos = []) => ({
     isOpen: false,
     photos: photos,
     currentIndex: 0,
+    touchStartX: 0,
+    touchStartY: 0,
 
     open(index) {
         this.currentIndex = index;
@@ -27,6 +29,26 @@ Alpine.data('lightbox', (photos = []) => ({
     prev() {
         if (this.photos.length > 0) {
             this.currentIndex = (this.currentIndex - 1 + this.photos.length) % this.photos.length;
+        }
+    },
+
+    handleTouchStart(e) {
+        if (!e.changedTouches || e.changedTouches.length === 0) return;
+        this.touchStartX = e.changedTouches[0].clientX;
+        this.touchStartY = e.changedTouches[0].clientY;
+    },
+
+    handleTouchEnd(e) {
+        if (!e.changedTouches || e.changedTouches.length === 0) return;
+        const diffX = e.changedTouches[0].clientX - this.touchStartX;
+        const diffY = e.changedTouches[0].clientY - this.touchStartY;
+        // Check horizontal swipe if swipe distance is significant and predominantly horizontal
+        if (Math.abs(diffX) > 40 && Math.abs(diffX) > Math.abs(diffY)) {
+            if (diffX < 0) {
+                this.next();
+            } else {
+                this.prev();
+            }
         }
     },
 

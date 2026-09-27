@@ -157,46 +157,52 @@
     {{-- Darkroom Lightbox Modal --}}
     <div x-show="isOpen" 
          x-cloak 
-         class="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-2xl p-4 sm:p-8"
+         @touchstart.passive="handleTouchStart($event)"
+         @touchend.passive="handleTouchEnd($event)"
+         class="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-2xl p-2 sm:p-8 select-none"
          role="dialog"
          aria-modal="true"
          aria-label="Просмотр фотографии">
         
-        <button @click="close()" 
+        {{-- Close Button --}}
+        <button @click.stop="close()" 
                 type="button" 
-                class="absolute top-6 right-6 text-white hover:text-crimson p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors z-50"
+                class="absolute top-4 right-4 sm:top-6 sm:right-6 text-white hover:text-crimson p-3 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 transition-all z-[110] cursor-pointer"
                 aria-label="{{ __('site.lightbox_close') }}">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
         </button>
 
-        <button @click="prev()" 
+        {{-- Previous Button --}}
+        <button @click.stop="prev()" 
                 type="button" 
-                class="absolute left-6 top-1/2 -translate-y-1/2 text-white hover:text-crimson p-3.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors z-50"
+                class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 text-white hover:text-crimson p-3.5 sm:p-4 rounded-full bg-black/40 sm:bg-white/10 hover:bg-white/20 active:scale-95 transition-all z-[110] cursor-pointer"
                 aria-label="{{ __('site.lightbox_prev') }}">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
             </svg>
         </button>
 
-        <button @click="next()" 
+        {{-- Next Button --}}
+        <button @click.stop="next()" 
                 type="button" 
-                class="absolute right-6 top-1/2 -translate-y-1/2 text-white hover:text-crimson p-3.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors z-50"
+                class="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 text-white hover:text-crimson p-3.5 sm:p-4 rounded-full bg-black/40 sm:bg-white/10 hover:bg-white/20 active:scale-95 transition-all z-[110] cursor-pointer"
                 aria-label="{{ __('site.lightbox_next') }}">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
             </svg>
         </button>
 
-        <div class="relative max-w-full max-h-[88vh] flex flex-col items-center justify-center select-none" @click.away="close()">
+        {{-- Image & Caption Container --}}
+        <div class="relative max-w-full max-h-[88vh] flex flex-col items-center justify-center pointer-events-auto" @click.away="close()">
             <img :src="currentPhoto().url" 
                  :alt="currentPhoto().alt || ''" 
-                 class="max-w-full max-h-[82vh] object-contain shadow-2xl transition-all duration-300">
+                 class="max-w-full max-h-[78vh] sm:max-h-[82vh] object-contain shadow-2xl transition-all duration-300">
             
-            <div class="mt-4 flex items-center justify-between w-full text-xs text-white/80 font-mono px-4">
-                <span x-text="currentPhoto().caption || currentPhoto().alt || ''"></span>
-                <span class="bg-crimson px-3 py-1 font-bold text-white uppercase tracking-wider" x-text="(currentIndex + 1) + ' / ' + photos.length"></span>
+            <div class="mt-4 flex items-center justify-between w-full max-w-lg text-xs text-white/80 font-mono px-4">
+                <span class="truncate pr-3" x-text="currentPhoto().caption || currentPhoto().alt || ''"></span>
+                <span class="bg-crimson px-3 py-1 font-bold text-white uppercase tracking-wider shrink-0" x-text="(currentIndex + 1) + ' / ' + photos.length"></span>
             </div>
         </div>
 
