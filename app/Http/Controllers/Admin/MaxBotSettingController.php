@@ -115,4 +115,95 @@ class MaxBotSettingController extends Controller
 
         return back()->with('success', 'Настройки кнопок и текстов бота MAX успешно сохранены.');
     }
+
+    /**
+     * Display connected clients and broadcast form.
+     */
+    public function clients(): View
+    {
+        // Get all shoots that have a connected MAX user or chat
+        $shoots = \App\Models\Shoot::whereNotNull('max_connected_at')
+            ->where(function ($query) {
+                $query->whereNotNull('max_chat_id')
+                      ->orWhereNotNull('max_user_id');
+            })
+            ->latest('max_connected_at')
+            ->get();
+
+        // Count unique subscribers by max_chat_id / max_user_id
+        $uniqueSubscribersCount = $shoots->unique(function ($item) {
+            return $item->max_chat_id ?: $item->max_user_id;
+        })->count();
+
+        return view('admin.max_bot.clients', compact('shoots', 'uniqueSubscribersCount'));
+    }
+
+    /**
+     * Send broadcast message to all or selected connected clients.
+     */
+    public function sendBroadcast(Request $request, \App\Services\MaxMessengerService $maxService): RedirectResponse
+    {
+        $validated = $request->validate([
+            'message' => ['required', 'string', 'max:3000'],
+            'target' => ['required', 'in:all,selected'],
+            'shoot_ids' => ['nullable', 'array'],
+            'shoot_ids.*' => ['exists:shoots,id'],
+            'include_menu' => ['nullable'],
+        ]);
+
+        $query = \App\Models\Shoot::whereNotNull('max_connected_at')
+            ->where(function ($q) {
+                $q->whereNotNull('max_chat_id')
+                  ->orWhereNotNull('max_user_id');
+            });
+
+        if ($validated['target'] === 'selected') {
+            if (empty($validated['shoot_ids'])) {
+                return back()->withErrors(['shoot_ids' => 'Выберите хотя бы одного получателя для рассылки.']);
+            }
+            $query->whereIn('id', $validated['shoot_ids']);
+        }
+
+        $recipients = $query->get();
+
+        if ($recipients->isEmpty()) {
+            return back()->withErrors(['message' => 'Нет активных получателей в MAX для отправки.']);
+        }
+
+        $sentCount = 0;
+        $failedCount = 0;
+        $processedRecipients = [];
+
+        foreach ($recipients as $recipient) {
+            $uniqueKey = $recipient->max_chat_id ?: $recipient->max_user_id;
+            if (isset($processedRecipients[$uniqueKey])) {
+                continue; // Avoid sending duplicate message to the same chat
+            }
+            $processedRecipients[$uniqueKey] = true;
+
+            $text = str_replace('{client_name}', $recipient->client_name, $validated['message']);
+            
+            $buttons = !empty($validated['include_menu']) 
+                ? $maxService->getMenuButtons($recipient) 
+                : [];
+
+            $success = $maxService->sendMessage($recipient->max_chat_id, $recipient->max_user_id, $text, $buttons);
+
+            if ($success) {
+                $sentCount++;
+            } else {
+                $failedCount++;
+            }
+
+            // Small delay to prevent rate limiting
+            usleep(150000); // 150ms
+        }
+
+        $statusMsg = "Рассылка завершена! Успешно доставлено: {$sentCount}";
+        if ($failedCount > 0) {
+            $statusMsg .= ", ошибок: {$failedCount}";
+        }
+
+        return back()->with('success', $statusMsg);
+    }
 }

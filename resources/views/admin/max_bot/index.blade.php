@@ -6,11 +6,26 @@
 <div class="max-w-4xl mx-auto space-y-8">
 
     <div class="border-b border-slate-200 pb-4">
-        <div class="flex items-center gap-3">
-            <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
-            <h1 class="text-2xl font-serif font-bold text-slate-900">Настройки бота MAX (@se14454241_bot)</h1>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <div class="flex items-center gap-3">
+                    <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                    <h1 class="text-2xl font-serif font-bold text-slate-900">Бот MAX (@se14454241_bot)</h1>
+                </div>
+                <p class="text-xs text-slate-500 mt-1">Управление интерактивными кнопками, приветствием и рассылками для клиентов.</p>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <a href="{{ route('admin.max_bot.index') }}" 
+                   class="px-3.5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider bg-neutral-900 text-white shadow-sm">
+                    Кнопки и тексты
+                </a>
+                <a href="{{ route('admin.max_bot.clients') }}" 
+                   class="px-3.5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors">
+                    Клиенты и рассылка
+                </a>
+            </div>
         </div>
-        <p class="text-xs text-slate-500 mt-1">Здесь вы можете настраивать интерактивные кнопки, приветственное сообщение и тексты ответов бота для клиентов.</p>
     </div>
 
     <form method="POST" action="{{ route('admin.max_bot.update') }}" class="space-y-8">

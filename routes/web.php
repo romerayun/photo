@@ -118,9 +118,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings.index');
         Route::post('/settings', [AdminSettingController::class, 'update'])->name('settings.update');
 
-        // MAX Bot Settings
+        // MAX Bot Settings & Broadcasts
         Route::get('/max-bot', [\App\Http\Controllers\Admin\MaxBotSettingController::class, 'index'])->name('max_bot.index');
         Route::post('/max-bot', [\App\Http\Controllers\Admin\MaxBotSettingController::class, 'update'])->name('max_bot.update');
+        Route::get('/max-bot/clients', [\App\Http\Controllers\Admin\MaxBotSettingController::class, 'clients'])->name('max_bot.clients');
+        Route::post('/max-bot/broadcast', [\App\Http\Controllers\Admin\MaxBotSettingController::class, 'sendBroadcast'])->name('max_bot.broadcast');
 
         // Shoots & Calendar
         Route::get('/shoots', [AdminShootController::class, 'index'])->name('shoots.index');
