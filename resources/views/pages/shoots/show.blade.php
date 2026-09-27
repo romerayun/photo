@@ -183,81 +183,64 @@
                              x-cloak 
                              class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
                              @keydown.escape.window="maxModalOpen = false">
-                            <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-neutral-200 relative text-left"
+                            <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-neutral-100 relative text-left"
                                  @click.away="maxModalOpen = false">
                                 
                                 {{-- Close cross --}}
-                                <button type="button" @click="maxModalOpen = false" class="absolute top-5 right-5 text-neutral-400 hover:text-neutral-700 p-1">
+                                <button type="button" @click="maxModalOpen = false" class="absolute top-5 right-5 text-neutral-400 hover:text-neutral-700 p-1.5 rounded-full hover:bg-neutral-100 transition-colors cursor-pointer">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                                 </button>
 
-                                <div class="flex items-center gap-3 mb-4">
-                                    <div class="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 font-bold">
+                                <div class="flex items-center gap-3.5 mb-5 pr-8">
+                                    <div class="w-11 h-11 rounded-2xl bg-neutral-900 text-white flex items-center justify-center font-bold text-sm shadow-sm shrink-0">
                                         MAX
                                     </div>
                                     <div>
-                                        <h3 class="text-base sm:text-lg font-bold font-display uppercase tracking-tight text-neutral-900">
-                                            Подключение напоминаний
+                                        <h3 class="text-base font-bold uppercase tracking-tight text-neutral-900 font-sans">
+                                            Напоминания о съёмке
                                         </h3>
-                                        <p class="text-xs text-neutral-500 font-mono">Выберите удобный способ запуска бота</p>
+                                        <p class="text-xs text-neutral-500 font-sans mt-0.5">Выберите удобный способ запуска бота</p>
                                     </div>
                                 </div>
 
-                                <div class="space-y-3.5 mt-5">
+                                <div class="space-y-3">
                                     {{-- Option 1: Mobile / Desktop App installed --}}
                                     <a :href="maxData.app_link" 
-                                       class="group block p-4 rounded-2xl border-2 border-neutral-900 bg-neutral-900 hover:bg-black text-white transition-all shadow-sm">
-                                        <div class="flex items-center justify-between">
-                                            <div class="flex items-center gap-2.5">
-                                                <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 24 24"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
-                                                <span class="font-bold text-sm">У меня установлено приложение MAX</span>
+                                       class="group flex items-center justify-between p-4 rounded-2xl bg-neutral-900 hover:bg-black text-white transition-all shadow-sm">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-amber-400 shrink-0">
+                                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
                                             </div>
-                                            <svg class="w-4 h-4 text-neutral-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                            <div>
+                                                <span class="font-bold text-sm block">Открыть в приложении MAX</span>
+                                                <span class="text-xs text-neutral-400 block mt-0.5">Если у вас установлено приложение</span>
+                                            </div>
                                         </div>
-                                        <p class="text-xs text-neutral-300 font-mono mt-1.5 pl-7.5">Откроет приложение напрямую в чате бота</p>
+                                        <svg class="w-4 h-4 text-neutral-400 group-hover:translate-x-1 transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                                     </a>
 
                                     {{-- Option 2: Web Browser Link (web.max.ru) --}}
                                     <a :href="maxData.web_link || maxData.deep_link" 
                                        target="_blank"
-                                       class="group block p-4 rounded-2xl border border-neutral-300 bg-neutral-50 hover:bg-neutral-100 text-neutral-900 transition-all">
-                                        <div class="flex items-center justify-between">
-                                            <div class="flex items-center gap-2.5">
-                                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
-                                                <span class="font-bold text-sm">Открыть в веб-версии (web.max.ru)</span>
+                                       class="group flex items-center justify-between p-4 rounded-2xl border border-neutral-200 bg-neutral-50/70 hover:bg-neutral-100 text-neutral-900 transition-all">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
                                             </div>
-                                            <svg class="w-4 h-4 text-neutral-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                            <div>
+                                                <span class="font-bold text-sm block">Открыть в веб-версии (Web)</span>
+                                                <span class="text-xs text-neutral-500 block mt-0.5">Без установки приложения</span>
+                                            </div>
                                         </div>
-                                        <p class="text-xs text-neutral-500 font-mono mt-1.5 pl-7.5">Откроет диалог сразу в браузере без ошибки приложения</p>
+                                        <svg class="w-4 h-4 text-neutral-400 group-hover:translate-x-1 transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                     </a>
-
-                                    {{-- Option 3: Manual Command Copy --}}
-                                    <div class="p-4 rounded-2xl border border-neutral-200 bg-white">
-                                        <div class="text-xs font-mono font-bold text-neutral-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
-                                            <span>Или скопируйте команду:</span>
-                                            <span class="text-[0.65rem] text-neutral-400 font-normal">Срок действия: 15 минут</span>
-                                        </div>
-                                        <p class="text-xs text-neutral-600 mb-2.5">
-                                            Откройте бота <strong class="text-neutral-900">@<span x-text="maxData.bot_username"></span></strong> в MAX и отправьте:
-                                        </p>
-                                        <div class="flex items-center gap-2">
-                                            <code class="px-3 py-2 bg-neutral-100 rounded-xl text-xs font-mono text-neutral-800 break-all select-all flex-1 border border-neutral-200" x-text="maxData.start_command"></code>
-                                            <button type="button" 
-                                                    @click="copyCommand()" 
-                                                    class="px-3 py-2 rounded-xl bg-neutral-900 text-white hover:bg-black text-xs font-mono font-bold shrink-0 transition-all flex items-center gap-1">
-                                                <svg x-show="!copied" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
-                                                <svg x-show="copied" class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                                <span x-text="copied ? 'Скопировано!' : 'Копировать'"></span>
-                                            </button>
-                                        </div>
-                                    </div>
                                 </div>
 
-                                <div class="mt-5 pt-4 border-t border-neutral-100 flex justify-end">
+                                <div class="mt-5 pt-3 border-t border-neutral-100 flex justify-center">
                                     <button type="button" 
                                             @click="maxModalOpen = false" 
-                                            class="px-4 py-2 rounded-xl text-xs font-mono text-neutral-600 hover:text-neutral-900 font-bold uppercase tracking-wider">
-                                        Закрыть
+                                            class="text-xs text-neutral-400 hover:text-neutral-700 font-semibold transition-colors py-1 cursor-pointer">
+                                        Отмена
                                     </button>
                                 </div>
                             </div>
