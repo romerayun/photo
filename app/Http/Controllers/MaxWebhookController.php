@@ -226,7 +226,11 @@ class MaxWebhookController extends Controller
         // 1. Details button
         if ($callbackPayload === 'shoot_details') {
             if ($allShoots->isEmpty()) {
-                $maxService->sendMessage($chatId, $userId, "У вас пока нет активной фотосессии, привязанной к этому чату.", $maxService->getMenuButtons());
+                $noShootsText = \App\Models\Setting::get('max_bot_no_shoots_text', 
+                    "Здравствуйте! У вас пока нет запланированных съёмок.\n\n"
+                    . "Вы можете записаться на фотосессию или связаться со мной для консультации кнопками ниже:"
+                );
+                $maxService->sendMessage($chatId, $userId, $noShootsText, $maxService->getMenuButtons(null, null, 0));
                 return response()->json(['status' => 'ok']);
             }
 
@@ -282,7 +286,11 @@ class MaxWebhookController extends Controller
         // Card button clicked when client has MULTIPLE shoots
         if ($callbackPayload === 'shoot_card_menu') {
             if ($allShoots->isEmpty()) {
-                $maxService->sendMessage($chatId, $userId, "У вас пока нет активной фотосессии, привязанной к этому чату.", $maxService->getMenuButtons());
+                $noShootsText = \App\Models\Setting::get('max_bot_no_shoots_text', 
+                    "Здравствуйте! У вас пока нет запланированных съёмок.\n\n"
+                    . "Вы можете записаться на фотосессию или связаться со мной для консультации кнопками ниже:"
+                );
+                $maxService->sendMessage($chatId, $userId, $noShootsText, $maxService->getMenuButtons(null, null, 0));
                 return response()->json(['status' => 'ok']);
             }
 
@@ -319,8 +327,16 @@ class MaxWebhookController extends Controller
 
         // Main menu button
         if ($callbackPayload === 'main_menu') {
-            $reply = "Главное меню бота. Выберите действие кнопками ниже:";
-            $buttons = $maxService->getMenuButtons($shoot, null, $allShoots->count());
+            if ($allShoots->isEmpty()) {
+                $reply = \App\Models\Setting::get('max_bot_no_shoots_text', 
+                    "Здравствуйте! У вас пока нет запланированных съёмок.\n\n"
+                    . "Вы можете записаться на фотосессию или связаться со мной для консультации кнопками ниже:"
+                );
+                $buttons = $maxService->getMenuButtons(null, null, 0);
+            } else {
+                $reply = "Главное меню бота. Выберите действие кнопками ниже:";
+                $buttons = $maxService->getMenuButtons($shoot, null, $allShoots->count());
+            }
             $maxService->sendMessage($chatId, $userId, $reply, $buttons);
             return response()->json(['status' => 'ok']);
         }
@@ -395,6 +411,16 @@ class MaxWebhookController extends Controller
 
         $allShoots = $shootsQuery->orderBy('shoot_date', 'desc')->get();
         $shoot = $allShoots->first();
+
+        if ($allShoots->isEmpty()) {
+            $defaultNoShootsText = "Здравствуйте! У вас пока нет запланированных съёмок.\n\n"
+                . "Вы можете записаться на фотосессию или связаться со мной для консультации кнопками ниже:";
+            $reply = \App\Models\Setting::get('max_bot_no_shoots_text', $defaultNoShootsText);
+            $buttons = $maxService->getMenuButtons(null, null, 0);
+
+            $maxService->sendMessage($chatId, $userId, $reply, $buttons);
+            return response()->json(['status' => 'ok']);
+        }
 
         $reply = "Здравствуйте! Чем могу помочь? Выберите действие кнопками меню ниже:";
         $buttons = $maxService->getMenuButtons($shoot, null, $allShoots->count());

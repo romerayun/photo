@@ -141,6 +141,30 @@ class MaxMessengerService
         $buttons = [];
         $filter = $allowedButtons !== null;
 
+        // If client has NO shoots at all, only offer booking and contacts
+        if ($shootsCount === 0 && $shoot === null) {
+            $bookingUrl = \App\Models\Setting::get('max_bot_booking_url') ?: url('/contacts');
+            $bookingText = \App\Models\Setting::get('max_bot_btn_book_text', '📅 Записаться на съёмку');
+            $contactsText = \App\Models\Setting::get('max_bot_btn_contacts_text', '📞 Контакты фотографа');
+
+            $buttons[] = [
+                [
+                    'type' => 'link',
+                    'text' => $bookingText,
+                    'url' => $bookingUrl,
+                ],
+            ];
+            $buttons[] = [
+                [
+                    'type' => 'callback',
+                    'text' => $contactsText,
+                    'payload' => 'photographer_contacts',
+                ],
+            ];
+
+            return $buttons;
+        }
+
         // 1. Button to web card
         $cardEnabled = \App\Models\Setting::get('max_bot_btn_card_enabled', '1') === '1';
         $cardText = \App\Models\Setting::get('max_bot_btn_card_text', '📱 Открыть карточку съёмки');

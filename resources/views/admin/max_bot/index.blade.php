@@ -63,10 +63,48 @@
             </div>
         </div>
 
-        {{-- 2. Standard Buttons & Responses --}}
+        {{-- 2. Scenario When Client Has No Shoots --}}
         <div class="bg-white p-6 sm:p-8 border border-slate-200 rounded-xl shadow-sm space-y-6">
             <div class="border-b border-slate-100 pb-3">
-                <h2 class="text-base font-bold text-slate-900">2. Стандартные кнопки и ответы</h2>
+                <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded bg-amber-50 text-amber-800 text-[0.7rem] font-bold border border-amber-200 uppercase tracking-wide">Сценарий</span>
+                    <h2 class="text-base font-bold text-slate-900">Если у пользователя нет съёмок</h2>
+                </div>
+                <p class="text-xs text-slate-500 mt-1">Когда человек запускает бота или пишет ему, но у него ещё нет привязанных съёмок, бот отправляет этот текст и выводит <b>только 2 кнопки: «Записаться» и «Контакты»</b>.</p>
+            </div>
+
+            <div class="space-y-5">
+                <div>
+                    <label for="no_shoots_text" class="block text-xs uppercase tracking-wider font-bold text-slate-700 mb-1.5">
+                        Текст ответа бота (съёмки не запланированы) *
+                    </label>
+                    <textarea name="no_shoots_text" id="no_shoots_text" rows="4" required
+                              class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 leading-relaxed font-sans">{{ old('no_shoots_text', $settings['no_shoots_text']) }}</textarea>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                    <div>
+                        <label for="btn_book_text" class="block text-[0.7rem] uppercase tracking-wider font-bold text-slate-500 mb-1">
+                            Текст кнопки записи *
+                        </label>
+                        <input type="text" name="btn_book_text" id="btn_book_text" value="{{ old('btn_book_text', $settings['btn_book_text']) }}" required
+                               class="w-full px-3.5 py-2 border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-neutral-900">
+                    </div>
+                    <div>
+                        <label for="booking_url" class="block text-[0.7rem] uppercase tracking-wider font-bold text-slate-500 mb-1">
+                            Ссылка для записи (сайт / страница контактов) *
+                        </label>
+                        <input type="url" name="booking_url" id="booking_url" value="{{ old('booking_url', $settings['booking_url']) }}" required
+                               class="w-full px-3.5 py-2 border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-neutral-900">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- 3. Standard Buttons & Responses --}}
+        <div class="bg-white p-6 sm:p-8 border border-slate-200 rounded-xl shadow-sm space-y-6">
+            <div class="border-b border-slate-100 pb-3">
+                <h2 class="text-base font-bold text-slate-900">3. Стандартные кнопки и ответы (для клиентов со съёмками)</h2>
                 <p class="text-xs text-slate-500 mt-0.5">Включайте или отключайте кнопки, меняйте названия и тексты автоматических ответов.</p>
             </div>
 
@@ -170,11 +208,11 @@
             </div>
         </div>
 
-        {{-- 3. Custom Buttons Builder --}}
+        {{-- 4. Custom Buttons Builder --}}
         <div class="bg-white p-6 sm:p-8 border border-slate-200 rounded-xl shadow-sm space-y-6">
             <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
                 <div>
-                    <h2 class="text-base font-bold text-slate-900">3. Дополнительные пользовательские кнопки</h2>
+                    <h2 class="text-base font-bold text-slate-900">4. Дополнительные пользовательские кнопки</h2>
                     <p class="text-xs text-slate-500 mt-0.5">Вы можете добавить любые свои кнопки: ссылку на Яндекс.Карты, реквизиты, ссылку на ВК или портфолио.</p>
                 </div>
                 <button type="button" id="add-custom-btn" class="px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-semibold rounded-lg transition-colors cursor-pointer flex items-center gap-1.5">

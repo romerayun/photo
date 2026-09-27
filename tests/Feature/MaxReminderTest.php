@@ -178,4 +178,37 @@ class MaxReminderTest extends TestCase
         $cardRequest = end($sentRequests);
         $this->assertStringContainsString('Выберите карточку съёмки', $cardRequest['text'] ?? '');
     }
+
+    public function test_user_without_shoots_receives_no_shoots_message_and_booking_buttons(): void
+    {
+        $sentRequests = [];
+        Http::fake(function ($request) use (&$sentRequests) {
+            $sentRequests[] = $request->data();
+            return Http::response(['ok' => true], 200);
+        });
+
+        // User without any shoots sends a text message to bot
+        $response = $this->postJson(route('webhook.max'), [
+            'update_type' => 'message_created',
+            'chat_id' => 'chat_no_shoots_999',
+            'user' => ['user_id' => 'user_no_shoots_999'],
+            'message' => [
+                'text' => 'Привет',
+            ],
+        ]);
+
+        $response->assertStatus(200);
+        $lastRequest = end($sentRequests);
+        $this->assertNotEmpty($lastRequest);
+        $this->assertStringContainsString('нет запланированных съёмок', $lastRequest['text'] ?? '');
+
+        // Verify attachments only have 2 buttons: "Записаться на съёмку" and "Контакты фотографа"
+        $buttons = $lastRequest['attachments'][0]['payload']['buttons'] ?? [];
+        $this->assertCount(2, $buttons);
+        $this->assertEquals('📅 Записаться на съёмку', $buttons[0][0]['text']);
+        $this->assertEquals('link', $buttons[0][0]['type']);
+        $this->assertEquals('📞 Контакты фотографа', $buttons[1][0]['text']);
+        $this->assertEquals('callback', $buttons[1][0]['type']);
+    }
 }
+

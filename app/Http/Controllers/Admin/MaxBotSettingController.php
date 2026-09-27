@@ -57,6 +57,14 @@ class MaxBotSettingController extends Controller
                 "Чтобы вам было удобно, вы можете прямо сейчас посмотреть детали съёмки, памятку по подготовке или перейти в карточку съёмки кнопками ниже:"
             ),
 
+            // Settings when client has NO shoots
+            'no_shoots_text' => Setting::get('max_bot_no_shoots_text',
+                "Здравствуйте! У вас пока нет запланированных съёмок.\n\n"
+                . "Вы можете записаться на фотосессию или связаться со мной для консультации кнопками ниже:"
+            ),
+            'btn_book_text' => Setting::get('max_bot_btn_book_text', '📅 Записаться на съёмку'),
+            'booking_url' => Setting::get('max_bot_booking_url', url('/contacts')),
+
             'custom_buttons' => json_decode(Setting::get('max_bot_custom_buttons', '[]'), true) ?: [],
         ];
 
@@ -77,6 +85,9 @@ class MaxBotSettingController extends Controller
             'contacts_response' => ['required', 'string', 'max:2000'],
             'welcome_text' => ['required', 'string', 'max:1000'],
             'welcome_second_text' => ['required', 'string', 'max:1000'],
+            'no_shoots_text' => ['required', 'string', 'max:1000'],
+            'btn_book_text' => ['required', 'string', 'max:50'],
+            'booking_url' => ['required', 'url', 'max:255'],
             'custom_buttons' => ['nullable', 'array'],
             'custom_buttons.*.title' => ['required_with:custom_buttons', 'string', 'max:50'],
             'custom_buttons.*.type' => ['required_with:custom_buttons', 'in:link,text'],
@@ -100,6 +111,9 @@ class MaxBotSettingController extends Controller
 
         Setting::set('max_bot_welcome_text', $validated['welcome_text']);
         Setting::set('max_bot_welcome_second_text', $validated['welcome_second_text']);
+        Setting::set('max_bot_no_shoots_text', $validated['no_shoots_text']);
+        Setting::set('max_bot_btn_book_text', $validated['btn_book_text']);
+        Setting::set('max_bot_booking_url', $validated['booking_url']);
 
         // Filter and sanitize custom buttons
         $customButtons = [];
