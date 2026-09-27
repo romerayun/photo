@@ -183,27 +183,30 @@
                              x-cloak 
                              class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
                              @keydown.escape.window="maxModalOpen = false">
-                            <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-neutral-100 relative text-left"
+                            <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-neutral-100 text-left"
                                  @click.away="maxModalOpen = false">
                                 
-                                {{-- Close cross --}}
-                                <button type="button" 
-                                        @click="maxModalOpen = false" 
-                                        aria-label="Закрыть"
-                                        class="absolute top-5 right-5 text-neutral-400 hover:text-neutral-700 p-2 rounded-full hover:bg-neutral-100 transition-colors cursor-pointer">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                                </button>
-
-                                <div class="flex items-center gap-3.5 mb-5 pr-10">
-                                    <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-sm shrink-0 border border-neutral-100 bg-black flex items-center justify-center">
-                                        <img src="{{ asset('images/max-logo.png') }}" alt="MAX" class="w-full h-full object-cover">
+                                {{-- Header with Logo left, Titles middle, Cross button right --}}
+                                <div class="flex items-start justify-between gap-4 mb-5">
+                                    <div class="flex items-center gap-3.5 min-w-0">
+                                        <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-sm shrink-0 border border-neutral-100 bg-black flex items-center justify-center">
+                                            <img src="{{ asset('images/max-logo.png') }}" alt="MAX" class="w-full h-full object-cover">
+                                        </div>
+                                        <div class="min-w-0">
+                                            <h3 class="text-base font-bold uppercase tracking-tight text-neutral-900 font-sans truncate">
+                                                Напоминания о съёмке
+                                            </h3>
+                                            <p class="text-xs text-neutral-500 font-sans mt-0.5">Выберите способ запуска бота</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h3 class="text-base font-bold uppercase tracking-tight text-neutral-900 font-sans">
-                                            Напоминания о съёмке
-                                        </h3>
-                                        <p class="text-xs text-neutral-500 font-sans mt-0.5">Выберите удобный способ запуска бота</p>
-                                    </div>
+                                    
+                                    {{-- Close cross on the right --}}
+                                    <button type="button" 
+                                            @click="maxModalOpen = false" 
+                                            aria-label="Закрыть"
+                                            class="text-neutral-400 hover:text-neutral-800 p-2 -mr-1 -mt-1 rounded-full hover:bg-neutral-100 transition-colors shrink-0 cursor-pointer">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    </button>
                                 </div>
 
                                 <div class="space-y-3">
