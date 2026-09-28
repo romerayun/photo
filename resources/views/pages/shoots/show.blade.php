@@ -287,10 +287,10 @@
         </div>
 
         {{-- 2-COLUMN DASHBOARD GRID --}}
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
 
             {{-- LEFT COLUMN: Concept, Details & Moodboard --}}
-            <div class="lg:col-span-6 space-y-6">
+            <div class="space-y-6">
 
                 {{-- Description / Concept Card --}}
                 @if($shoot->description)
@@ -331,14 +331,14 @@
                                 @foreach($images as $file)
                                     <button type="button" 
                                             @click="openLightbox('{{ $file->url }}', '{{ addslashes($file->original_name) }}')"
-                                            class="group relative aspect-square rounded-xl overflow-hidden bg-neutral-100 border border-arch-border block w-full text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-crimson shadow-2xs hover:shadow-md transition-all">
+                                            class="group relative aspect-square rounded-xl overflow-hidden bg-neutral-100 border border-arch-border block w-full text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-crimson shadow-xs hover:shadow-md transition-all">
                                         <img src="{{ $file->url }}" alt="{{ $file->original_name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                                         
                                         <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2.5">
                                             <span class="text-[0.68rem] text-white font-mono truncate">{{ $file->original_name }}</span>
                                         </div>
 
-                                        <div class="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-xs shadow-md">
+                                        <div class="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm shadow-md">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/></svg>
                                         </div>
                                     </button>
@@ -349,9 +349,9 @@
                         @if($otherFiles->count() > 0)
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
                                 @foreach($otherFiles as $file)
-                                    <div class="p-3 rounded-xl border border-arch-border bg-arch-bg hover:bg-neutral-100 transition-colors flex items-center justify-between gap-3 shadow-2xs">
+                                    <div class="p-3 rounded-xl border border-arch-border bg-arch-bg hover:bg-neutral-100 transition-colors flex items-center justify-between gap-3 shadow-xs">
                                         <div class="flex items-center gap-3 truncate">
-                                            <div class="w-9 h-9 rounded-lg bg-white text-arch-text border border-arch-border flex items-center justify-center shrink-0 uppercase text-xs font-mono font-bold shadow-2xs">
+                                            <div class="w-9 h-9 rounded-lg bg-white text-arch-text border border-arch-border flex items-center justify-center shrink-0 uppercase text-xs font-mono font-bold shadow-xs">
                                                 {{ $file->extension }}
                                             </div>
                                             <div class="truncate">
@@ -359,7 +359,7 @@
                                                 <span class="text-[0.65rem] text-neutral-500 font-mono">{{ $file->formatted_size }}</span>
                                             </div>
                                         </div>
-                                        <a href="{{ $file->url }}" download class="px-3 py-1.5 bg-white hover:bg-neutral-50 text-xs font-mono uppercase tracking-wider text-arch-text border border-arch-border rounded-lg transition-colors font-bold shrink-0 shadow-2xs">
+                                        <a href="{{ $file->url }}" download class="px-3 py-1.5 bg-white hover:bg-neutral-50 text-xs font-mono uppercase tracking-wider text-arch-text border border-arch-border rounded-lg transition-colors font-bold shrink-0 shadow-xs">
                                             Скачать
                                         </a>
                                     </div>
@@ -371,15 +371,39 @@
 
                 {{-- If no description and no files, show a neat placeholder card --}}
                 @if(!$shoot->description && $shoot->files->count() === 0)
-                    <div class="bg-white border border-arch-border rounded-2xl md:rounded-3xl p-6 sm:p-8 shadow-card-depth text-center space-y-2 text-neutral-500">
-                        <span class="text-xs font-mono">Дополнительные референсы и концепт съёмки пока не добавлены.</span>
+                    <div class="bg-white border border-arch-border rounded-2xl md:rounded-3xl p-6 sm:p-8 shadow-card-depth space-y-4">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-neutral-400"></span>
+                            <span class="text-[0.68rem] uppercase tracking-widest text-neutral-400 font-mono font-bold block">
+                                Концепт и референсы
+                            </span>
+                        </div>
+                        <div class="p-6 rounded-2xl border-2 border-dashed border-arch-border bg-arch-bg/50 text-center space-y-3">
+                            <div class="w-12 h-12 rounded-2xl bg-white border border-arch-border text-neutral-400 mx-auto flex items-center justify-center shadow-xs">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            </div>
+                            <div class="space-y-1">
+                                <h3 class="text-base font-extrabold uppercase tracking-tight font-display text-arch-text">Подготовка в процессе</h3>
+                                <p class="text-xs text-neutral-500 font-sans max-w-sm mx-auto leading-relaxed">
+                                    Роман добавит сюда референсы образов, мудборд и рекомендации по подготовке к съёмке.
+                                </p>
+                            </div>
+                            @if($photographerTelegram)
+                                <div class="pt-2">
+                                    <a href="{{ $photographerTelegram }}" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-neutral-700 hover:text-crimson transition-colors">
+                                        <span>Предложить свои референсы</span>
+                                        <span>&rarr;</span>
+                                    </a>
+                                </div>
+                            @endif
+                        </div>
                     </div>
                 @endif
 
             </div>
 
             {{-- RIGHT COLUMN: Top = Contract & Prepayment, Bottom = Photoshoot Results / Gallery --}}
-            <div class="lg:col-span-6 space-y-6">
+            <div class="space-y-6">
 
                 {{-- Right Card 1: CONTRACT & PREPAYMENT / BOOKING --}}
                 <div x-data="{
@@ -1007,6 +1031,8 @@
                     @endif
                 </div>
 
+            </div>
+
         </div>
 
         {{-- BOTTOM: Photographer Contact Card (Across full width) --}}
@@ -1078,10 +1104,11 @@
                  class="max-w-full max-h-[82vh] object-contain rounded-xl shadow-2xl ring-1 ring-white/10">
             
             <template x-if="lightboxTitle">
-                <div class="mt-3.5 text-center text-xs sm:text-sm text-white/90 font-mono px-4 max-w-xl truncate bg-white/10 py-1.5 rounded-full border border-white/10 backdrop-blur-xs" x-text="lightboxTitle"></div>
+                <div class="mt-3.5 text-center text-xs sm:text-sm text-white/90 font-mono px-4 max-w-xl truncate bg-white/10 py-1.5 rounded-full border border-white/10 backdrop-blur-sm" x-text="lightboxTitle"></div>
             </template>
         </div>
     </div>
 
+</div>
 </div>
 @endsection
