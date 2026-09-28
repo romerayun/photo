@@ -33,321 +33,331 @@
             <span class="font-mono text-[0.7rem] uppercase tracking-wider text-neutral-400">ID: {{ substr(md5($shoot->id . $shoot->share_token), 0, 8) }}</span>
         </div>
 
-        {{-- TOP CARD: Shoot Hero & Essential Info (Date, Time, Location, Calendar) --}}
-        <div class="bg-white border border-arch-border rounded-2xl md:rounded-3xl overflow-hidden shadow-card-depth mb-6">
-            
-            {{-- Hero Header --}}
-            <div class="p-6 sm:p-8 lg:p-10 border-b border-arch-border relative overflow-hidden bg-gradient-to-br from-white via-arch-bg/40 to-white">
-                <div class="absolute -right-20 -top-20 w-72 h-72 bg-crimson/5 rounded-full blur-3xl pointer-events-none"></div>
-
-                <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[0.68rem] font-mono uppercase tracking-widest bg-arch-bg text-neutral-700 border border-arch-border shadow-2xs font-bold">
-                        <span class="w-2 h-2 rounded-full bg-crimson animate-pulse"></span>
-                        <span>Персональная карточка съёмки</span>
-                    </span>
-
-                    @if($shoot->booking_confirmed_at && $shoot->status === 'planned')
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider font-bold bg-emerald-50 text-emerald-700 border border-emerald-300">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                            <span>Бронь подтверждена</span>
-                        </span>
-                    @else
-                        <span class="px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider font-bold {{ $shoot->status === 'completed' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : ($shoot->status === 'cancelled' ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-blue-50 text-blue-700 border border-blue-200') }}">
-                            {{ $shoot->status_label }}
-                        </span>
-                    @endif
-                </div>
-
-                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                    <div>
-                        <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold uppercase tracking-tight font-display text-arch-text leading-[1.08]">
-                            {{ $shoot->client_name }}
-                        </h1>
-                        <p class="text-xs sm:text-sm text-neutral-600 font-mono mt-2.5 max-w-2xl leading-relaxed">
-                            Вся актуальная информация о фотосессии: дата, тайминг, локация, договор и готовые материалы.
-                        </p>
-                    </div>
-
-                    @if($shoot->price)
-                        <div class="md:text-right shrink-0">
-                            <span class="text-[0.68rem] uppercase tracking-widest text-neutral-400 font-mono font-bold block mb-0.5">Стоимость съёмки</span>
-                            <div class="text-2xl sm:text-3xl font-extrabold font-display text-arch-text">
-                                {{ number_format($shoot->price, 0, '', ' ') }} ₽
-                            </div>
-                        </div>
-                    @endif
-                </div>
-            </div>
-
-            {{-- Key Details Grid: Date & Time + Location & Navigation --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-arch-border bg-arch-bg/40">
-                
-                {{-- Date & Time Box --}}
-                <div class="p-6 sm:p-7 flex flex-col justify-between space-y-4">
-                    <div>
-                        <span class="text-[0.68rem] uppercase tracking-widest text-neutral-400 font-mono font-bold block mb-1">Дата и время</span>
-                        <div class="text-xl sm:text-2xl font-extrabold uppercase font-display tracking-tight text-arch-text">
-                            {{ $shoot->shoot_date->translatedFormat('d F Y') }}
-                        </div>
-                        <div class="text-xs sm:text-sm font-mono text-neutral-600 mt-1.5 flex items-center gap-2">
-                            <span class="text-crimson font-bold">{{ substr($shoot->start_time, 0, 5) }} – {{ $shoot->end_time ?: '...' }}</span>
-                            <span class="text-neutral-300">&bull;</span>
-                            <span>{{ $shoot->duration_label }}</span>
-                        </div>
-                    </div>
-
-                    {{-- Add to calendar & MAX reminders --}}
-                    <div class="pt-1 flex flex-wrap gap-2 items-center" x-data="{
-                        maxLoading: false,
-                        maxModalOpen: false,
-                        copied: false,
-                        maxConnected: {{ $shoot->max_connected_at ? 'true' : 'false' }},
-                        maxData: {
-                            deep_link: '',
-                            app_link: '',
-                            start_command: '',
-                            bot_username: 'se14454241_bot'
-                        },
-                        async initMaxConnect() {
-                            if (this.maxLoading) return;
-                            this.maxLoading = true;
-                            try {
-                                const response = await fetch('{{ route('shoots.share.max_link', ['token' => $shoot->share_token]) }}', {
-                                    method: 'POST',
-                                    headers: {
-                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                        'Accept': 'application/json'
-                                    }
-                                });
-                                const data = await response.json();
-                                if (data.success) {
-                                    this.maxData = data;
-                                    this.maxModalOpen = true;
-                                } else {
-                                    alert('Не удалось сформировать данные для MAX. Попробуйте еще раз.');
-                                }
-                            } catch (e) {
-                                alert('Произошла ошибка при формировании ссылки MAX');
-                            } finally {
-                                this.maxLoading = false;
-                            }
-                        },
-                        copyCommand() {
-                            if (!this.maxData.start_command) return;
-                            navigator.clipboard.writeText(this.maxData.start_command);
-                            this.copied = true;
-                            setTimeout(() => { this.copied = false; }, 2500);
-                        },
-                        async disconnectMax() {
-                            if (!confirm('Отключить напоминания в MAX для этой съёмки?')) return;
-                            try {
-                                const response = await fetch('{{ route('shoots.share.max_disconnect', ['token' => $shoot->share_token]) }}', {
-                                    method: 'POST',
-                                    headers: {
-                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                        'Accept': 'application/json'
-                                    }
-                                });
-                                const data = await response.json();
-                                if (data.success) {
-                                    this.maxConnected = false;
-                                }
-                            } catch (e) {
-                                alert('Не удалось отключить напоминания');
-                            }
-                        }
-                    }">
-                        <a href="{{ route('shoots.share.ics', ['token' => $shoot->share_token]) }}" 
-                           class="px-3.5 py-2 rounded-xl bg-white hover:bg-neutral-50 text-xs font-mono uppercase tracking-wider text-arch-text font-bold transition-colors inline-flex items-center gap-1.5 border border-arch-border shadow-2xs hover:border-neutral-400">
-                            <svg class="w-3.5 h-3.5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                            <span>В календарь (.ics)</span>
-                        </a>
-
-                        <template x-if="maxConnected">
-                            <div class="inline-flex items-center gap-2">
-                                <span class="px-3 py-2 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-mono uppercase tracking-wider font-bold inline-flex items-center gap-1.5 border border-emerald-200 shadow-2xs">
-                                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                    <span>MAX подключен</span>
-                                </span>
-                                <button type="button"
-                                        @click="disconnectMax()"
-                                        title="Отвязать напоминания"
-                                        class="px-2.5 py-2 rounded-xl bg-neutral-100 hover:bg-rose-50 text-neutral-400 hover:text-rose-600 text-xs font-mono transition-colors border border-neutral-200 hover:border-rose-200">
-                                    <span class="sr-only">Отключить</span>
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                </button>
-                            </div>
-                        </template>
-
-                        <template x-if="!maxConnected">
-                            <button type="button"
-                                    @click="initMaxConnect()"
-                                    :disabled="maxLoading"
-                                    class="px-3.5 py-2 rounded-xl bg-neutral-900 hover:bg-black text-white text-xs font-mono uppercase tracking-wider font-bold transition-all inline-flex items-center gap-1.5 border border-neutral-800 shadow-sm disabled:opacity-50 cursor-pointer">
-                                <svg class="w-3.5 h-3.5 text-amber-400 animate-pulse" fill="currentColor" viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/></svg>
-                                <span x-text="maxLoading ? 'Генерация...' : 'Напоминания в MAX'"></span>
-                            </button>
-                        </template>
-
-                        {{-- Modal: Choice for with app / without app --}}
-                        <div x-show="maxModalOpen" 
-                             x-cloak 
-                             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
-                             @keydown.escape.window="maxModalOpen = false">
-                            <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-neutral-100 text-left"
-                                 @click.away="maxModalOpen = false">
-                                
-                                <div class="flex items-start justify-between gap-4 mb-5">
-                                    <div class="flex items-center gap-3.5 min-w-0">
-                                        <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-sm shrink-0 border border-neutral-100 bg-black flex items-center justify-center">
-                                            <img src="{{ asset('images/max-logo.png') }}" alt="MAX" class="w-full h-full object-cover">
-                                        </div>
-                                        <div class="min-w-0">
-                                            <h3 class="text-base font-bold uppercase tracking-tight text-neutral-900 font-sans truncate">
-                                                Напоминания о съёмке
-                                            </h3>
-                                            <p class="text-xs text-neutral-500 font-sans mt-0.5">Выберите способ запуска бота</p>
-                                        </div>
-                                    </div>
-                                    
-                                    <button type="button" 
-                                            @click="maxModalOpen = false" 
-                                            aria-label="Закрыть"
-                                            class="text-neutral-400 hover:text-neutral-800 p-2 -mr-1 -mt-1 rounded-full hover:bg-neutral-100 transition-colors shrink-0 cursor-pointer">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                                    </button>
-                                </div>
-
-                                <div class="space-y-3">
-                                    <a :href="maxData.app_link" 
-                                       class="group flex items-center justify-between p-4 rounded-2xl bg-neutral-900 hover:bg-black text-white transition-all shadow-sm">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-amber-400 shrink-0">
-                                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
-                                            </div>
-                                            <div>
-                                                <span class="font-bold text-sm block">Открыть в приложении MAX</span>
-                                                <span class="text-xs text-neutral-400 block mt-0.5">Если у вас установлено приложение</span>
-                                            </div>
-                                        </div>
-                                        <svg class="w-4 h-4 text-neutral-400 group-hover:translate-x-1 transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                                    </a>
-
-                                    <a :href="maxData.web_link || maxData.deep_link" 
-                                       target="_blank"
-                                       class="group flex items-center justify-between p-4 rounded-2xl border border-neutral-200 bg-neutral-50/70 hover:bg-neutral-100 text-neutral-900 transition-all">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
-                                            </div>
-                                            <div>
-                                                <span class="font-bold text-sm block">Открыть в веб-версии (Web)</span>
-                                                <span class="text-xs text-neutral-500 block mt-0.5">Без установки приложения</span>
-                                            </div>
-                                        </div>
-                                        <svg class="w-4 h-4 text-neutral-400 group-hover:translate-x-1 transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                    </a>
-                                </div>
-
-                                <div class="mt-5 pt-3 border-t border-neutral-100 flex justify-center">
-                                    <button type="button" 
-                                            @click="maxModalOpen = false" 
-                                            class="text-xs text-neutral-400 hover:text-neutral-700 font-semibold transition-colors py-1 cursor-pointer">
-                                        Отмена
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Location Box --}}
-                <div class="p-6 sm:p-7 flex flex-col justify-between space-y-4">
-                    <div>
-                        <span class="text-[0.68rem] uppercase tracking-widest text-neutral-400 font-mono font-bold block mb-1">Место проведения / Локация</span>
-                        <div class="text-lg sm:text-xl font-bold font-display uppercase tracking-tight text-arch-text leading-snug">
-                            {{ $shoot->location ?: 'Локация уточняется / на согласовании' }}
-                        </div>
-                    </div>
-
-                    @if($shoot->location)
-                        <div>
-                            <a href="https://yandex.ru/maps/?text={{ urlencode($shoot->location) }}" 
-                               target="_blank" 
-                               class="px-3.5 py-2 rounded-xl bg-white hover:bg-neutral-50 text-xs font-mono uppercase tracking-wider text-arch-text font-bold transition-colors inline-flex items-center gap-1.5 border border-arch-border shadow-2xs hover:border-neutral-400">
-                                <svg class="w-3.5 h-3.5 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                <span>Открыть на Яндекс Картах</span>
-                            </a>
-                        </div>
-                    @endif
-                </div>
-
-            </div>
-
-        </div>
-
-        {{-- 2-COLUMN DASHBOARD GRID --}}
+        {{-- 4-CARD 2x2 GRID --}}
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
 
-            {{-- LEFT COLUMN: Concept, Details & Moodboard --}}
-            <div class="space-y-6">
+            {{-- ========================================================
+                 CARD 1 (Top-Left): Shoot Information & Logistics
+                 ======================================================== --}}
+            <div class="bg-white border border-arch-border rounded-2xl md:rounded-3xl overflow-hidden shadow-card-depth flex flex-col justify-between">
+                
+                {{-- Hero Header --}}
+                <div class="p-6 sm:p-8 border-b border-arch-border relative overflow-hidden bg-gradient-to-br from-white via-arch-bg/40 to-white">
+                    <div class="absolute -right-20 -top-20 w-72 h-72 bg-crimson/5 rounded-full blur-3xl pointer-events-none"></div>
 
-                {{-- Description / Concept Card --}}
-                @if($shoot->description)
-                    <div class="bg-white border border-arch-border rounded-2xl md:rounded-3xl p-6 sm:p-8 shadow-card-depth space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[0.68rem] font-mono uppercase tracking-widest bg-arch-bg text-neutral-700 border border-arch-border shadow-xs font-bold">
+                            <span class="w-2 h-2 rounded-full bg-crimson animate-pulse"></span>
+                            <span>Информация о съёмке</span>
+                        </span>
+
+                        @if($shoot->booking_confirmed_at && $shoot->status === 'planned')
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider font-bold bg-emerald-50 text-emerald-700 border border-emerald-300">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                <span>Бронь подтверждена</span>
+                            </span>
+                        @else
+                            <span class="px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider font-bold {{ $shoot->status === 'completed' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : ($shoot->status === 'cancelled' ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-blue-50 text-blue-700 border border-blue-200') }}">
+                                {{ $shoot->status_label }}
+                            </span>
+                        @endif
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                        <div>
+                            <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold uppercase tracking-tight font-display text-arch-text leading-[1.08]">
+                                {{ $shoot->client_name }}
+                            </h1>
+                            <p class="text-xs sm:text-sm text-neutral-600 font-mono mt-2 max-w-xl leading-relaxed">
+                                Актуальные детали фотосессии: дата, тайминг, место и статус.
+                            </p>
+                        </div>
+
+                        @if($shoot->price)
+                            <div class="sm:text-right shrink-0">
+                                <span class="text-[0.68rem] uppercase tracking-widest text-neutral-400 font-mono font-bold block mb-0.5">Стоимость съёмки</span>
+                                <div class="text-2xl sm:text-3xl font-extrabold font-display text-arch-text">
+                                    {{ number_format($shoot->price, 0, '', ' ') }} ₽
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                {{-- Details Sections: Date & Time + Location --}}
+                <div class="divide-y divide-arch-border bg-arch-bg/40 flex-1 flex flex-col justify-between">
+                    
+                    {{-- Date & Time Box --}}
+                    <div class="p-6 sm:p-7 space-y-4">
+                        <div>
+                            <span class="text-[0.68rem] uppercase tracking-widest text-neutral-400 font-mono font-bold block mb-1">Дата и время</span>
+                            <div class="text-xl sm:text-2xl font-extrabold uppercase font-display tracking-tight text-arch-text">
+                                {{ $shoot->shoot_date->translatedFormat('d F Y') }}
+                            </div>
+                            <div class="text-xs sm:text-sm font-mono text-neutral-600 mt-1.5 flex items-center gap-2">
+                                <span class="text-crimson font-bold">{{ substr($shoot->start_time, 0, 5) }} – {{ $shoot->end_time ?: '...' }}</span>
+                                <span class="text-neutral-300">&bull;</span>
+                                <span>{{ $shoot->duration_label }}</span>
+                            </div>
+                        </div>
+
+                        {{-- Add to calendar & MAX reminders --}}
+                        <div class="pt-1 flex flex-wrap gap-2 items-center" x-data="{
+                            maxLoading: false,
+                            maxModalOpen: false,
+                            copied: false,
+                            maxConnected: {{ $shoot->max_connected_at ? 'true' : 'false' }},
+                            maxData: {
+                                deep_link: '',
+                                app_link: '',
+                                start_command: '',
+                                bot_username: 'se14454241_bot'
+                            },
+                            async initMaxConnect() {
+                                if (this.maxLoading) return;
+                                this.maxLoading = true;
+                                try {
+                                    const response = await fetch('{{ route('shoots.share.max_link', ['token' => $shoot->share_token]) }}', {
+                                        method: 'POST',
+                                        headers: {
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                            'Accept': 'application/json'
+                                        }
+                                    });
+                                    const data = await response.json();
+                                    if (data.success) {
+                                        this.maxData = data;
+                                        this.maxModalOpen = true;
+                                    } else {
+                                        alert('Не удалось сформировать данные для MAX. Попробуйте еще раз.');
+                                    }
+                                } catch (e) {
+                                    alert('Произошла ошибка при формировании ссылки MAX');
+                                } finally {
+                                    this.maxLoading = false;
+                                }
+                            },
+                            copyCommand() {
+                                if (!this.maxData.start_command) return;
+                                navigator.clipboard.writeText(this.maxData.start_command);
+                                this.copied = true;
+                                setTimeout(() => { this.copied = false; }, 2500);
+                            },
+                            async disconnectMax() {
+                                if (!confirm('Отключить напоминания в MAX для этой съёмки?')) return;
+                                try {
+                                    const response = await fetch('{{ route('shoots.share.max_disconnect', ['token' => $shoot->share_token]) }}', {
+                                        method: 'POST',
+                                        headers: {
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                            'Accept': 'application/json'
+                                        }
+                                    });
+                                    const data = await response.json();
+                                    if (data.success) {
+                                        this.maxConnected = false;
+                                    }
+                                } catch (e) {
+                                    alert('Не удалось отключить напоминания');
+                                }
+                            }
+                        }">
+                            <a href="{{ route('shoots.share.ics', ['token' => $shoot->share_token]) }}" 
+                               class="px-3.5 py-2 rounded-xl bg-white hover:bg-neutral-50 text-xs font-mono uppercase tracking-wider text-arch-text font-bold transition-colors inline-flex items-center gap-1.5 border border-arch-border shadow-xs hover:border-neutral-400">
+                                <svg class="w-3.5 h-3.5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                <span>В календарь</span>
+                            </a>
+
+                            <template x-if="maxConnected">
+                                <div class="inline-flex items-center gap-2">
+                                    <span class="px-3 py-2 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-mono uppercase tracking-wider font-bold inline-flex items-center gap-1.5 border border-emerald-200 shadow-xs">
+                                        <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        <span>MAX подключен</span>
+                                    </span>
+                                    <button type="button"
+                                            @click="disconnectMax()"
+                                            title="Отвязать напоминания"
+                                            class="px-2.5 py-2 rounded-xl bg-neutral-100 hover:bg-rose-50 text-neutral-400 hover:text-rose-600 text-xs font-mono transition-colors border border-neutral-200 hover:border-rose-200">
+                                        <span class="sr-only">Отключить</span>
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                    </button>
+                                </div>
+                            </template>
+
+                            <template x-if="!maxConnected">
+                                <button type="button"
+                                        @click="initMaxConnect()"
+                                        :disabled="maxLoading"
+                                        class="px-3.5 py-2 rounded-xl bg-neutral-900 hover:bg-black text-white text-xs font-mono uppercase tracking-wider font-bold transition-all inline-flex items-center gap-1.5 border border-neutral-800 shadow-sm disabled:opacity-50 cursor-pointer">
+                                    <svg class="w-3.5 h-3.5 text-amber-400 animate-pulse" fill="currentColor" viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/></svg>
+                                    <span x-text="maxLoading ? 'Генерация...' : 'Напоминания в MAX'"></span>
+                                </button>
+                            </template>
+
+                            {{-- Modal: Choice for with app / without app --}}
+                            <div x-show="maxModalOpen" 
+                                 x-cloak 
+                                 class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                                 @keydown.escape.window="maxModalOpen = false">
+                                <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-neutral-100 text-left"
+                                     @click.away="maxModalOpen = false">
+                                    
+                                    <div class="flex items-start justify-between gap-4 mb-5">
+                                        <div class="flex items-center gap-3.5 min-w-0">
+                                            <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-sm shrink-0 border border-neutral-100 bg-black flex items-center justify-center">
+                                                <img src="{{ asset('images/max-logo.png') }}" alt="MAX" class="w-full h-full object-cover">
+                                            </div>
+                                            <div class="min-w-0">
+                                                <h3 class="text-base font-bold uppercase tracking-tight text-neutral-900 font-sans truncate">
+                                                    Напоминания о съёмке
+                                                </h3>
+                                                <p class="text-xs text-neutral-500 font-sans mt-0.5">Выберите способ запуска бота</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <button type="button" 
+                                                @click="maxModalOpen = false" 
+                                                aria-label="Закрыть"
+                                                class="text-neutral-400 hover:text-neutral-800 p-2 -mr-1 -mt-1 rounded-full hover:bg-neutral-100 transition-colors shrink-0 cursor-pointer">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                        </button>
+                                    </div>
+
+                                    <div class="space-y-3">
+                                        <a :href="maxData.app_link" 
+                                           class="group flex items-center justify-between p-4 rounded-2xl bg-neutral-900 hover:bg-black text-white transition-all shadow-sm">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-amber-400 shrink-0">
+                                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
+                                                </div>
+                                                <div>
+                                                    <span class="font-bold text-sm block">Открыть в приложении MAX</span>
+                                                    <span class="text-xs text-neutral-400 block mt-0.5">Если у вас установлено приложение</span>
+                                                </div>
+                                            </div>
+                                            <svg class="w-4 h-4 text-neutral-400 group-hover:translate-x-1 transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                        </a>
+
+                                        <a :href="maxData.web_link || maxData.deep_link" 
+                                           target="_blank"
+                                           class="group flex items-center justify-between p-4 rounded-2xl border border-neutral-200 bg-neutral-50/70 hover:bg-neutral-100 text-neutral-900 transition-all">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+                                                </div>
+                                                <div>
+                                                    <span class="font-bold text-sm block">Открыть в веб-версии (Web)</span>
+                                                    <span class="text-xs text-neutral-500 block mt-0.5">Без установки приложения</span>
+                                                </div>
+                                            </div>
+                                            <svg class="w-4 h-4 text-neutral-400 group-hover:translate-x-1 transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                        </a>
+                                    </div>
+
+                                    <div class="mt-5 pt-3 border-t border-neutral-100 flex justify-center">
+                                        <button type="button" 
+                                                @click="maxModalOpen = false" 
+                                                class="text-xs text-neutral-400 hover:text-neutral-700 font-semibold transition-colors py-1 cursor-pointer">
+                                            Отмена
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Location Box --}}
+                    <div class="p-6 sm:p-7 space-y-3">
+                        <div>
+                            <span class="text-[0.68rem] uppercase tracking-widest text-neutral-400 font-mono font-bold block mb-1">Место проведения / Локация</span>
+                            <div class="text-base sm:text-lg font-bold font-display uppercase tracking-tight text-arch-text leading-snug">
+                                {{ $shoot->location ?: 'Локация уточняется / на согласовании' }}
+                            </div>
+                        </div>
+
+                        @if($shoot->location)
+                            <div>
+                                <a href="https://yandex.ru/maps/?text={{ urlencode($shoot->location) }}" 
+                                   target="_blank" 
+                                   class="px-3.5 py-2 rounded-xl bg-white hover:bg-neutral-50 text-xs font-mono uppercase tracking-wider text-arch-text font-bold transition-colors inline-flex items-center gap-1.5 border border-arch-border shadow-xs hover:border-neutral-400">
+                                    <svg class="w-3.5 h-3.5 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    <span>Открыть на Яндекс Картах</span>
+                                </a>
+                            </div>
+                        @endif
+                    </div>
+
+                </div>
+
+            </div>
+
+            {{-- ========================================================
+                 CARD 2 (Top-Right): Concept, Moodboard & References
+                 ======================================================== --}}
+            <div class="bg-white border border-arch-border rounded-2xl md:rounded-3xl p-6 sm:p-8 shadow-card-depth flex flex-col justify-between space-y-6">
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between gap-3">
                         <div class="flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-crimson"></span>
                             <span class="text-[0.68rem] uppercase tracking-widest text-neutral-400 font-mono font-bold block">
-                                Концепт и детали съёмки
+                                Концепт и референсы
                             </span>
                         </div>
+                        @if($shoot->files->count() > 0)
+                            <span class="px-2.5 py-0.5 rounded-full bg-arch-bg text-neutral-700 text-xs font-mono font-semibold border border-arch-border">
+                                {{ $shoot->files->count() }} шт.
+                            </span>
+                        @endif
+                    </div>
+
+                    <div>
                         <h2 class="text-xl sm:text-2xl font-extrabold uppercase tracking-tight font-display text-arch-text">
                             Подготовка к фотосессии
                         </h2>
-                        <div class="text-xs sm:text-sm text-neutral-700 leading-relaxed whitespace-pre-line bg-arch-bg/70 p-5 rounded-2xl border border-arch-border font-sans mt-3">
+                        <p class="text-xs text-neutral-500 font-mono mt-1">
+                            Образы, мудборд и рекомендации по подготовке
+                        </p>
+                    </div>
+
+                    @if($shoot->description)
+                        <div class="text-xs sm:text-sm text-neutral-700 leading-relaxed whitespace-pre-line bg-arch-bg/70 p-5 rounded-2xl border border-arch-border font-sans">
                             {{ $shoot->description }}
                         </div>
-                    </div>
-                @endif
+                    @endif
 
-                {{-- Moodboard & Materials Card --}}
-                @if($shoot->files->count() > 0)
-                    <div class="bg-white border border-arch-border rounded-2xl md:rounded-3xl p-6 sm:p-8 shadow-card-depth space-y-4">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <span class="text-[0.68rem] uppercase tracking-widest text-neutral-400 font-mono font-bold block">Материалы и референсы</span>
-                                <h3 class="text-xl sm:text-2xl font-extrabold uppercase tracking-tight font-display text-arch-text mt-0.5">Мудборд съёмки</h3>
-                            </div>
-                            <span class="px-2.5 py-0.5 rounded-full bg-arch-bg text-neutral-700 text-xs font-mono font-semibold border border-arch-border">{{ $shoot->files->count() }} шт.</span>
-                        </div>
-
+                    @if($shoot->files->count() > 0)
                         @php
                             $images = $shoot->files->filter->is_image;
                             $otherFiles = $shoot->files->reject->is_image;
                         @endphp
 
                         @if($images->count() > 0)
-                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
-                                @foreach($images as $file)
-                                    <button type="button" 
-                                            @click="openLightbox('{{ $file->url }}', '{{ addslashes($file->original_name) }}')"
-                                            class="group relative aspect-square rounded-xl overflow-hidden bg-neutral-100 border border-arch-border block w-full text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-crimson shadow-xs hover:shadow-md transition-all">
-                                        <img src="{{ $file->url }}" alt="{{ $file->original_name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                                        
-                                        <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2.5">
-                                            <span class="text-[0.68rem] text-white font-mono truncate">{{ $file->original_name }}</span>
-                                        </div>
+                            <div class="space-y-2">
+                                <span class="text-[0.65rem] uppercase tracking-widest text-neutral-400 font-mono font-bold block">
+                                    Мудборд съёмки
+                                </span>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                                    @foreach($images as $file)
+                                        <button type="button" 
+                                                @click="openLightbox('{{ $file->url }}', '{{ addslashes($file->original_name) }}')"
+                                                class="group relative aspect-square rounded-xl overflow-hidden bg-neutral-100 border border-arch-border block w-full text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-crimson shadow-xs hover:shadow-md transition-all">
+                                            <img src="{{ $file->url }}" alt="{{ $file->original_name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                            
+                                            <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2.5">
+                                                <span class="text-[0.68rem] text-white font-mono truncate">{{ $file->original_name }}</span>
+                                            </div>
 
-                                        <div class="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm shadow-md">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/></svg>
-                                        </div>
-                                    </button>
-                                @endforeach
+                                            <div class="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm shadow-md">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/></svg>
+                                            </div>
+                                        </button>
+                                    @endforeach
+                                </div>
                             </div>
                         @endif
 
                         @if($otherFiles->count() > 0)
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
                                 @foreach($otherFiles as $file)
                                     <div class="p-3 rounded-xl border border-arch-border bg-arch-bg hover:bg-neutral-100 transition-colors flex items-center justify-between gap-3 shadow-xs">
                                         <div class="flex items-center gap-3 truncate">
@@ -366,18 +376,10 @@
                                 @endforeach
                             </div>
                         @endif
-                    </div>
-                @endif
+                    @endif
 
-                {{-- If no description and no files, show a neat placeholder card --}}
-                @if(!$shoot->description && $shoot->files->count() === 0)
-                    <div class="bg-white border border-arch-border rounded-2xl md:rounded-3xl p-6 sm:p-8 shadow-card-depth space-y-4">
-                        <div class="flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-neutral-400"></span>
-                            <span class="text-[0.68rem] uppercase tracking-widest text-neutral-400 font-mono font-bold block">
-                                Концепт и референсы
-                            </span>
-                        </div>
+                    {{-- If no description and no files, show a neat placeholder card --}}
+                    @if(!$shoot->description && $shoot->files->count() === 0)
                         <div class="p-6 rounded-2xl border-2 border-dashed border-arch-border bg-arch-bg/50 text-center space-y-3">
                             <div class="w-12 h-12 rounded-2xl bg-white border border-arch-border text-neutral-400 mx-auto flex items-center justify-center shadow-xs">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
@@ -397,16 +399,14 @@
                                 </div>
                             @endif
                         </div>
-                    </div>
-                @endif
-
+                    @endif
+                </div>
             </div>
 
-            {{-- RIGHT COLUMN: Top = Contract & Prepayment, Bottom = Photoshoot Results / Gallery --}}
-            <div class="space-y-6">
-
-                {{-- Right Card 1: CONTRACT & PREPAYMENT / BOOKING --}}
-                <div x-data="{
+            {{-- ========================================================
+                 CARD 3 (Bottom-Left): Contract & Prepayment / Booking
+                 ======================================================== --}}
+            <div x-data="{
                     bookingConfirmed: {{ $shoot->booking_confirmed_at ? 'true' : 'false' }},
                     bookingConfirmedAt: {{ $shoot->booking_confirmed_at ? "'" . e($shoot->booking_confirmed_at->timezone('Asia/Irkutsk')->translatedFormat('d F Y, H:i')) . "'" : 'null' }},
                     contractAccepted: {{ ($shoot->receipt_path || $shoot->booking_confirmed_at) ? 'true' : 'false' }},
@@ -966,8 +966,10 @@
 
                 </div>
 
-                {{-- Right Card 2: PHOTOSHOOT RESULTS / GALLERY SECTION (Ниже справа) --}}
-                <div class="bg-white border border-arch-border rounded-2xl md:rounded-3xl overflow-hidden shadow-card-depth p-6 sm:p-8 relative">
+            {{-- ========================================================
+                 CARD 4 (Bottom-Right): Photoshoot Results / Gallery
+                 ======================================================== --}}
+            <div class="bg-white border border-arch-border rounded-2xl md:rounded-3xl overflow-hidden shadow-card-depth p-6 sm:p-8 relative">
                     @if(!empty($shoot->gallery_link))
                         {{-- Ready Photos with Gallery Link --}}
                         <div class="rounded-2xl p-6 bg-gradient-to-br from-emerald-50 via-white to-emerald-50/40 border border-emerald-200 relative overflow-hidden shadow-xs space-y-4">
@@ -1032,8 +1034,6 @@
                 </div>
 
             </div>
-
-        </div>
 
         {{-- BOTTOM: Photographer Contact Card (Across full width) --}}
         <div class="mt-6 bg-white border border-arch-border rounded-2xl md:rounded-3xl overflow-hidden shadow-card-depth p-6 sm:p-8 bg-gradient-to-r from-crimson/5 via-arch-bg to-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -1109,6 +1109,5 @@
         </div>
     </div>
 
-</div>
 </div>
 @endsection
