@@ -34,6 +34,9 @@
         'files' => $s->files->map(fn($f) => [
             'id' => $f->id,
             'original_name' => $f->original_name,
+            'title' => $f->title,
+            'display_name' => $f->display_name,
+            'category' => $f->category ?? 'general',
             'url' => $f->url,
             'is_image' => $f->is_image,
             'formatted_size' => $f->formatted_size,
@@ -585,6 +588,9 @@
                                             <button type="button" @click="promptEditFileName(file)" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer" title="Переименовать для клиента">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                                             </button>
+                                            <button type="button" @click="moveFileCategory(file, 'general')" class="p-1.5 text-slate-400 hover:text-amber-700 rounded-lg hover:bg-amber-50 transition-colors cursor-pointer" title="Перенести в материалы съёмки">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                                            </button>
                                             <a :href="file.url" download class="p-1.5 text-slate-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors" title="Скачать файл">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                                             </a>
@@ -694,13 +700,20 @@
                                             <p class="text-[0.62rem] text-slate-400 font-mono" x-text="file.formatted_size"></p>
                                         </div>
 
-                                        {{-- Delete Button --}}
-                                        <button type="button" 
-                                                @click.stop="deleteFile(file.id)" 
-                                                class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/60 hover:bg-rose-600 text-white flex items-center justify-center shadow transition-colors cursor-pointer z-10" 
-                                                title="Удалить файл">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-                                        </button>
+                                        <div class="absolute top-1.5 right-1.5 flex items-center gap-1 z-10">
+                                            <button type="button" 
+                                                    @click.stop="moveFileCategory(file, 'contract')" 
+                                                    class="w-6 h-6 rounded-full bg-black/60 hover:bg-amber-600 text-white flex items-center justify-center shadow transition-colors cursor-pointer" 
+                                                    title="Перенести в документы договора">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                            </button>
+                                            <button type="button" 
+                                                    @click.stop="deleteFile(file.id)" 
+                                                    class="w-6 h-6 rounded-full bg-black/60 hover:bg-rose-600 text-white flex items-center justify-center shadow transition-colors cursor-pointer" 
+                                                    title="Удалить файл">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                            </button>
+                                        </div>
                                     </div>
                                 </template>
                             </div>
@@ -1129,6 +1142,9 @@
                                                 <button type="button" @click="promptEditFileName(file)" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-white transition-colors cursor-pointer" title="Переименовать для клиента">
                                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                                                 </button>
+                                                <button type="button" @click="moveFileCategory(file, 'general')" class="p-1.5 text-slate-400 hover:text-amber-700 rounded-lg hover:bg-white transition-colors cursor-pointer" title="Перенести в материалы съёмки">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                                                </button>
                                                 <a :href="file.url" download class="p-1.5 text-slate-400 hover:text-blue-600 rounded-lg hover:bg-white transition-colors" title="Скачать файл">
                                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                                                 </a>
@@ -1193,6 +1209,12 @@
                                                     <p class="text-[0.62rem] text-slate-400 font-mono" x-text="file.formatted_size"></p>
                                                 </div>
                                                 <div class="flex items-center gap-1 shrink-0">
+                                                    <button type="button" @click="promptEditFileName(file)" class="p-1 text-slate-400 hover:text-slate-700 rounded hover:bg-slate-50 transition-colors cursor-pointer" title="Переименовать для клиента">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                                    </button>
+                                                    <button type="button" @click="moveFileCategory(file, 'contract')" class="p-1 text-slate-400 hover:text-amber-600 rounded hover:bg-amber-50 transition-colors cursor-pointer" title="Перенести в документы договора">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                                    </button>
                                                     <a :href="file.url" download class="p-1 text-slate-400 hover:text-blue-600 rounded hover:bg-blue-50 transition-colors" title="Скачать файл">
                                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                                                     </a>
@@ -2082,6 +2104,47 @@ document.addEventListener('alpine:init', () => {
             } catch (err) {
                 console.error(err);
                 alert('Не удалось обновить название файла.');
+            }
+        },
+
+        async moveFileCategory(file, newCategory) {
+            try {
+                const response = await fetch(`/admin/shoots/files/${file.id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': config.csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ category: newCategory })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    file.category = newCategory;
+                    if (this.selectedShoot && this.selectedShoot.files) {
+                        const target = this.selectedShoot.files.find(f => f.id === file.id);
+                        if (target) target.category = newCategory;
+                    }
+                    if (this.currentShootFiles) {
+                        const target = this.currentShootFiles.find(f => f.id === file.id);
+                        if (target) target.category = newCategory;
+                    }
+                    this.shoots.forEach(s => {
+                        if (s.files) {
+                            const target = s.files.find(f => f.id === file.id);
+                            if (target) target.category = newCategory;
+                        }
+                    });
+                    this.triggerToast(newCategory === 'contract' ? 'Файл перемещён в документы договора' : 'Файл перемещён в материалы съёмки');
+                } else {
+                    alert(result.message || 'Ошибка перемещения файла.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Не удалось переместить файл.');
             }
         },
 
