@@ -33,15 +33,16 @@
             <span class="font-mono text-[0.7rem] uppercase tracking-wider text-neutral-400">ID: {{ substr(md5($shoot->id . $shoot->share_token), 0, 8) }}</span>
         </div>
 
-        {{-- 4-CARD 2x2 GRID --}}
         {{-- 2-COLUMN MASONRY GRID --}}
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
 
             {{-- LEFT COLUMN: Shoot Info & Contract/Prepayment --}}
             <div class="flex flex-col gap-6">
-                 CARD 1 (Top-Left): Shoot Information & Logistics
-                 ======================================================== --}}
-            <div class="bg-white border border-arch-border rounded-2xl md:rounded-3xl overflow-hidden shadow-card-depth flex flex-col justify-between">
+
+                {{-- ========================================================
+                     CARD 1: Shoot Information & Logistics
+                     ======================================================== --}}
+                <div class="bg-white border border-arch-border rounded-2xl md:rounded-3xl overflow-hidden shadow-card-depth flex flex-col justify-between">
                 
                 {{-- Hero Header --}}
                 <div class="p-6 sm:p-8 border-b border-arch-border relative overflow-hidden bg-gradient-to-br from-white via-arch-bg/40 to-white">
