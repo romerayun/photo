@@ -63,22 +63,22 @@
                         @endif
                     </div>
 
-                    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                    <div class="space-y-3">
                         <div>
                             <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold uppercase tracking-tight font-display text-arch-text leading-[1.08]">
                                 {{ $shoot->client_name }}
                             </h1>
-                            <p class="text-xs sm:text-sm text-neutral-600 font-mono mt-2 max-w-xl leading-relaxed">
+                            <p class="text-xs sm:text-sm text-neutral-600 font-mono mt-1.5 max-w-xl leading-relaxed">
                                 Актуальные детали фотосессии: дата, тайминг, место и статус.
                             </p>
                         </div>
 
                         @if($shoot->price)
-                            <div class="sm:text-right shrink-0">
-                                <span class="text-[0.68rem] uppercase tracking-widest text-neutral-400 font-mono font-bold block mb-0.5">Стоимость съёмки</span>
-                                <div class="text-2xl sm:text-3xl font-extrabold font-display text-arch-text">
+                            <div class="pt-1 flex items-baseline gap-2.5">
+                                <span class="text-[0.68rem] uppercase tracking-widest text-neutral-400 font-mono font-bold">Стоимость съёмки:</span>
+                                <span class="text-2xl sm:text-3xl font-extrabold font-display text-arch-text">
                                     {{ number_format($shoot->price, 0, '', ' ') }} ₽
-                                </div>
+                                </span>
                             </div>
                         @endif
                     </div>
@@ -294,113 +294,104 @@
             {{-- ========================================================
                  CARD 2 (Top-Right): Concept, Moodboard & References
                  ======================================================== --}}
-            <div class="bg-white border border-arch-border rounded-2xl md:rounded-3xl p-6 sm:p-8 shadow-card-depth flex flex-col justify-between space-y-6">
-                <div class="space-y-6">
-                    <div class="flex items-center justify-between gap-3">
-                        <div class="flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-crimson"></span>
-                            <span class="text-[0.68rem] uppercase tracking-widest text-neutral-400 font-mono font-bold block">
-                                Концепт и референсы
-                            </span>
-                        </div>
-                        @if($shoot->files->count() > 0)
-                            <span class="px-2.5 py-0.5 rounded-full bg-arch-bg text-neutral-700 text-xs font-mono font-semibold border border-arch-border">
-                                {{ $shoot->files->count() }} шт.
-                            </span>
-                        @endif
+            <div class="bg-white border border-arch-border rounded-2xl md:rounded-3xl p-6 sm:p-8 shadow-card-depth flex flex-col gap-5">
+                <div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="w-2 h-2 rounded-full bg-crimson"></span>
+                        <span class="text-[0.68rem] uppercase tracking-widest text-neutral-400 font-mono font-bold block">
+                            Концепт и референсы
+                        </span>
                     </div>
 
-                    <div>
-                        <h2 class="text-xl sm:text-2xl font-extrabold uppercase tracking-tight font-display text-arch-text">
-                            Подготовка к фотосессии
-                        </h2>
-                        <p class="text-xs text-neutral-500 font-mono mt-1">
-                            Образы, мудборд и рекомендации по подготовке
-                        </p>
+                    <h2 class="text-xl sm:text-2xl font-extrabold uppercase tracking-tight font-display text-arch-text">
+                        Подготовка к фотосессии
+                    </h2>
+                    <p class="text-xs text-neutral-500 font-mono mt-1">
+                        Образы, мудборд и рекомендации по подготовке
+                    </p>
+                </div>
+
+                @if($shoot->description)
+                    <div class="text-xs sm:text-sm text-neutral-700 leading-relaxed whitespace-pre-line bg-arch-bg/70 p-4 sm:p-5 rounded-2xl border border-arch-border font-sans">
+                        {{ $shoot->description }}
                     </div>
+                @endif
 
-                    @if($shoot->description)
-                        <div class="text-xs sm:text-sm text-neutral-700 leading-relaxed whitespace-pre-line bg-arch-bg/70 p-5 rounded-2xl border border-arch-border font-sans">
-                            {{ $shoot->description }}
-                        </div>
-                    @endif
+                @if($shoot->files->count() > 0)
+                    @php
+                        $images = $shoot->files->filter->is_image;
+                        $otherFiles = $shoot->files->reject->is_image;
+                    @endphp
 
-                    @if($shoot->files->count() > 0)
-                        @php
-                            $images = $shoot->files->filter->is_image;
-                            $otherFiles = $shoot->files->reject->is_image;
-                        @endphp
-
-                        @if($images->count() > 0)
-                            <div class="space-y-2">
-                                <span class="text-[0.65rem] uppercase tracking-widest text-neutral-400 font-mono font-bold block">
-                                    Мудборд съёмки
-                                </span>
-                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                                    @foreach($images as $file)
-                                        <button type="button" 
-                                                @click="openLightbox('{{ $file->url }}', '{{ addslashes($file->original_name) }}')"
-                                                class="group relative aspect-square rounded-xl overflow-hidden bg-neutral-100 border border-arch-border block w-full text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-crimson shadow-xs hover:shadow-md transition-all">
-                                            <img src="{{ $file->url }}" alt="{{ $file->original_name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                                            
-                                            <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2.5">
-                                                <span class="text-[0.68rem] text-white font-mono truncate">{{ $file->original_name }}</span>
-                                            </div>
-
-                                            <div class="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm shadow-md">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/></svg>
-                                            </div>
-                                        </button>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endif
-
-                        @if($otherFiles->count() > 0)
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-                                @foreach($otherFiles as $file)
-                                    <div class="p-3 rounded-xl border border-arch-border bg-arch-bg hover:bg-neutral-100 transition-colors flex items-center justify-between gap-3 shadow-xs">
-                                        <div class="flex items-center gap-3 truncate">
-                                            <div class="w-9 h-9 rounded-lg bg-white text-arch-text border border-arch-border flex items-center justify-center shrink-0 uppercase text-xs font-mono font-bold shadow-xs">
-                                                {{ $file->extension }}
-                                            </div>
-                                            <div class="truncate">
-                                                <span class="text-xs font-mono font-bold text-arch-text truncate block">{{ $file->original_name }}</span>
-                                                <span class="text-[0.65rem] text-neutral-500 font-mono">{{ $file->formatted_size }}</span>
-                                            </div>
+                    @if($images->count() > 0)
+                        <div class="space-y-2">
+                            <span class="text-[0.65rem] uppercase tracking-widest text-neutral-400 font-mono font-bold block">
+                                Мудборд съёмки
+                            </span>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                                @foreach($images as $file)
+                                    <button type="button" 
+                                            @click="openLightbox('{{ $file->url }}', '{{ addslashes($file->original_name) }}')"
+                                            class="group relative aspect-square rounded-xl overflow-hidden bg-neutral-100 border border-arch-border block w-full text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-crimson shadow-xs hover:shadow-md transition-all">
+                                        <img src="{{ $file->url }}" alt="{{ $file->original_name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                        
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2.5">
+                                            <span class="text-[0.68rem] text-white font-mono truncate">{{ $file->original_name }}</span>
                                         </div>
-                                        <a href="{{ $file->url }}" download class="px-3 py-1.5 bg-white hover:bg-neutral-50 text-xs font-mono uppercase tracking-wider text-arch-text border border-arch-border rounded-lg transition-colors font-bold shrink-0 shadow-xs">
-                                            Скачать
-                                        </a>
-                                    </div>
+
+                                        <div class="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm shadow-md">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/></svg>
+                                        </div>
+                                    </button>
                                 @endforeach
                             </div>
-                        @endif
-                    @endif
-
-                    {{-- If no description and no files, show a neat placeholder card --}}
-                    @if(!$shoot->description && $shoot->files->count() === 0)
-                        <div class="p-6 rounded-2xl border-2 border-dashed border-arch-border bg-arch-bg/50 text-center space-y-3">
-                            <div class="w-12 h-12 rounded-2xl bg-white border border-arch-border text-neutral-400 mx-auto flex items-center justify-center shadow-xs">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                            </div>
-                            <div class="space-y-1">
-                                <h3 class="text-base font-extrabold uppercase tracking-tight font-display text-arch-text">Подготовка в процессе</h3>
-                                <p class="text-xs text-neutral-500 font-sans max-w-sm mx-auto leading-relaxed">
-                                    Роман добавит сюда референсы образов, мудборд и рекомендации по подготовке к съёмке.
-                                </p>
-                            </div>
-                            @if($photographerTelegram)
-                                <div class="pt-2">
-                                    <a href="{{ $photographerTelegram }}" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-neutral-700 hover:text-crimson transition-colors">
-                                        <span>Предложить свои референсы</span>
-                                        <span>&rarr;</span>
-                                    </a>
-                                </div>
-                            @endif
                         </div>
                     @endif
-                </div>
+
+                    @if($otherFiles->count() > 0)
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                            @foreach($otherFiles as $file)
+                                <div class="p-3 rounded-xl border border-arch-border bg-arch-bg hover:bg-neutral-100 transition-colors flex items-center justify-between gap-3 shadow-xs">
+                                    <div class="flex items-center gap-3 truncate">
+                                        <div class="w-9 h-9 rounded-lg bg-white text-arch-text border border-arch-border flex items-center justify-center shrink-0 uppercase text-xs font-mono font-bold shadow-xs">
+                                            {{ $file->extension }}
+                                        </div>
+                                        <div class="truncate">
+                                            <span class="text-xs font-mono font-bold text-arch-text truncate block">{{ $file->original_name }}</span>
+                                            <span class="text-[0.65rem] text-neutral-500 font-mono">{{ $file->formatted_size }}</span>
+                                        </div>
+                                    </div>
+                                    <a href="{{ $file->url }}" download class="px-3 py-1.5 bg-white hover:bg-neutral-50 text-xs font-mono uppercase tracking-wider text-arch-text border border-arch-border rounded-lg transition-colors font-bold shrink-0 shadow-xs">
+                                        Скачать
+                                    </a>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                @endif
+
+                {{-- If no description and no files, show a neat placeholder card --}}
+                @if(!$shoot->description && $shoot->files->count() === 0)
+                    <div class="p-6 rounded-2xl border-2 border-dashed border-arch-border bg-arch-bg/50 text-center space-y-3">
+                        <div class="w-12 h-12 rounded-2xl bg-white border border-arch-border text-neutral-400 mx-auto flex items-center justify-center shadow-xs">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        </div>
+                        <div class="space-y-1">
+                            <h3 class="text-base font-extrabold uppercase tracking-tight font-display text-arch-text">Подготовка в процессе</h3>
+                            <p class="text-xs text-neutral-500 font-sans max-w-sm mx-auto leading-relaxed">
+                                Роман добавит сюда референсы образов, мудборд и рекомендации по подготовке к съёмке.
+                            </p>
+                        </div>
+                        @if($photographerTelegram)
+                            <div class="pt-2">
+                                <a href="{{ $photographerTelegram }}" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-neutral-700 hover:text-crimson transition-colors">
+                                    <span>Предложить свои референсы</span>
+                                    <span>&rarr;</span>
+                                </a>
+                            </div>
+                        @endif
+                    </div>
+                @endif
             </div>
 
             {{-- ========================================================
@@ -546,7 +537,7 @@
 
                     {{-- 2. CONTRACT & PREPAYMENT SECTION (Hidden when booking is confirmed) --}}
                     <div x-show="!bookingConfirmed"
-                         class="p-6 sm:p-8 space-y-5">
+                         class="p-6 sm:p-8 flex flex-col gap-5">
                     
                         {{-- Section Title --}}
                         <div class="flex items-start justify-between gap-3">
@@ -565,7 +556,7 @@
                         </div>
 
                         {{-- Pricing Breakdown Card --}}
-                        <div class="grid grid-cols-3 gap-2 p-4 rounded-xl bg-arch-bg border border-arch-border text-arch-text text-center sm:text-left">
+                        <div class="grid grid-cols-3 gap-2 p-4 sm:p-5 rounded-2xl bg-arch-bg/80 border border-arch-border text-arch-text text-center sm:text-left shadow-xs">
                             <div class="space-y-0.5">
                                 <span class="text-[0.65rem] uppercase tracking-widest text-neutral-400 font-mono font-bold block">
                                     Стоимость съёмки
@@ -596,7 +587,7 @@
                         </div>
 
                         {{-- Explanatory note with Deadline --}}
-                        <div class="p-3.5 rounded-xl bg-amber-500/5 border border-amber-500/20 text-xs text-neutral-700 leading-relaxed font-sans">
+                        <div class="p-4 rounded-xl bg-amber-500/5 border border-amber-500/20 text-xs text-neutral-700 leading-relaxed font-sans">
                             <p>
                                 Для подтверждения бронирования ознакомьтесь с договором и внесите предоплату до 
                                 <strong class="font-bold text-neutral-900 font-mono underline decoration-amber-500/50 underline-offset-2">
@@ -607,11 +598,11 @@
                         </div>
 
                         {{-- Contract Action and Acceptance --}}
-                        <div class="space-y-3.5">
+                        <div class="flex flex-col gap-3.5 pt-1">
                             <div>
                                 <button type="button" 
                                         @click="contractModalOpen = true" 
-                                        class="w-full px-4 py-2.5 rounded-xl bg-white hover:bg-neutral-50 text-arch-text border border-arch-border hover:border-neutral-400 text-xs font-mono uppercase tracking-wider font-bold transition-all shadow-2xs inline-flex items-center justify-center gap-2 cursor-pointer group">
+                                        class="w-full px-4 py-2.5 rounded-xl bg-white hover:bg-neutral-50 text-arch-text border border-arch-border hover:border-neutral-400 text-xs font-mono uppercase tracking-wider font-bold transition-all shadow-xs inline-flex items-center justify-center gap-2 cursor-pointer group">
                                     <svg class="w-4 h-4 text-crimson group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                     <span>Открыть и скачать договор</span>
                                     <span class="text-[0.65rem] text-neutral-400 font-normal lowercase">(№ {{ $shoot->contract_number }})</span>
