@@ -311,10 +311,8 @@
                     </p>
                 </div>
 
-                @if($shoot->description)
-                    <div class="text-xs sm:text-sm text-neutral-700 leading-relaxed whitespace-pre-line bg-arch-bg/70 p-4 sm:p-5 rounded-2xl border border-arch-border font-sans">
-                        {{ $shoot->description }}
-                    </div>
+                @if(filled(trim($shoot->description ?? '')))
+                    <div class="text-xs sm:text-sm text-neutral-700 leading-relaxed whitespace-pre-line bg-arch-bg/70 py-3.5 px-4 sm:py-4 sm:px-5 rounded-2xl border border-arch-border font-sans">{{ trim($shoot->description) }}</div>
                 @endif
 
                 @if($shoot->files->count() > 0)
