@@ -2224,6 +2224,14 @@ document.addEventListener('alpine:init', () => {
             this.copyText(msg, 'msg-' + shoot.id, 'Готовое сообщение для клиента скопировано!');
         },
 
+        triggerToast(message) {
+            this.toastMessage = message;
+            this.showToast = true;
+            setTimeout(() => {
+                this.showToast = false;
+            }, 3000);
+        },
+
         // Date formatter for Russian display
         formatDateRussian(dateStr) {
             if (!dateStr) return '';
