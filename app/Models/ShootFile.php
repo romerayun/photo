@@ -15,6 +15,8 @@ class ShootFile extends Model
         'shoot_id',
         'file_path',
         'original_name',
+        'title',
+        'category',
         'mime_type',
         'file_size',
     ];
@@ -24,7 +26,13 @@ class ShootFile extends Model
         'is_image',
         'formatted_size',
         'extension',
+        'display_name',
     ];
+
+    public function getDisplayNameAttribute(): string
+    {
+        return !empty($this->title) ? $this->title : $this->original_name;
+    }
 
     public function shoot(): BelongsTo
     {

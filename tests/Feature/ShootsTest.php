@@ -296,4 +296,81 @@ class ShootsTest extends TestCase
         $response->assertSee('Предоплата успешно получена');
         $response->assertSee('bookingConfirmed: true', false);
     }
+
+    public function test_admin_can_create_shoot_with_contract_files_and_custom_titles(): void
+    {
+        Storage::fake('public');
+
+        $contractDoc = UploadedFile::fake()->create('contract_scan_signed_v2.pdf', 1500, 'application/pdf');
+        $moodboardImg = UploadedFile::fake()->image('ref1.jpg', 600, 600);
+
+        $payload = [
+            'client_name' => 'Дмитрий',
+            'shoot_date' => now()->addDays(3)->format('Y-m-d'),
+            'start_time' => '16:00',
+            'duration_minutes' => 60,
+            'status' => 'planned',
+            'files' => [$moodboardImg],
+            'contract_files' => [$contractDoc],
+            'contract_file_titles' => ['Договор-оферта на фотосъемку'],
+        ];
+
+        $response = $this->actingAs($this->admin)->postJson(route('admin.shoots.store'), $payload);
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        $shoot = Shoot::where('client_name', 'Дмитрий')->first();
+        $this->assertNotNull($shoot);
+        $this->assertCount(2, $shoot->files);
+
+        $contractFile = $shoot->files()->where('category', 'contract')->first();
+        $this->assertNotNull($contractFile);
+        $this->assertEquals('Договор-оферта на фотосъемку', $contractFile->title);
+        $this->assertEquals('Договор-оферта на фотосъемку', $contractFile->display_name);
+
+        $shareResponse = $this->get(route('shoots.share', $shoot->share_token));
+        $shareResponse->assertStatus(200);
+        $shareResponse->assertSee('Договор-оферта на фотосъемку');
+        $shareResponse->assertSee('Документы к договору');
+    }
+
+    public function test_admin_can_rename_attached_file(): void
+    {
+        Storage::fake('public');
+
+        $shoot = Shoot::create([
+            'client_name' => 'Ольга',
+            'shoot_date' => now()->addDays(2)->toDateString(),
+            'start_time' => '11:00',
+            'duration_minutes' => 60,
+            'status' => 'planned',
+        ]);
+
+        $file = ShootFile::create([
+            'shoot_id' => $shoot->id,
+            'file_path' => 'shoots/files/test.pdf',
+            'original_name' => 'scan_final_signed.pdf',
+            'mime_type' => 'application/pdf',
+            'size' => 2048,
+            'category' => 'contract',
+            'title' => null,
+        ]);
+
+        $response = $this->actingAs($this->admin)->patchJson("/admin/shoots/files/{$file->id}", [
+            'title' => 'Подписанный договор с клиентом',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'file' => [
+                'id' => $file->id,
+                'title' => 'Подписанный договор с клиентом',
+                'display_name' => 'Подписанный договор с клиентом',
+            ],
+        ]);
+
+        $this->assertEquals('Подписанный договор с клиентом', $file->fresh()->title);
+    }
 }

@@ -111,7 +111,13 @@ class ShootController extends Controller
             'gallery_link' => ['nullable', 'string', 'max:2000'],
             'notes' => ['nullable', 'string'],
             'files' => ['nullable', 'array'],
-            'files.*' => ['file', 'max:51200'], // up to 50MB
+            'files.*' => ['file', 'max:51200'],
+            'file_titles' => ['nullable', 'array'],
+            'file_titles.*' => ['nullable', 'string', 'max:255'],
+            'contract_files' => ['nullable', 'array'],
+            'contract_files.*' => ['file', 'max:51200'],
+            'contract_file_titles' => ['nullable', 'array'],
+            'contract_file_titles.*' => ['nullable', 'string', 'max:255'],
         ]);
 
         $validated['status'] = $validated['status'] ?? 'planned';
@@ -148,9 +154,12 @@ class ShootController extends Controller
 
         $shoot = Shoot::create($validated);
 
-        // Process uploaded files if any
         if ($request->hasFile('files')) {
-            $this->storeUploadedFiles($shoot, $request->file('files'));
+            $this->storeUploadedFiles($shoot, $request->file('files'), $request->input('file_titles', []), 'general');
+        }
+
+        if ($request->hasFile('contract_files')) {
+            $this->storeUploadedFiles($shoot, $request->file('contract_files'), $request->input('contract_file_titles', []), 'contract');
         }
 
         $shoot->load('files');
@@ -188,6 +197,12 @@ class ShootController extends Controller
             'notes' => ['nullable', 'string'],
             'files' => ['nullable', 'array'],
             'files.*' => ['file', 'max:51200'],
+            'file_titles' => ['nullable', 'array'],
+            'file_titles.*' => ['nullable', 'string', 'max:255'],
+            'contract_files' => ['nullable', 'array'],
+            'contract_files.*' => ['file', 'max:51200'],
+            'contract_file_titles' => ['nullable', 'array'],
+            'contract_file_titles.*' => ['nullable', 'string', 'max:255'],
         ]);
 
         $validated['status'] = $validated['status'] ?? 'planned';
@@ -215,9 +230,12 @@ class ShootController extends Controller
 
         $shoot->update($validated);
 
-        // Process uploaded files if any
         if ($request->hasFile('files')) {
-            $this->storeUploadedFiles($shoot, $request->file('files'));
+            $this->storeUploadedFiles($shoot, $request->file('files'), $request->input('file_titles', []), 'general');
+        }
+
+        if ($request->hasFile('contract_files')) {
+            $this->storeUploadedFiles($shoot, $request->file('contract_files'), $request->input('contract_file_titles', []), 'contract');
         }
 
         $shoot->load('files');
@@ -241,9 +259,19 @@ class ShootController extends Controller
         $request->validate([
             'files' => ['required', 'array'],
             'files.*' => ['required', 'file', 'max:51200'],
+            'category' => ['nullable', 'string', 'in:general,contract'],
+            'titles' => ['nullable', 'array'],
+            'titles.*' => ['nullable', 'string', 'max:255'],
+            'title' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $newFiles = $this->storeUploadedFiles($shoot, $request->file('files'));
+        $category = $request->input('category', 'general');
+        $titles = $request->input('titles', []);
+        if (empty($titles) && $request->filled('title')) {
+            $titles = array_fill(0, count($request->file('files')), $request->input('title'));
+        }
+
+        $newFiles = $this->storeUploadedFiles($shoot, $request->file('files'), $titles, $category);
 
         return response()->json([
             'success' => true,
@@ -251,12 +279,42 @@ class ShootController extends Controller
             'files' => $newFiles->map(fn($f) => [
                 'id' => $f->id,
                 'original_name' => $f->original_name,
+                'title' => $f->title,
+                'display_name' => $f->display_name,
+                'category' => $f->category,
                 'url' => $f->url,
                 'is_image' => $f->is_image,
                 'formatted_size' => $f->formatted_size,
                 'extension' => $f->extension,
                 'created_at' => $f->created_at->format('d.m.Y H:i'),
             ]),
+        ]);
+    }
+
+    public function updateFile(Request $request, ShootFile $file): JsonResponse
+    {
+        $validated = $request->validate([
+            'title' => ['nullable', 'string', 'max:255'],
+            'category' => ['nullable', 'string', 'in:general,contract'],
+        ]);
+
+        $file->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Информация о файле обновлена.',
+            'file' => [
+                'id' => $file->id,
+                'original_name' => $file->original_name,
+                'title' => $file->title,
+                'display_name' => $file->display_name,
+                'category' => $file->category,
+                'url' => $file->url,
+                'is_image' => $file->is_image,
+                'formatted_size' => $file->formatted_size,
+                'extension' => $file->extension,
+                'created_at' => $file->created_at->format('d.m.Y H:i'),
+            ],
         ]);
     }
 
@@ -346,17 +404,20 @@ class ShootController extends Controller
     /**
      * Store multiple uploaded files for a shoot.
      */
-    private function storeUploadedFiles(Shoot $shoot, array $files)
+    private function storeUploadedFiles(Shoot $shoot, array $files, array $titles = [], string $category = 'general')
     {
         $created = collect();
 
-        foreach ($files as $file) {
+        foreach ($files as $i => $file) {
             $originalName = $file->getClientOriginalName();
             $path = $file->store("shoots/{$shoot->id}", 'public');
+            $title = !empty($titles[$i]) ? trim($titles[$i]) : null;
 
             $shootFile = $shoot->files()->create([
                 'file_path' => $path,
                 'original_name' => $originalName,
+                'title' => $title,
+                'category' => $category,
                 'mime_type' => $file->getClientMimeType(),
                 'file_size' => $file->getSize(),
             ]);
@@ -406,6 +467,9 @@ class ShootController extends Controller
             'files' => $shoot->files->map(fn($f) => [
                 'id' => $f->id,
                 'original_name' => $f->original_name,
+                'title' => $f->title,
+                'display_name' => $f->display_name,
+                'category' => $f->category ?? 'general',
                 'url' => $f->url,
                 'is_image' => $f->is_image,
                 'formatted_size' => $f->formatted_size,

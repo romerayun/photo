@@ -136,6 +136,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::patch('/shoots/{shoot}/gallery-link', [AdminShootController::class, 'updateGalleryLink'])->name('shoots.gallery_link');
         Route::delete('/shoots/{shoot}', [AdminShootController::class, 'destroy'])->name('shoots.destroy');
         Route::post('/shoots/{shoot}/files', [AdminShootController::class, 'uploadFiles'])->name('shoots.files.upload');
+        Route::patch('/shoots/files/{file}', [AdminShootController::class, 'updateFile'])->name('shoots.files.update');
         Route::delete('/shoots/files/{file}', [AdminShootController::class, 'destroyFile'])->name('shoots.files.destroy');
         Route::patch('/shoots/{shoot}/confirm-booking', [AdminShootController::class, 'confirmBooking'])->name('shoots.confirm_booking');
     });

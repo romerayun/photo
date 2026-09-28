@@ -372,6 +372,10 @@
                     }
                 }" class="bg-white border border-arch-border rounded-2xl md:rounded-3xl overflow-hidden shadow-card-depth">
 
+                    @php
+                        $contractFiles = $shoot->files->where('category', 'contract');
+                    @endphp
+
                     {{-- 1. CONFIRMED BOOKING BANNER (Shown when booking is confirmed) --}}
                     <div x-show="bookingConfirmed"
                          class="p-6 sm:p-8 bg-gradient-to-br from-emerald-50/80 via-white to-emerald-50/40 space-y-5">
@@ -434,6 +438,32 @@
                                 </a>
                             </template>
                         </div>
+
+                        @if($contractFiles->count() > 0)
+                            <div class="pt-3 border-t border-arch-border space-y-2">
+                                <span class="text-[0.65rem] uppercase tracking-widest text-neutral-400 font-mono font-bold block">
+                                    Документы к договору и оплате
+                                </span>
+                                <div class="space-y-2">
+                                    @foreach($contractFiles as $cFile)
+                                        <div class="p-3 rounded-xl border border-arch-border bg-white hover:bg-neutral-50 transition-colors flex items-center justify-between gap-3 shadow-2xs">
+                                            <div class="flex items-center gap-3 truncate min-w-0">
+                                                <div class="w-9 h-9 rounded-lg bg-arch-bg text-arch-text border border-arch-border flex items-center justify-center shrink-0 uppercase text-xs font-mono font-bold shadow-2xs">
+                                                    {{ $cFile->extension }}
+                                                </div>
+                                                <div class="truncate">
+                                                    <span class="text-xs font-mono font-bold text-arch-text truncate block">{{ $cFile->display_name }}</span>
+                                                    <span class="text-[0.65rem] text-neutral-500 font-mono">{{ $cFile->formatted_size }}</span>
+                                                </div>
+                                            </div>
+                                            <a href="{{ $cFile->url }}" download target="_blank" class="px-3 py-1.5 bg-arch-bg hover:bg-neutral-100 text-xs font-mono uppercase tracking-wider text-arch-text border border-arch-border rounded-lg transition-colors font-bold shrink-0 shadow-2xs">
+                                                Скачать
+                                            </a>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
                     </div>
 
                     {{-- 2. CONTRACT & PREPAYMENT SECTION (Hidden when booking is confirmed) --}}
@@ -509,6 +539,32 @@
                                     <span class="text-[0.65rem] text-neutral-400 font-normal lowercase">(№ {{ $shoot->contract_number }})</span>
                                 </button>
                             </div>
+
+                            @if($contractFiles->count() > 0)
+                                <div class="space-y-2 pt-1">
+                                    <span class="text-[0.65rem] uppercase tracking-widest text-neutral-400 font-mono font-bold block">
+                                        Прикреплённые документы и файлы
+                                    </span>
+                                    <div class="space-y-2">
+                                        @foreach($contractFiles as $cFile)
+                                            <div class="p-3 rounded-xl border border-arch-border bg-arch-bg/70 hover:bg-neutral-100 transition-colors flex items-center justify-between gap-3 shadow-2xs">
+                                                <div class="flex items-center gap-3 truncate min-w-0">
+                                                    <div class="w-9 h-9 rounded-lg bg-white text-arch-text border border-arch-border flex items-center justify-center shrink-0 uppercase text-xs font-mono font-bold shadow-2xs">
+                                                        {{ $cFile->extension }}
+                                                    </div>
+                                                    <div class="truncate">
+                                                        <span class="text-xs font-mono font-bold text-arch-text truncate block">{{ $cFile->display_name }}</span>
+                                                        <span class="text-[0.65rem] text-neutral-500 font-mono">{{ $cFile->formatted_size }}</span>
+                                                    </div>
+                                                </div>
+                                                <a href="{{ $cFile->url }}" download target="_blank" class="px-3 py-1.5 bg-white hover:bg-neutral-50 text-xs font-mono uppercase tracking-wider text-arch-text border border-arch-border rounded-lg transition-colors font-bold shrink-0 shadow-2xs">
+                                                    Скачать
+                                                </a>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
 
                             {{-- Agreement Checkbox --}}
                             <div class="flex items-start gap-2.5 p-3 rounded-xl border transition-colors select-none"
@@ -886,10 +942,14 @@
                     <div class="text-xs sm:text-sm text-neutral-700 leading-relaxed whitespace-pre-line bg-arch-bg/70 py-3.5 px-4 sm:py-4 sm:px-5 rounded-2xl border border-arch-border font-sans">{{ trim($shoot->description) }}</div>
                 @endif
 
-                @if($shoot->files->count() > 0)
+                @php
+                    $prepFiles = $shoot->files->where('category', '!=', 'contract');
+                @endphp
+
+                @if($prepFiles->count() > 0)
                     @php
-                        $images = $shoot->files->filter->is_image;
-                        $otherFiles = $shoot->files->reject->is_image;
+                        $images = $prepFiles->filter->is_image;
+                        $otherFiles = $prepFiles->reject->is_image;
                     @endphp
 
                     @if($images->count() > 0)
@@ -900,12 +960,12 @@
                             <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                                 @foreach($images as $file)
                                     <button type="button" 
-                                            @click="openLightbox('{{ $file->url }}', '{{ addslashes($file->original_name) }}')"
+                                            @click="openLightbox('{{ $file->url }}', '{{ addslashes($file->display_name) }}')"
                                             class="group relative aspect-square rounded-xl overflow-hidden bg-neutral-100 border border-arch-border block w-full text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-crimson shadow-xs hover:shadow-md transition-all">
-                                        <img src="{{ $file->url }}" alt="{{ $file->original_name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                        <img src="{{ $file->url }}" alt="{{ $file->display_name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                                         
                                         <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2.5">
-                                            <span class="text-[0.68rem] text-white font-mono truncate">{{ $file->original_name }}</span>
+                                            <span class="text-[0.68rem] text-white font-mono truncate">{{ $file->display_name }}</span>
                                         </div>
 
                                         <div class="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm shadow-md">
@@ -926,7 +986,7 @@
                                             {{ $file->extension }}
                                         </div>
                                         <div class="truncate">
-                                            <span class="text-xs font-mono font-bold text-arch-text truncate block">{{ $file->original_name }}</span>
+                                            <span class="text-xs font-mono font-bold text-arch-text truncate block">{{ $file->display_name }}</span>
                                             <span class="text-[0.65rem] text-neutral-500 font-mono">{{ $file->formatted_size }}</span>
                                         </div>
                                     </div>
@@ -940,7 +1000,7 @@
                 @endif
 
                 {{-- If no description and no files, show a neat placeholder card --}}
-                @if(!$shoot->description && $shoot->files->count() === 0)
+                @if(!$shoot->description && $prepFiles->count() === 0)
                     <div class="p-6 rounded-2xl border-2 border-dashed border-arch-border bg-arch-bg/50 text-center space-y-3">
                         <div class="w-12 h-12 rounded-2xl bg-white border border-arch-border text-neutral-400 mx-auto flex items-center justify-center shadow-xs">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>

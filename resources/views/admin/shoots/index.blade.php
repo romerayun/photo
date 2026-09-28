@@ -558,29 +558,120 @@
                               class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900 transition-colors"></textarea>
                 </div>
 
-                {{-- FILE ATTACHMENTS SECTION IN FORM --}}
+                {{-- CONTRACT & PAYMENT FILES SECTION IN FORM --}}
                 <div class="pt-2 border-t border-slate-200">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5 flex items-center justify-between">
-                        <span>Файлы и материалы съёмки</span>
-                        <span class="text-slate-400 font-normal lowercase">мудборд, референсы, бриф, договоры</span>
+                        <span>Файлы договора и оплаты</span>
+                        <span class="text-slate-400 font-normal lowercase">договоры, счета, приложения (с названиями)</span>
                     </label>
 
-                    {{-- Already attached files in Edit mode --}}
-                    <template x-if="isEditMode && currentShootFiles.length > 0">
+                    {{-- Already attached contract files in Edit mode --}}
+                    <template x-if="isEditMode && currentShootFiles.filter(f => f.category === 'contract').length > 0">
+                        <div class="mb-3 space-y-2">
+                            <span class="text-[0.7rem] font-bold text-slate-600 uppercase tracking-wider block">
+                                Документы договора (<span x-text="currentShootFiles.filter(f => f.category === 'contract').length"></span>):
+                            </span>
+                            <div class="space-y-2">
+                                <template x-for="file in currentShootFiles.filter(f => f.category === 'contract')" :key="file.id">
+                                    <div class="p-2.5 rounded-xl border border-slate-200 bg-white flex items-center justify-between gap-3 shadow-2xs">
+                                        <div class="flex items-center gap-2.5 truncate min-w-0">
+                                            <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 flex items-center justify-center font-mono font-bold text-xs uppercase shrink-0" x-text="file.extension"></div>
+                                            <div class="truncate">
+                                                <p class="text-xs font-medium text-slate-800 truncate" x-text="file.display_name || file.original_name"></p>
+                                                <p class="text-[0.65rem] text-slate-400 font-mono" x-text="file.original_name + ' · ' + file.formatted_size"></p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-1 shrink-0">
+                                            <button type="button" @click="promptEditFileName(file)" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer" title="Переименовать для клиента">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                            </button>
+                                            <a :href="file.url" download class="p-1.5 text-slate-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors" title="Скачать файл">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                            </a>
+                                            <button type="button" @click="deleteFile(file.id)" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer" title="Удалить файл">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+
+                    {{-- Dropzone for contract files --}}
+                    <div class="border-2 border-dashed border-amber-300 hover:border-amber-500 rounded-xl p-3.5 text-center bg-amber-50/30 hover:bg-amber-50/50 transition-all cursor-pointer relative">
+                        <input type="file" 
+                               multiple 
+                               @change="handleContractFilesSelected($event)" 
+                               class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                               accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,image/*">
+                        <div class="flex flex-col items-center justify-center space-y-1">
+                            <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <span class="text-xs font-semibold text-slate-800">Добавить документ к договору (PDF, DOCX, скан)</span>
+                            <span class="text-[0.68rem] text-slate-400">После выбора вы сможете задать понятное название для клиента</span>
+                        </div>
+                    </div>
+
+                    {{-- Staged contract files to upload with custom name inputs --}}
+                    <template x-if="newSelectedContractFiles.length > 0">
+                        <div class="mt-3 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[0.7rem] font-bold text-amber-900 uppercase tracking-wider">Документы к загрузке (<span x-text="newSelectedContractFiles.length"></span>):</span>
+                                <button type="button" @click="clearNewSelectedContractFiles()" class="text-[0.68rem] text-rose-500 hover:text-rose-700 font-medium cursor-pointer">Очистить</button>
+                            </div>
+                            <div class="space-y-2">
+                                <template x-for="(item, idx) in newSelectedContractFiles" :key="idx">
+                                    <div class="p-2.5 rounded-xl border border-amber-200 bg-amber-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                                        <div class="flex items-center gap-2 truncate min-w-0">
+                                            <div class="w-8 h-8 rounded-lg bg-white text-amber-800 border border-amber-200 flex items-center justify-center font-mono font-bold text-xs uppercase shrink-0">
+                                                <svg class="w-4 h-4 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                            </div>
+                                            <div class="truncate">
+                                                <p class="text-xs font-medium text-slate-800 truncate" x-text="item.name"></p>
+                                                <p class="text-[0.65rem] text-slate-400 font-mono" x-text="formatBytes(item.size)"></p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-2 flex-1 sm:max-w-xs">
+                                            <input type="text" 
+                                                   x-model="item.custom_title" 
+                                                   placeholder="Название (напр.: Счёт на оплату)" 
+                                                   class="w-full px-2.5 py-1.5 bg-white border border-amber-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:border-amber-600">
+                                            <button type="button" @click="removeNewSelectedContractFile(idx)" class="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg shrink-0 cursor-pointer" title="Убрать">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                {{-- GENERAL FILES & MOODBOARD SECTION IN FORM --}}
+                <div class="pt-2 border-t border-slate-200">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5 flex items-center justify-between">
+                        <span>Материалы съёмки и мудборд</span>
+                        <span class="text-slate-400 font-normal lowercase">референсы, образы, фото локаций</span>
+                    </label>
+
+                    {{-- Already attached general files in Edit mode --}}
+                    <template x-if="isEditMode && currentShootFiles.filter(f => f.category !== 'contract').length > 0">
                         <div class="mb-4 space-y-2">
-                            <span class="text-[0.7rem] font-bold text-slate-600 uppercase tracking-wider block">Уже прикреплённые файлы (<span x-text="currentShootFiles.length"></span>):</span>
+                            <span class="text-[0.7rem] font-bold text-slate-600 uppercase tracking-wider block">
+                                Прикреплённые материалы (<span x-text="currentShootFiles.filter(f => f.category !== 'contract').length"></span>):
+                            </span>
                             
                             {{-- Grid with thumbnails for images and cards for documents --}}
                             <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2.5 max-h-60 overflow-y-auto pr-1">
-                                <template x-for="file in currentShootFiles" :key="file.id">
+                                <template x-for="file in currentShootFiles.filter(f => f.category !== 'contract')" :key="file.id">
                                     <div class="relative group rounded-xl border border-slate-200 bg-white overflow-hidden shadow-2xs hover:shadow-md transition-all">
                                         
                                         {{-- Image Thumbnail with Lightbox trigger --}}
                                         <template x-if="file.is_image">
                                             <div class="relative aspect-square bg-slate-100 cursor-pointer overflow-hidden"
-                                                 @click="openLightbox(file.url, file.original_name)"
+                                                 @click="openLightbox(file.url, file.display_name || file.original_name)"
                                                  title="Нажмите, чтобы открыть миниатюру на весь экран">
-                                                <img :src="file.url" :alt="file.original_name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200">
+                                                <img :src="file.url" :alt="file.display_name || file.original_name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200">
                                                 <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                                                     <span class="p-1.5 rounded-full bg-white/25 text-white backdrop-blur-xs">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/></svg>
@@ -599,7 +690,7 @@
 
                                         {{-- File Name and Size --}}
                                         <div class="p-1.5 bg-white border-t border-slate-100">
-                                            <p class="text-[0.68rem] font-medium text-slate-800 truncate" :title="file.original_name" x-text="file.original_name"></p>
+                                            <p class="text-[0.68rem] font-medium text-slate-800 truncate" :title="file.display_name || file.original_name" x-text="file.display_name || file.original_name"></p>
                                             <p class="text-[0.62rem] text-slate-400 font-mono" x-text="file.formatted_size"></p>
                                         </div>
 
@@ -1009,15 +1100,61 @@
                             </div>
                         </div>
 
-                        {{-- ATTACHED FILES VIEW & UPLOAD SECTION --}}
+                        <div class="pt-3 border-t border-slate-200 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[0.68rem] uppercase font-bold tracking-wider text-slate-700">Документы договора и оплаты</span>
+                                    <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 text-xs font-semibold" x-text="(selectedShoot.files ? selectedShoot.files.filter(f => f.category === 'contract').length : 0) + ' шт.'"></span>
+                                </div>
+
+                                <label class="text-xs text-amber-800 hover:text-amber-950 font-bold flex items-center gap-1 cursor-pointer">
+                                    <input type="file" multiple @change="uploadDirectContractFiles($event)" class="hidden" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,image/*">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                                    <span>Добавить документ</span>
+                                </label>
+                            </div>
+
+                            <template x-if="selectedShoot.files && selectedShoot.files.filter(f => f.category === 'contract').length > 0">
+                                <div class="space-y-2">
+                                    <template x-for="file in selectedShoot.files.filter(f => f.category === 'contract')" :key="file.id">
+                                        <div class="p-2.5 rounded-xl border border-amber-200 bg-amber-50/40 flex items-center justify-between gap-3 shadow-2xs">
+                                            <div class="flex items-center gap-2.5 truncate min-w-0">
+                                                <div class="w-8 h-8 rounded-lg bg-white text-amber-800 border border-amber-200 flex items-center justify-center font-mono font-bold text-xs uppercase shrink-0" x-text="file.extension"></div>
+                                                <div class="truncate">
+                                                    <p class="text-xs font-semibold text-slate-800 truncate" x-text="file.display_name || file.original_name"></p>
+                                                    <p class="text-[0.65rem] text-slate-400 font-mono" x-text="file.original_name + ' · ' + file.formatted_size"></p>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center gap-1 shrink-0">
+                                                <button type="button" @click="promptEditFileName(file)" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-white transition-colors cursor-pointer" title="Переименовать для клиента">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                                </button>
+                                                <a :href="file.url" download class="p-1.5 text-slate-400 hover:text-blue-600 rounded-lg hover:bg-white transition-colors" title="Скачать файл">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                                </a>
+                                                <button type="button" @click="deleteFile(file.id)" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-white transition-colors cursor-pointer" title="Удалить файл">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+
+                            <template x-if="!selectedShoot.files || selectedShoot.files.filter(f => f.category === 'contract').length === 0">
+                                <div class="p-3 rounded-xl border border-dashed border-amber-200 text-center text-xs text-amber-700/70 bg-amber-50/20">
+                                    Документы договора ещё не загружены. Нажмите «Добавить документ» для загрузки PDF, DOCX или счёта.
+                                </div>
+                            </template>
+                        </div>
+
                         <div class="pt-3 border-t border-slate-200">
                             <div class="flex items-center justify-between mb-2">
                                 <div class="flex items-center gap-2">
-                                    <span class="text-[0.68rem] uppercase font-bold tracking-wider text-slate-700">Файлы и материалы</span>
-                                    <span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold" x-text="(selectedShoot.files ? selectedShoot.files.length : 0) + ' шт.'"></span>
+                                    <span class="text-[0.68rem] uppercase font-bold tracking-wider text-slate-700">Материалы съёмки и мудборд</span>
+                                    <span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold" x-text="(selectedShoot.files ? selectedShoot.files.filter(f => f.category !== 'contract').length : 0) + ' шт.'"></span>
                                 </div>
 
-                                {{-- Quick Add File Button --}}
                                 <label class="text-xs text-crimson hover:text-crimson/80 font-bold flex items-center gap-1 cursor-pointer">
                                     <input type="file" multiple @change="uploadDirectFiles($event)" class="hidden" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip,.rar">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
@@ -1025,20 +1162,16 @@
                                 </label>
                             </div>
 
-                            {{-- Files Grid --}}
-                            <template x-if="selectedShoot.files && selectedShoot.files.length > 0">
+                            <template x-if="selectedShoot.files && selectedShoot.files.filter(f => f.category !== 'contract').length > 0">
                                 <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                                    <template x-for="file in selectedShoot.files" :key="file.id">
+                                    <template x-for="file in selectedShoot.files.filter(f => f.category !== 'contract')" :key="file.id">
                                         <div class="relative group rounded-xl border border-slate-200 bg-white overflow-hidden shadow-2xs hover:shadow-md transition-all flex flex-col justify-between">
                                             
-                                            {{-- If Image: click opens lightbox --}}
                                             <template x-if="file.is_image">
                                                 <div class="relative aspect-square bg-slate-100 cursor-pointer overflow-hidden"
-                                                     @click="openLightbox(file.url, file.original_name)"
+                                                     @click="openLightbox(file.url, file.display_name || file.original_name)"
                                                      title="Нажмите, чтобы открыть миниатюру на весь экран">
-                                                    <img :src="file.url" :alt="file.original_name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200">
-                                                    
-                                                    {{-- Hover zoom overlay --}}
+                                                    <img :src="file.url" :alt="file.display_name || file.original_name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200">
                                                     <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                                                         <span class="p-1.5 rounded-full bg-white/25 text-white backdrop-blur-xs">
                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/></svg>
@@ -1047,7 +1180,6 @@
                                                 </div>
                                             </template>
 
-                                            {{-- If Non-Image: document badge --}}
                                             <template x-if="!file.is_image">
                                                 <a :href="file.url" target="_blank" class="aspect-square bg-slate-50 flex flex-col items-center justify-center p-2 text-center border-b border-slate-100 group-hover:bg-slate-100 transition-colors">
                                                     <div class="w-10 h-10 rounded-lg bg-slate-200 text-slate-700 flex items-center justify-center font-mono font-bold text-xs uppercase mb-1" x-text="file.extension"></div>
@@ -1055,10 +1187,9 @@
                                                 </a>
                                             </template>
 
-                                            {{-- Caption & Action Bar --}}
                                             <div class="p-2 bg-white border-t border-slate-100 flex items-center justify-between gap-1">
                                                 <div class="min-w-0 pr-1">
-                                                    <p class="text-[0.68rem] font-medium text-slate-800 truncate" :title="file.original_name" x-text="file.original_name"></p>
+                                                    <p class="text-[0.68rem] font-medium text-slate-800 truncate" :title="file.display_name || file.original_name" x-text="file.display_name || file.original_name"></p>
                                                     <p class="text-[0.62rem] text-slate-400 font-mono" x-text="file.formatted_size"></p>
                                                 </div>
                                                 <div class="flex items-center gap-1 shrink-0">
@@ -1075,9 +1206,9 @@
                                 </div>
                             </template>
 
-                            <template x-if="!selectedShoot.files || selectedShoot.files.length === 0">
+                            <template x-if="!selectedShoot.files || selectedShoot.files.filter(f => f.category !== 'contract').length === 0">
                                 <div class="p-4 rounded-xl border border-dashed border-slate-200 text-center text-xs text-slate-400 bg-slate-50">
-                                    К этой съёмке пока не прикреплены файлы. Нажмите «Добавить файл», чтобы загрузить мудборд или референсы.
+                                    К этой съёмке пока не прикреплены материалы. Нажмите «Добавить файл», чтобы загрузить мудборд или референсы.
                                 </div>
                             </template>
                         </div>
@@ -1266,6 +1397,7 @@ document.addEventListener('alpine:init', () => {
 
         // Files handling in form
         newSelectedFiles: [],
+        newSelectedContractFiles: [],
         currentShootFiles: [],
 
         // Lightbox modal state
@@ -1496,6 +1628,29 @@ document.addEventListener('alpine:init', () => {
             this.newSelectedFiles = [];
         },
 
+        handleContractFilesSelected(event) {
+            const rawFiles = Array.from(event.target.files);
+            if (!rawFiles.length) return;
+
+            const mapped = rawFiles.map(file => ({
+                file: file,
+                name: file.name,
+                size: file.size,
+                custom_title: '',
+            }));
+
+            this.newSelectedContractFiles = [...this.newSelectedContractFiles, ...mapped];
+            event.target.value = '';
+        },
+
+        removeNewSelectedContractFile(index) {
+            this.newSelectedContractFiles.splice(index, 1);
+        },
+
+        clearNewSelectedContractFiles() {
+            this.newSelectedContractFiles = [];
+        },
+
         // Fullscreen image lightbox viewer
         openLightbox(url, title = '') {
             if (!url) return;
@@ -1516,6 +1671,7 @@ document.addEventListener('alpine:init', () => {
         openCreateModal(prefillDate = null) {
             this.isEditMode = false;
             this.clearNewSelectedFiles();
+            this.clearNewSelectedContractFiles();
             this.currentShootFiles = [];
             this.clientSuggestions = [];
             const defaultDate = prefillDate || new Date().toISOString().split('T')[0];
@@ -1546,6 +1702,7 @@ document.addEventListener('alpine:init', () => {
             this.isViewModalOpen = false;
             this.isEditMode = true;
             this.clearNewSelectedFiles();
+            this.clearNewSelectedContractFiles();
             this.clientSuggestions = [];
             this.currentShootFiles = targetShoot.files ? [...targetShoot.files] : [];
             this.formData = {
@@ -1570,6 +1727,7 @@ document.addEventListener('alpine:init', () => {
         closeFormModal() {
             this.isFormModalOpen = false;
             this.clearNewSelectedFiles();
+            this.clearNewSelectedContractFiles();
             this.currentShootFiles = [];
             this.clientSuggestions = [];
         },
@@ -1738,6 +1896,10 @@ document.addEventListener('alpine:init', () => {
             this.newSelectedFiles.forEach((item) => {
                 formPayload.append('files[]', item.file);
             });
+            this.newSelectedContractFiles.forEach((item) => {
+                formPayload.append('contract_files[]', item.file);
+                formPayload.append('contract_file_titles[]', item.custom_title || '');
+            });
 
             try {
                 const response = await fetch(url, {
@@ -1754,6 +1916,7 @@ document.addEventListener('alpine:init', () => {
 
                 if (response.ok && result.success) {
                     this.clearNewSelectedFiles();
+                    this.clearNewSelectedContractFiles();
                     this.closeFormModal();
                     await this.fetchShoots();
                     if (this.selectedShoot && result.shoot) {
@@ -1808,6 +1971,117 @@ document.addEventListener('alpine:init', () => {
                 console.error(err);
             } finally {
                 event.target.value = '';
+            }
+        },
+
+        async uploadDirectContractFiles(event) {
+            const files = Array.from(event.target.files);
+            if (!files.length || !this.selectedShoot) return;
+
+            let title = '';
+            if (files.length === 1) {
+                const prompted = prompt('Задайте название для клиента (например: Договор на фотосессию):', '');
+                if (prompted === null) {
+                    event.target.value = '';
+                    return;
+                }
+                title = prompted.trim();
+            }
+
+            const formData = new FormData();
+            files.forEach(f => formData.append('files[]', f));
+            formData.append('category', 'contract');
+            if (title) {
+                formData.append('title', title);
+            }
+
+            try {
+                const response = await fetch(`/admin/shoots/${this.selectedShoot.id}/files`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': config.csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    if (!this.selectedShoot.files) this.selectedShoot.files = [];
+                    this.selectedShoot.files.push(...result.files);
+
+                    const item = this.shoots.find(s => s.id === this.selectedShoot.id);
+                    if (item) {
+                        item.files = this.selectedShoot.files;
+                    }
+                    this.triggerToast('Документы договора успешно добавлены');
+                } else {
+                    alert(result.message || 'Не удалось загрузить документы.');
+                }
+            } catch (err) {
+                alert('Ошибка загрузки документов.');
+                console.error(err);
+            } finally {
+                event.target.value = '';
+            }
+        },
+
+        promptEditFileName(file) {
+            const currentName = file.title || file.original_name;
+            const newTitle = prompt('Введите понятное название для клиента:', currentName);
+            if (newTitle === null) return;
+            this.updateFileTitle(file.id, newTitle.trim());
+        },
+
+        async updateFileTitle(fileId, title) {
+            try {
+                const response = await fetch(`/admin/shoots/files/${fileId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': config.csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ title: title })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    const updated = result.file;
+                    if (this.selectedShoot && this.selectedShoot.files) {
+                        const target = this.selectedShoot.files.find(f => f.id === fileId);
+                        if (target) {
+                            target.title = updated.title;
+                            target.display_name = updated.display_name;
+                        }
+                    }
+                    if (this.currentShootFiles) {
+                        const target = this.currentShootFiles.find(f => f.id === fileId);
+                        if (target) {
+                            target.title = updated.title;
+                            target.display_name = updated.display_name;
+                        }
+                    }
+                    this.shoots.forEach(s => {
+                        if (s.files) {
+                            const target = s.files.find(f => f.id === fileId);
+                            if (target) {
+                                target.title = updated.title;
+                                target.display_name = updated.display_name;
+                            }
+                        }
+                    });
+                    this.triggerToast('Название файла обновлено');
+                } else {
+                    alert(result.message || 'Ошибка обновления названия.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Не удалось обновить название файла.');
             }
         },
 

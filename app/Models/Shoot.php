@@ -50,6 +50,18 @@ class Shoot extends Model
         return $this->hasMany(ShootFile::class);
     }
 
+    public function contractFiles(): HasMany
+    {
+        return $this->hasMany(ShootFile::class)->where('category', 'contract');
+    }
+
+    public function preparationFiles(): HasMany
+    {
+        return $this->hasMany(ShootFile::class)->where(function ($q) {
+            $q->where('category', '!=', 'contract')->orWhereNull('category');
+        });
+    }
+
     protected function casts(): array
     {
         return [
