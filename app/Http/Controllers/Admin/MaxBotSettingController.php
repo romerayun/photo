@@ -95,6 +95,7 @@ class MaxBotSettingController extends Controller
             'custom_buttons.*.type' => ['required_with:custom_buttons', 'in:link,text'],
             'custom_buttons.*.url' => ['nullable', 'string', 'max:255'],
             'custom_buttons.*.reply' => ['nullable', 'string', 'max:2000'],
+            'custom_buttons.*.in_menu' => ['nullable'],
         ]);
 
         Setting::set('max_bot_btn_card_enabled', $request->has('btn_card_enabled') ? '1' : '0');
@@ -120,15 +121,17 @@ class MaxBotSettingController extends Controller
 
         // Filter and sanitize custom buttons
         $customButtons = [];
-        if (!empty($validated['custom_buttons'])) {
-            foreach ($validated['custom_buttons'] as $btn) {
+        $rawButtons = $request->input('custom_buttons', []);
+        if (is_array($rawButtons)) {
+            foreach ($rawButtons as $btn) {
                 $title = trim($btn['title'] ?? '');
                 if (empty($title)) {
                     continue;
                 }
+                $type = in_array($btn['type'] ?? '', ['link', 'text'], true) ? $btn['type'] : 'link';
                 $customButtons[] = [
-                    'title' => $title,
-                    'type' => $btn['type'] ?? 'link',
+                    'title' => mb_substr($title, 0, 50),
+                    'type' => $type,
                     'url' => trim($btn['url'] ?? ''),
                     'reply' => trim($btn['reply'] ?? ''),
                     'in_menu' => !empty($btn['in_menu']),

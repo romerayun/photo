@@ -361,7 +361,7 @@ class MaxWebhookController extends Controller
                 . "Если у вас есть вопросы по референсам или идеям — пишите фотографу!"
             );
 
-            $buttons = $maxService->getMenuButtons($shoot);
+            $buttons = $maxService->getMenuButtons($shoot, null, $allShoots->count());
 
             $maxService->sendMessage($chatId, $userId, $text, $buttons);
             return response()->json(['status' => 'ok']);
@@ -377,7 +377,7 @@ class MaxWebhookController extends Controller
 
             $text = \App\Models\Setting::get('max_bot_contacts_response', $defaultContacts);
 
-            $buttons = $maxService->getMenuButtons($shoot);
+            $buttons = $maxService->getMenuButtons($shoot, null, $allShoots->count());
 
             $maxService->sendMessage($chatId, $userId, $text, $buttons);
             return response()->json(['status' => 'ok']);
@@ -390,7 +390,7 @@ class MaxWebhookController extends Controller
             if (isset($customButtons[$index])) {
                 $btn = $customButtons[$index];
                 $reply = !empty($btn['reply']) ? $btn['reply'] : 'Информация по данному запросу пока не заполнена.';
-                $buttons = $maxService->getMenuButtons($shoot);
+                $buttons = $maxService->getMenuButtons($shoot, null, $allShoots->count());
                 $maxService->sendMessage($chatId, $userId, $reply, $buttons);
                 return response()->json(['status' => 'ok']);
             }

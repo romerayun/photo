@@ -141,73 +141,64 @@ class MaxMessengerService
         $buttons = [];
         $filter = $allowedButtons !== null;
 
-        // If client has NO shoots at all, only offer booking and contacts
-        if ($shootsCount === 0 && $shoot === null) {
+        if ($shootsCount === 0 || $shoot === null) {
             $bookingUrl = \App\Models\Setting::get('max_bot_booking_url') ?: url('/contacts');
             $bookingText = \App\Models\Setting::get('max_bot_btn_book_text', '📅 Записаться на съёмку');
-            $contactsText = \App\Models\Setting::get('max_bot_btn_contacts_text', '📞 Контакты фотографа');
 
-            $buttons[] = [
-                [
-                    'type' => 'link',
-                    'text' => $bookingText,
-                    'url' => $bookingUrl,
-                ],
-            ];
-            $buttons[] = [
-                [
-                    'type' => 'callback',
-                    'text' => $contactsText,
-                    'payload' => 'photographer_contacts',
-                ],
-            ];
-
-            return $buttons;
-        }
-
-        // 1. Button to web card
-        $cardEnabled = \App\Models\Setting::get('max_bot_btn_card_enabled', '1') === '1';
-        $cardText = \App\Models\Setting::get('max_bot_btn_card_text', '📱 Открыть карточку съёмки');
-        if ($filter ? in_array('card', $allowedButtons, true) : $cardEnabled) {
-            if ($shootsCount > 1) {
-                // If client has multiple shoots, show selection prompt
-                $buttons[] = [
-                    [
-                        'type' => 'callback',
-                        'text' => $cardText,
-                        'payload' => 'shoot_card_menu',
-                    ],
-                ];
-            } elseif ($shoot && $shoot->share_token) {
-                // Exactly 1 shoot: direct link to web card
+            if ($filter ? in_array('book', $allowedButtons, true) : true) {
                 $buttons[] = [
                     [
                         'type' => 'link',
-                        'text' => $cardText,
-                        'url' => url("/shoot/{$shoot->share_token}"),
+                        'text' => $bookingText,
+                        'url' => $bookingUrl,
                     ],
                 ];
             }
-        }
+        } else {
+            // 1. Button to web card
+            $cardEnabled = \App\Models\Setting::get('max_bot_btn_card_enabled', '1') === '1';
+            $cardText = \App\Models\Setting::get('max_bot_btn_card_text', '📱 Открыть карточку съёмки');
+            if ($filter ? in_array('card', $allowedButtons, true) : $cardEnabled) {
+                if ($shootsCount > 1) {
+                    // If client has multiple shoots, show selection prompt
+                    $buttons[] = [
+                        [
+                            'type' => 'callback',
+                            'text' => $cardText,
+                            'payload' => 'shoot_card_menu',
+                        ],
+                    ];
+                } elseif ($shoot && $shoot->share_token) {
+                    // Exactly 1 shoot: direct link to web card
+                    $buttons[] = [
+                        [
+                            'type' => 'link',
+                            'text' => $cardText,
+                            'url' => url("/shoot/{$shoot->share_token}"),
+                        ],
+                    ];
+                }
+            }
 
-        // 2. Action buttons row (Details & Tips)
-        $actionRow = [];
-        $detailsEnabled = \App\Models\Setting::get('max_bot_btn_details_enabled', '1') === '1';
-        $detailsSingleText = \App\Models\Setting::get('max_bot_btn_details_text', 'ℹ️ Детали съёмки');
-        $detailsPluralText = \App\Models\Setting::get('max_bot_btn_details_plural_text', 'ℹ️ Детали съёмок');
-        $detailsText = ($shootsCount > 1) ? $detailsPluralText : $detailsSingleText;
+            // 2. Action buttons row (Details & Tips)
+            $actionRow = [];
+            $detailsEnabled = \App\Models\Setting::get('max_bot_btn_details_enabled', '1') === '1';
+            $detailsSingleText = \App\Models\Setting::get('max_bot_btn_details_text', 'ℹ️ Детали съёмки');
+            $detailsPluralText = \App\Models\Setting::get('max_bot_btn_details_plural_text', 'ℹ️ Детали съёмок');
+            $detailsText = ($shootsCount > 1) ? $detailsPluralText : $detailsSingleText;
 
-        if ($filter ? in_array('details', $allowedButtons, true) : $detailsEnabled) {
-            $actionRow[] = ['type' => 'callback', 'text' => $detailsText, 'payload' => 'shoot_details'];
-        }
+            if ($filter ? in_array('details', $allowedButtons, true) : $detailsEnabled) {
+                $actionRow[] = ['type' => 'callback', 'text' => $detailsText, 'payload' => 'shoot_details'];
+            }
 
-        $tipsEnabled = \App\Models\Setting::get('max_bot_btn_tips_enabled', '1') === '1';
-        $tipsText = \App\Models\Setting::get('max_bot_btn_tips_text', '👗 Подготовка');
-        if ($filter ? in_array('tips', $allowedButtons, true) : $tipsEnabled) {
-            $actionRow[] = ['type' => 'callback', 'text' => $tipsText, 'payload' => 'shoot_tips'];
-        }
-        if (!empty($actionRow)) {
-            $buttons[] = $actionRow;
+            $tipsEnabled = \App\Models\Setting::get('max_bot_btn_tips_enabled', '1') === '1';
+            $tipsText = \App\Models\Setting::get('max_bot_btn_tips_text', '👗 Подготовка');
+            if ($filter ? in_array('tips', $allowedButtons, true) : $tipsEnabled) {
+                $actionRow[] = ['type' => 'callback', 'text' => $tipsText, 'payload' => 'shoot_tips'];
+            }
+            if (!empty($actionRow)) {
+                $buttons[] = $actionRow;
+            }
         }
 
         // 3. Contacts button

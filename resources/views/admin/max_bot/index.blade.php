@@ -234,19 +234,19 @@
                 @forelse($settings['custom_buttons'] as $index => $cBtn)
                     <div class="custom-button-card p-4 border border-slate-200 rounded-xl bg-slate-50 relative space-y-3">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold uppercase tracking-wider text-slate-700">Кнопка #{{ $index + 1 }}</span>
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-700 custom-btn-num">Кнопка #{{ $index + 1 }}</span>
                             <button type="button" class="remove-custom-btn text-rose-500 hover:text-rose-700 text-xs font-semibold cursor-pointer">Удалить</button>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-[0.7rem] uppercase font-bold text-slate-500 mb-1">Название кнопки *</label>
-                                <input type="text" name="custom_buttons[{{ $index }}][title]" value="{{ $cBtn['title'] ?? '' }}" required
+                                <input type="text" data-name="title" name="custom_buttons[{{ $index }}][title]" value="{{ $cBtn['title'] ?? '' }}" required
                                        placeholder="Например: 📍 Студия на карте"
                                        class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:border-neutral-900">
                             </div>
                             <div>
                                 <label class="block text-[0.7rem] uppercase font-bold text-slate-500 mb-1">Тип действия</label>
-                                <select name="custom_buttons[{{ $index }}][type]" class="custom-type-select w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:border-neutral-900">
+                                <select data-name="type" name="custom_buttons[{{ $index }}][type]" class="custom-type-select w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:border-neutral-900">
                                     <option value="link" {{ ($cBtn['type'] ?? '') === 'link' ? 'selected' : '' }}>Открыть ссылку в браузере</option>
                                     <option value="text" {{ ($cBtn['type'] ?? '') === 'text' ? 'selected' : '' }}>Ответить текстом в чат</option>
                                 </select>
@@ -255,21 +255,21 @@
 
                         <div class="custom-url-field {{ ($cBtn['type'] ?? '') === 'text' ? 'hidden' : '' }}">
                             <label class="block text-[0.7rem] uppercase font-bold text-slate-500 mb-1">URL адрес ссылки</label>
-                            <input type="text" name="custom_buttons[{{ $index }}][url]" value="{{ $cBtn['url'] ?? '' }}"
+                            <input type="text" data-name="url" name="custom_buttons[{{ $index }}][url]" value="{{ $cBtn['url'] ?? '' }}"
                                    placeholder="https://yandex.ru/maps/..."
                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:border-neutral-900">
                         </div>
 
                         <div class="custom-reply-field {{ ($cBtn['type'] ?? '') === 'text' ? '' : 'hidden' }}">
                             <label class="block text-[0.7rem] uppercase font-bold text-slate-500 mb-1">Текст ответа бота в чат</label>
-                            <textarea name="custom_buttons[{{ $index }}][reply]" rows="3"
+                            <textarea data-name="reply" name="custom_buttons[{{ $index }}][reply]" rows="3"
                                       placeholder="Текст, который бот пришлет клиенту..."
                                       class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:border-neutral-900 leading-relaxed">{{ $cBtn['reply'] ?? '' }}</textarea>
                         </div>
 
                         <div class="pt-2 border-t border-slate-200/80">
                             <label class="flex items-center cursor-pointer select-none">
-                                <input type="checkbox" name="custom_buttons[{{ $index }}][in_menu]" value="1" {{ (!isset($cBtn['in_menu']) || !empty($cBtn['in_menu'])) ? 'checked' : '' }}
+                                <input type="checkbox" data-name="in_menu" name="custom_buttons[{{ $index }}][in_menu]" value="1" {{ (!isset($cBtn['in_menu']) || !empty($cBtn['in_menu'])) ? 'checked' : '' }}
                                        class="w-4 h-4 rounded border-slate-300 text-neutral-900 focus:ring-neutral-900 mr-2">
                                 <span class="text-xs font-semibold text-slate-700">Показывать в основном постоянном меню бота (приветствие, ответы на сообщения)</span>
                             </label>
