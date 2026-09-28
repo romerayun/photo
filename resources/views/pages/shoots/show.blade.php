@@ -30,7 +30,10 @@
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                 <span>На главную</span>
             </a>
-            <span class="font-mono text-[0.7rem] uppercase tracking-wider text-neutral-400">ID: {{ substr(md5($shoot-        {{-- TOP CARD: Shoot Hero & Essential Info (Date, Time, Location, Calendar) --}}
+            <span class="font-mono text-[0.7rem] uppercase tracking-wider text-neutral-400">ID: {{ substr(md5($shoot->id . $shoot->share_token), 0, 8) }}</span>
+        </div>
+
+        {{-- TOP CARD: Shoot Hero & Essential Info (Date, Time, Location, Calendar) --}}
         <div class="bg-white border border-arch-border rounded-2xl md:rounded-3xl overflow-hidden shadow-card-depth mb-6">
             
             {{-- Hero Header --}}
@@ -463,10 +466,10 @@
                             </div>
                             <div class="min-w-0">
                                 <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.65rem] font-mono uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold mb-0.5">
-                                    <span>Бронь подтверждена</span>
+                                    <span>Бронирование подтверждено</span>
                                 </div>
                                 <h2 class="text-xl sm:text-2xl font-extrabold uppercase tracking-tight font-display text-arch-text truncate">
-                                    Бронь подтверждена!
+                                    Бронирование подтверждено!
                                 </h2>
                             </div>
                         </div>
@@ -525,7 +528,7 @@
                         <div class="flex items-start justify-between gap-3">
                             <div>
                                 <span class="text-[0.68rem] uppercase tracking-widest text-crimson font-mono font-bold block mb-1">
-                                    Условия бронирования
+                                    ДОГОВОР И ПРЕДОПЛАТА
                                 </span>
                                 <h2 class="text-xl sm:text-2xl font-extrabold uppercase tracking-tight font-display text-arch-text">
                                     Договор и предоплата
@@ -541,7 +544,7 @@
                         <div class="grid grid-cols-3 gap-2 p-4 rounded-xl bg-arch-bg border border-arch-border text-arch-text text-center sm:text-left">
                             <div class="space-y-0.5">
                                 <span class="text-[0.65rem] uppercase tracking-widest text-neutral-400 font-mono font-bold block">
-                                    Стоимость
+                                    Стоимость съёмки
                                 </span>
                                 <div class="text-sm sm:text-base font-extrabold font-display text-arch-text">
                                     {{ number_format($shoot->price ?? 3500, 0, '', ' ') }} ₽
@@ -550,7 +553,7 @@
 
                             <div class="space-y-0.5 border-l border-arch-border pl-2 sm:pl-3">
                                 <span class="text-[0.65rem] uppercase tracking-widest text-crimson font-mono font-bold block">
-                                    Предоплата
+                                    Предоплата (бронь)
                                 </span>
                                 <div class="text-sm sm:text-base font-extrabold font-display text-crimson">
                                     {{ number_format($shoot->prepayment_amount, 0, '', ' ') }} ₽
@@ -564,13 +567,14 @@
                                 <div class="text-sm sm:text-base font-extrabold font-display text-arch-text">
                                     {{ number_format($shoot->remainder_amount, 0, '', ' ') }} ₽
                                 </div>
+                                <span class="text-[0.65rem] font-mono text-neutral-400 block">в день съёмки</span>
                             </div>
                         </div>
 
                         {{-- Explanatory note with Deadline --}}
                         <div class="p-3.5 rounded-xl bg-amber-500/5 border border-amber-500/20 text-xs text-neutral-700 leading-relaxed font-sans">
                             <p>
-                                Для бронирования внесите предоплату до 
+                                Для подтверждения бронирования ознакомьтесь с договором и внесите предоплату до 
                                 <strong class="font-bold text-neutral-900 font-mono underline decoration-amber-500/50 underline-offset-2">
                                     {{ $shoot->prepayment_deadline['formatted'] }}
                                 </strong>. 
@@ -585,7 +589,7 @@
                                         @click="contractModalOpen = true" 
                                         class="w-full px-4 py-2.5 rounded-xl bg-white hover:bg-neutral-50 text-arch-text border border-arch-border hover:border-neutral-400 text-xs font-mono uppercase tracking-wider font-bold transition-all shadow-2xs inline-flex items-center justify-center gap-2 cursor-pointer group">
                                     <svg class="w-4 h-4 text-crimson group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                    <span>Открыть договор-оферту</span>
+                                    <span>Открыть и скачать договор</span>
                                     <span class="text-[0.65rem] text-neutral-400 font-normal lowercase">(№ {{ $shoot->contract_number }})</span>
                                 </button>
                             </div>
@@ -653,11 +657,15 @@
                                     <div class="flex items-center gap-2">
                                         <span class="w-2 h-2 rounded-full bg-crimson"></span>
                                         <h3 class="text-xs sm:text-sm font-extrabold uppercase tracking-tight font-display text-arch-text">
-                                            Реквизиты для перевода
+                                            Реквизиты для внесения предоплаты
                                         </h3>
                                     </div>
                                     <span class="text-[0.65rem] font-mono font-bold text-crimson">СБП / Перевод</span>
                                 </div>
+
+                                <p class="text-[0.68rem] text-neutral-500 font-mono">
+                                    Внесение предоплаты означает принятие договора-оферты.
+                                </p>
 
                                 <div class="space-y-3 text-xs">
                                     <div>
@@ -710,7 +718,7 @@
                                     <div class="flex items-center gap-2">
                                         <span class="w-1.5 h-1.5 rounded-full" :class="receiptUploaded ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'"></span>
                                         <h4 class="text-xs font-extrabold uppercase tracking-tight font-display text-arch-text">
-                                            Загрузка чека
+                                            Загрузка чека об оплате
                                         </h4>
                                     </div>
 
@@ -778,7 +786,7 @@
                                                     <template x-if="!receiptUploading">
                                                         <div>
                                                             <p class="text-xs font-bold text-arch-text font-display uppercase tracking-tight">
-                                                                Загрузить скриншот чека
+                                                                Загрузите скриншот или фото чека
                                                             </p>
                                                             <p class="text-[0.68rem] text-neutral-400 font-mono mt-1">
                                                                 JPG, PNG, WebP, PDF · до 10 МБ
@@ -947,7 +955,7 @@
                                     <span>Готовые фото</span>
                                 </div>
                                 <h3 class="text-xl sm:text-2xl font-extrabold uppercase tracking-tight font-display text-arch-text">
-                                    Результат съёмки
+                                    Результат вашей съёмки
                                 </h3>
                                 <p class="text-xs text-neutral-600 font-mono leading-relaxed">
                                     Вся серия обработана и доступна в персональной онлайн-галерее в максимальном качестве.
@@ -983,7 +991,7 @@
                             </div>
 
                             <div class="space-y-1">
-                                <span class="text-[0.65rem] uppercase font-mono tracking-widest text-neutral-400 font-bold block">Результаты съёмки</span>
+                                <span class="text-[0.65rem] uppercase font-mono tracking-widest text-neutral-400 font-bold block">Здесь будет результат съёмки</span>
                                 <h3 class="text-base font-extrabold uppercase tracking-tight font-display text-arch-text">Готовые фото появятся здесь</h3>
                             </div>
 
@@ -998,43 +1006,6 @@
                         </div>
                     @endif
                 </div>
-
-            </div>
-
-        </div>m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                            </div>
-                            <h3 class="text-base font-extrabold uppercase tracking-tight font-display text-arch-text">
-                                Фотографии в обработке
-                            </h3>
-                            <p class="text-xs text-neutral-600 font-mono leading-relaxed">
-                                Съёмка завершена. Роман отбирает и обрабатывает кадры. Скоро здесь появится ссылка на готовую серию.
-                            </p>
-                        </div>
-                    @else
-                        {{-- Pending photoshoot --}}
-                        <div class="rounded-2xl p-6 border-2 border-dashed border-arch-border bg-arch-bg/40 text-center space-y-3 relative overflow-hidden">
-                            <div class="w-10 h-10 rounded-xl bg-white border border-arch-border text-neutral-500 mx-auto flex items-center justify-center shadow-2xs">
-                                <svg class="w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                            </div>
-
-                            <div class="space-y-1">
-                                <span class="text-[0.65rem] uppercase font-mono tracking-widest text-neutral-400 font-bold block">Результаты съёмки</span>
-                                <h3 class="text-base font-extrabold uppercase tracking-tight font-display text-arch-text">Готовые фото появятся здесь</h3>
-                            </div>
-
-                            <p class="text-xs text-neutral-600 font-mono leading-relaxed">
-                                После проведения съёмки и обработки в этом блоке появится прямая ссылка на онлайн-галерею для скачивания кадров.
-                            </p>
-
-                            <div class="pt-1 inline-flex items-center gap-1.5 text-[0.68rem] font-mono text-neutral-500">
-                                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
-                                <span>{{ $shoot->status_label }}</span>
-                            </div>
-                        </div>
-                    @endif
-                </div>
-
-            </div>
 
         </div>
 
